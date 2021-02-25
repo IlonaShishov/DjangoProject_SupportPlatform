@@ -26,8 +26,21 @@ hr.solid {
 	width: 160px;
 }
 
+.int_bar{
+	width: 80px;
+}
+
 .not_first{
 	margin-left: 40px;
+}
+
+.add_or_del_btn {
+  background-color: white;
+  color: gray;
+  border: 2px solid gray;
+  height: 30px;
+  width: 30px;
+  padding: 3px;
 }
 
 .action_btn{
@@ -38,4 +51,28 @@ hr.solid {
 .action_btn button{
 	width: 100px;
 	margin: 5px;
+}
+
+.remote_cb{
+	color: green;
+	padding-left: 40px;
+}
+
+.charge_cb{
+	color: orange;
+	padding-left: 40px;
+}
+
+.spacing{
+	padding-top: 20px;
+}
+
+.parts_lst{
+	border: 1px solid gray;
+	padding: 20px;
+	width: 100%;
+}
+
+.description_bar{
+	margin: 15px 0px 15px 0px;
 }
