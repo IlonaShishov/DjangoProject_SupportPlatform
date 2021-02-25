@@ -8,6 +8,7 @@ body {
 .form-container{
 	position: absolute;
 	top: 15vh;
+	margin: 0px 20px 0px;
 	background: #fff;
 	padding: 30px;
 	border-radius: 10px;
@@ -23,8 +24,8 @@ hr.solid {
 }
 
 .select_bar{
-	width: 130px;
-	height: 30px;
+	width: 160px;
+	height: 35px;
 }
 
 .date_bar{
@@ -71,3 +72,10 @@ hr.solid {
 	margin: 5px;
 }
 
+tr td:last-child input{
+    width: 50px;
+}
+
+tr td:last-child label{
+    color: gray;
+}

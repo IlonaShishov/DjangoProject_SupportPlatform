@@ -8,6 +8,7 @@ body {
 .form-container{
 	position: absolute;
 	top: 15vh;
+	margin: 0px 60px 0px;
 	background: #fff;
 	padding: 30px;
 	border-radius: 10px;
@@ -60,7 +61,8 @@ hr.solid {
 
 .charge_cb{
 	color: orange;
-	padding-left: 40px;
+	margin-top: 6px;
+	/*padding-left: 40px;*/
 }
 
 .spacing{

@@ -35,6 +35,7 @@
 							<option value="1">One</option>
 						</select>
 					</dir>
+
 					<dir class="inline_it">
 						<div>
 							<label for="status">Status</label>
@@ -48,16 +49,16 @@
 					<!-- choose projected and actual dates -->
 					<div class="inline_it date_bar">
 						<div>
-							<label for="status">Projected Completion Date</label>
+							<label for="projected_date">Projected Completion Date</label>
 						</div>
-						<input class="form-control datepicker" type="date">
+						<input class="form-control datepicker" id="projected_date" type="date">
 					</div>
 
 					<div class="inline_it date_bar">
 						<div>
-							<label for="status">Actual Completion Date</label>
+							<label for="actual_date">Actual Completion Date</label>
 						</div>
-						<input class="form-control datepicker" type="date">
+						<input class="form-control datepicker" id="actual_date" type="date">
 					</div>
 
 					<hr class="solid">
@@ -65,13 +66,14 @@
 					<!-- choose case manager and check machine down -->
 					<dir class="inline_it">
 						<div>
-							<label for="status">Case Manager</label>
+							<label for="case_manager">Case Manager</label>
 						</div>
-						<select class="form-select select_bar" id="status">
+						<select class="form-select select_bar" id="case_manager">
 							<option selected>Choose...</option>
 							<option value="1">One</option>
 						</select>
 					</dir>
+
 					<div class="form-check inline_it machine_down_cb">
 						<input type="checkbox" id="machine_down">
 						<label for="machine_down">Machine Down</label>
@@ -82,33 +84,34 @@
 					<!-- customer details -->
 					<dir class="inline_it">
 						<div>
-							<label for="status">Customer</label>
+							<label for="customer">Customer</label>
 						</div>
-						<select class="form-select select_bar" id="status">
+						<select class="form-select select_bar" id="customer">
 							<option selected>Choose...</option>
 							<option value="1">One</option>
 						</select>
 					</dir>
+
 					<div class="inline_it text_bar">
 						<div>
-							<label for="customer">Customer Contact</label>
+							<label for="customer_contact">Customer Contact</label>
 						</div>
-						<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+						<input class="form-control" id="customer_contact" type="text" placeholder="Enter Name...">
 					</div>
 
 					<hr class="solid">
 
 					<!-- Equipment list -->
-					<div>
+					<!-- <div>
 						<label>Equipment</label>
 						<div class="equipment_lst">
 							<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
 
 							<dir class="inline_it">
 								<div>
-									<label for="type">Type</label>
+									<label for="serial_number">Serial Number</label>
 								</div>
-								<select class="form-select select_bar" id="type">
+								<select class="form-select select_bar" id="serial_number">
 									<option selected>Choose...</option>
 									<option value="1">One</option>
 								</select>
@@ -116,9 +119,9 @@
 
 							<dir class="inline_it">
 								<div>
-									<label for="status">Status</label>
+									<label for="part_number">Part Number</label>
 								</div>
-								<select class="form-select select_bar" id="status">
+								<select class="form-select select_bar" id="part_number">
 									<option selected>Choose...</option>
 									<option value="1">One</option>
 								</select>
@@ -126,9 +129,9 @@
 
 							<dir class="inline_it">
 								<div>
-									<label for="status">Status</label>
+									<label for="equipt_description">Description</label>
 								</div>
-								<select class="form-select select_bar" id="status">
+								<select class="form-select select_bar" id="equipt_description">
 									<option selected>Choose...</option>
 									<option value="1">One</option>
 								</select>
@@ -136,35 +139,93 @@
 
 							<div class="inline_it date_bar">
 								<div>
-									<label for="status">Actual Completion Date</label>
+									<label for="Installation_date">Installation Date</label>
 								</div>
-								<input class="form-control datepicker" type="date">
+								<input class="form-control datepicker" id="Installation_date" type="date">
 							</div>
 
 							<div class="inline_it text_bar">
 								<div>
-									<label for="customer">Customer</label>
+									<label for="warranty">Warranty Period</label>
 								</div>
-								<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+								<input class="form-control" id="warranty" type="text">
 							</div>
 
 							<div>
 								<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
 							</div>
 						</div>
+					</div> -->
+					<div>
+						<label>Equipment</label>
+						<div class="equipment_lst">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th scope="col"></th>
+										<th scope="col">Serial Number</th>
+							    		<th scope="col">Part Number</th>
+							    		<th scope="col">Description</th>
+							    		<th scope="col">Installation Date</th>
+							    		<th scope="col">Warranty Period</th>
+							    	</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+										</td>
+										<td>
+											<select class="form-select select_bar" id="serial_number">
+												<option selected>Choose...</option>
+												<option value="1">One</option>
+											</select>
+										</td>
+										<td>
+											<select class="form-select select_bar" id="part_number">
+												<option selected>Choose...</option>
+												<option value="1">One</option>
+											</select>
+										</td>
+										<td>
+											<select class="form-select select_bar" id="equipt_description">
+												<option selected>Choose...</option>
+												<option value="1">One</option>
+											</select>
+										</td>
+										<td>
+											<input class="form-control datepicker" id="Installation_date" type="date">
+										</td>
+										<td>
+											<input class="form-control inline_it" id="warranty" type="text">
+											<label>months</label>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+										</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 
 					<!-- add textarea for description -->
 					<div class="form-group description_bar">
-						<label for="description">Case Description</label>
-						<textarea class="form-control" id="description" rows="3"></textarea>
+						<label for="case_description">Case Description</label>
+						<textarea class="form-control" id="case_description" rows="3"></textarea>
 					</div>
 
 					<div class="action_btn"><!-- visible when in create new or edit mode -->
 						<button type="submit" class="btn btn-primary">Save</button>
 						<button type="submit" class="btn btn-primary">Cancel</button>
 					</div>
-
 
 				</form>
 			</section>

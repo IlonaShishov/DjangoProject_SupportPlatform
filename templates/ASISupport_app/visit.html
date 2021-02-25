@@ -28,15 +28,16 @@
 					<div class="spacing">
 						<div class="inline_it text_bar">
 							<div>
-								<label for="customer">Case Number</label>
+								<label for="case_num">Case Number</label>
 							</div>
-							<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+							<input class="form-control" id="case_num" type="text">
 						</div>
+
 						<div class="inline_it text_bar not_first">
 							<div>
-								<label for="customer">Case Type</label>
+								<label for="case_type">Case Type</label>
 							</div>
-							<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+							<input class="form-control" id="case_type" type="text">
 						</div>
 					</div>
 					
@@ -45,28 +46,32 @@
 					<!-- case details -->
 					<div class="inline_it">
 						<div>
-							<label for="status">Visit Date</label>
+							<label for="visit_date">Visit Date</label>
 						</div>
-						<input class="form-control datepicker" type="date">
+						<input class="form-control datepicker" id="visit_date" type="date">
 					</div>
+
 					<div class="inline_it text_bar not_first">
 						<div>
-							<label for="customer">Engineer</label>
+							<label for="case_manager">Engineer</label>
 						</div>
-						<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+						<input class="form-control" id="case_manager" type="text">
 					</div>
+
 					<div class="inline_it text_bar not_first">
 						<div>
 							<label for="customer">Customer</label>
 						</div>
-						<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+						<input class="form-control" id="customer" type="text">
 					</div>
+
 					<div class="inline_it text_bar not_first">
 						<div>
-							<label for="customer">Customer Contact</label>
+							<label for="customer_contact">Customer Contact</label>
 						</div>
-						<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+						<input class="form-control" id="customer_contact" type="text">
 					</div>
+
 					<div class="form-check inline_it remote_cb">
 						<input type="checkbox" id="remote">
 						<label for="remote">Remote</label>
@@ -78,77 +83,131 @@
 					<div>
 						<div class="inline_it">
 							<div>
-								<label for="status">Visit Start</label>
+								<label for="visit_start">Visit Start</label>
 							</div>
-							<input class="form-control datepicker" type="time">
+							<input class="form-control datepicker" id="visit_start" type="time">
 						</div>
+
 						<div class="inline_it not_first">
 							<div>
-								<label for="status">Visit End</label>
+								<label for="visit_end">Visit End</label>
 							</div>
-							<input class="form-control datepicker" type="time">
+							<input class="form-control datepicker" id="visit_end" type="time">
 						</div>
+
 						<div class="inline_it not_first">
 							<div>
-								<label for="customer">Tot Visit Hours</label>
+								<label for="visit_hours">Tot Visit Hours</label>
 							</div>
-							<input class="form-control int_bar" type="text" id="customer">
+							<input class="form-control int_bar" id="visit_hours" type="text">
 						</div>
 					</div>
 					
 					<div class="spacing">
 						<div class="inline_it">
 							<div>
-								<label for="customer">Travel Hours</label>
+								<label for="travel_hours">Travel Hours</label>
 							</div>
-							<input class="form-control int_bar" type="text" id="customer">
+							<input class="form-control int_bar" id="travel_hours" type="text">
 						</div>
+
 						<div class="inline_it not_first">
 							<div>
-								<label for="customer">Number of Engineers</label>
+								<label for="num_of_engineers">Number of Engineers</label>
 							</div>
-							<input class="form-control int_bar" type="text" id="customer">
+							<input class="form-control int_bar" id="num_of_engineers" type="text">
 						</div>
 					</div>
 
 					<!-- parts list -->
-					<div>
+					<!-- <div class="spacing">
 						<label>Parts Used</label>
 						<div class="parts_lst">
 							<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
 
 							<div class="inline_it text_bar not_first">
 								<div>
-									<label for="customer">Part Number</label>
+									<label for="part_num">Part Number</label>
 								</div>
-								<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+								<input class="form-control" type="text" id="part_num">
 							</div>
+
 							<div class="inline_it text_bar not_first">
 								<div>
-									<label for="customer">Description</label>
+									<label for="part_description">Description</label>
 								</div>
-								<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+								<input class="form-control" id="part_description" type="text">
 							</div>
+
 							<div class="inline_it text_bar not_first">
 								<div>
-									<label for="customer">Quantity</label>
+									<label for="qty">Quantity</label>
 								</div>
-								<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+								<input class="form-control" id="qty" type="text">
 							</div>
+
 							<div class="form-check inline_it charge_cb">
 								<input type="checkbox" id="charge">
 								<label for="charge">Charge</label>
 							</div>
-							<div>
+
+							<div class="spacing">
 								<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
 							</div>
+						</div>
+					</div> -->
+					<div class="spacing">
+						<label>Parts Used</label>
+						<div class="parts_lst">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th scope="col"></th>
+										<th scope="col">Part Number</th>
+							    		<th scope="col">Description</th>
+							    		<th scope="col">Quantity</th>
+							    		<th scope="col"></th>
+							    	</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+										</td>
+										<td>
+											<input class="form-control" type="text" id="part_num">
+										</td>
+										<td>
+											<input class="form-control" id="part_description" type="text">
+										</td>
+										<td>
+											<input class="form-control" id="qty" type="text">
+										</td>
+										<td>
+											<div class="form-check charge_cb">
+												<input type="checkbox" id="charge">
+												<label for="charge">Charge</label>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+										</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 
 					<!-- add textarea for description -->
 					<div class="form-group description_bar">
-						<label for="description">Visit Summary</label>
-						<textarea class="form-control" id="description" rows="3"></textarea>
+						<label for="visit_summary">Visit Summary</label>
+						<textarea class="form-control" id="visit_summary" rows="3"></textarea>
 					</div>
 
 					<div class="action_btn"><!-- visible when in create new or edit mode -->
