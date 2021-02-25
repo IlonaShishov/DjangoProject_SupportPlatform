@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Username</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
+	<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+	<section class="container-fluid">
+		<section class="row justify-content-center">
+			<section class="col-sm-3 col-sm-6 col-sm-3">
+				<form class="form-container" action="{% url 'ASISupport_app:dashboard' %}" method="POST">
+					{% csrf_token %}
+
+					<!-- welcome header -->
+					<div class="welcome">
+						<h1 class="inline_it">Welcome Username</h1>
+						<img src="/static/images/ASI_logo.jpg"/>
+					</div>
+
+					<hr class="solid">
+
+					<!-- navigation buttons -->
+					<div class="action_btn">
+						<button type="submit" class="btn btn-primary">New Case</button>
+						<button type="submit" class="btn btn-primary not_first">Reports</button>
+					</div>
+
+					<hr class="solid">
+
+						<!-- filter case -->
+						<div class="inline_it search_bar">
+							<div class="input-group">
+								<input type="search" class="form-control" placeholder="Search Case..." aria-lable="Search"/>
+								<div class="input-group-btn">
+									<button class="btn btn-default" type="submit">
+										<i class="glyphicon glyphicon-search"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<!-- filter visit -->
+						<div class="inline_it search_bar not_first">
+							<div class="input-group">
+								<input type="search" class="form-control" placeholder="Search Visit..." aria-lable="Search"/>
+								<div class="input-group-btn">
+									<button class="btn btn-default" type="submit">
+										<i class="glyphicon glyphicon-search"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- case info table -->
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">Case Number</th>
+						    		<th scope="col">Creation Date</th>
+						    		<th scope="col">Type</th>
+						    		<th scope="col">Status</th>
+						    		<th scope="col">Customer</th>
+						    		<th scope="col">Assignee</th>
+						    	</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>12345</td>
+									<td>01/01/2021</td>
+									<td>Support</td>
+									<td>Open</td>
+									<td>IBM</td>
+									<td>Elton John</td>
+								</tr>
+								<tr>
+									<td>12345</td>
+									<td>01/01/2021</td>
+									<td>Support</td>
+									<td>Open</td>
+									<td>IBM</td>
+									<td>Elton John</td>
+								</tr>
+								<tr>
+									<td>12345</td>
+									<td>01/01/2021</td>
+									<td>Support</td>
+									<td>Open</td>
+									<td>IBM</td>
+									<td>Elton John</td>
+								</tr>
+								<tr>
+									<td>12345</td>
+									<td>01/01/2021</td>
+									<td>Support</td>
+									<td>Open</td>
+									<td>IBM</td>
+									<td>Elton John</td>
+								</tr>
+							</tbody>
+						</table>
+				</form>
+			</section>
+		</section>
+	</section>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>

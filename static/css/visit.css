@@ -1,0 +1,41 @@
+body {
+	background-image: url('/static/images/Background1.jpg');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+}
+
+.form-container{
+	position: absolute;
+	top: 15vh;
+	background: #fff;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0px 0px 20px 0px #191970;
+}
+
+hr.solid {
+  border-top: 1px solid gray;
+}
+
+.inline_it{
+	display: inline-block;
+}
+
+.text_bar{
+	width: 160px;
+}
+
+.not_first{
+	margin-left: 40px;
+}
+
+.action_btn{
+	float: right;
+	margin-top: 12px;
+}
+
+.action_btn button{
+	width: 100px;
+	margin: 5px;
+}

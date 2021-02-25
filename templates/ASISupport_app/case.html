@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Case</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
+	<link rel="stylesheet" type="text/css" href="{% static 'css/case.css' %}">
+</head>
+<body>
+	<section class="container-fluid">
+		<section class="row justify-content-center">
+			<section class="col-sm-1 col-sm-10 col-sm-1">
+				<form class="form-container" action="{% url 'ASISupport_app:case' %}" method="POST">
+					{% csrf_token %}
+
+					<!-- show case number -->
+					<h1 class="inline_it">Case C000001</h1>
+
+					<div class="action_btn"><!-- visible when in view mode -->
+						<button type="submit" class="btn btn-primary">Edit</button>
+						<button type="submit" class="btn btn-primary">Back</button>
+					</div>
+
+					<hr class="solid">
+
+					<!-- choose type and status -->
+					<dir class="inline_it">
+						<div>
+							<label for="type">Type</label>
+						</div>
+						<select class="form-select select_bar" id="type">
+							<option selected>Choose...</option>
+							<option value="1">One</option>
+						</select>
+					</dir>
+					<dir class="inline_it">
+						<div>
+							<label for="status">Status</label>
+						</div>
+						<select class="form-select select_bar" id="status">
+							<option selected>Choose...</option>
+							<option value="1">One</option>
+						</select>
+					</dir>
+
+					<!-- choose projected and actual dates -->
+					<div class="inline_it date_bar">
+						<div>
+							<label for="status">Projected Completion Date</label>
+						</div>
+						<input class="form-control datepicker" type="date">
+					</div>
+
+					<div class="inline_it date_bar">
+						<div>
+							<label for="status">Actual Completion Date</label>
+						</div>
+						<input class="form-control datepicker" type="date">
+					</div>
+
+					<hr class="solid">
+
+					<!-- choose case manager and check machine down -->
+					<dir class="inline_it">
+						<div>
+							<label for="status">Case Manager</label>
+						</div>
+						<select class="form-select select_bar" id="status">
+							<option selected>Choose...</option>
+							<option value="1">One</option>
+						</select>
+					</dir>
+					<div class="form-check inline_it machine_down_cb">
+						<input type="checkbox" id="machine_down">
+						<label for="machine_down">Machine Down</label>
+					</div>
+
+					<hr class="solid">
+
+					<!-- customer details -->
+					<dir class="inline_it">
+						<div>
+							<label for="status">Customer</label>
+						</div>
+						<select class="form-select select_bar" id="status">
+							<option selected>Choose...</option>
+							<option value="1">One</option>
+						</select>
+					</dir>
+					<div class="inline_it text_bar">
+						<div>
+							<label for="customer">Customer Contact</label>
+						</div>
+						<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+					</div>
+
+					<hr class="solid">
+
+					<!-- Equipment list -->
+					<div>
+						<label>Equipment</label>
+						<div class="equipment_lst">
+							<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+
+							<dir class="inline_it">
+								<div>
+									<label for="type">Type</label>
+								</div>
+								<select class="form-select select_bar" id="type">
+									<option selected>Choose...</option>
+									<option value="1">One</option>
+								</select>
+							</dir>
+
+							<dir class="inline_it">
+								<div>
+									<label for="status">Status</label>
+								</div>
+								<select class="form-select select_bar" id="status">
+									<option selected>Choose...</option>
+									<option value="1">One</option>
+								</select>
+							</dir>
+
+							<dir class="inline_it">
+								<div>
+									<label for="status">Status</label>
+								</div>
+								<select class="form-select select_bar" id="status">
+									<option selected>Choose...</option>
+									<option value="1">One</option>
+								</select>
+							</dir>
+
+							<div class="inline_it date_bar">
+								<div>
+									<label for="status">Actual Completion Date</label>
+								</div>
+								<input class="form-control datepicker" type="date">
+							</div>
+
+							<div class="inline_it text_bar">
+								<div>
+									<label for="customer">Customer</label>
+								</div>
+								<input class="form-control" type="text" id="customer" placeholder="Enter Name...">
+							</div>
+
+							<div>
+								<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- add textarea for description -->
+					<div class="form-group description_bar">
+						<label for="description">Case Description</label>
+						<textarea class="form-control" id="description" rows="3"></textarea>
+					</div>
+
+					<div class="action_btn"><!-- visible when in create new or edit mode -->
+						<button type="submit" class="btn btn-primary">Save</button>
+						<button type="submit" class="btn btn-primary">Cancel</button>
+					</div>
+
+
+				</form>
+			</section>
+		</section>
+	</section>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>	
+</body>
+</html>
