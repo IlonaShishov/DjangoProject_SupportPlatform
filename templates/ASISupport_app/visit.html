@@ -1,226 +1,217 @@
 <!DOCTYPE html>
+{% extends "ASISupport_app/base.html" %}
 {% load static %}
-<html>
-<head>
-	<meta charset="UTF-8">
+
+{% block head_block %}
 	<title>Visit</title>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
 	<link rel="stylesheet" type="text/css" href="{% static 'css/visit.css' %}">
-</head>
-<body>
-	<section class="container-fluid">
-		<section class="row justify-content-center">
-			<section class="col-sm-1 col-sm-10 col-sm-1">
-				<form class="form-container" action="{% url 'ASISupport_app:case' %}" method="POST">
-					{% csrf_token %}
+{% endblock %}
 
-					<!-- show case number -->
+{% block body_block %}
+	<section class="col-sm-1 col-sm-10 col-sm-1">
+		<form class="form-container" action="{% url 'ASISupport_app:case' %}" method="POST">
+			{% csrf_token %}
+
+			<!-- show case number -->
+			<div>
+				<h1 class="inline_it">Visit V000001</h1>
+
+				<div class="action_btn"><!-- visible when in view mode -->
+					<button type="submit" class="btn btn-primary">Edit</button>
+					<button type="submit" class="btn btn-primary">Back</button>
+				</div>
+			</div>
+			
+			<div class="spacing">
+				<div class="inline_it text_bar">
 					<div>
-						<h1 class="inline_it">Visit V000001</h1>
-
-						<div class="action_btn"><!-- visible when in view mode -->
-							<button type="submit" class="btn btn-primary">Edit</button>
-							<button type="submit" class="btn btn-primary">Back</button>
-						</div>
+						<label for="case_num">Case Number</label>
 					</div>
-					
-					<div class="spacing">
-						<div class="inline_it text_bar">
-							<div>
-								<label for="case_num">Case Number</label>
-							</div>
-							<input class="form-control" id="case_num" type="text">
-						</div>
+					<input class="form-control" id="case_num" type="text">
+				</div>
 
-						<div class="inline_it text_bar not_first">
-							<div>
-								<label for="case_type">Case Type</label>
-							</div>
-							<input class="form-control" id="case_type" type="text">
-						</div>
-					</div>
-					
-					<hr class="solid">
-
-					<!-- case details -->
-					<div class="inline_it">
-						<div>
-							<label for="visit_date">Visit Date</label>
-						</div>
-						<input class="form-control datepicker" id="visit_date" type="date">
-					</div>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="case_manager">Engineer</label>
-						</div>
-						<input class="form-control" id="case_manager" type="text">
-					</div>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="customer">Customer</label>
-						</div>
-						<input class="form-control" id="customer" type="text">
-					</div>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="customer_contact">Customer Contact</label>
-						</div>
-						<input class="form-control" id="customer_contact" type="text">
-					</div>
-
-					<div class="form-check inline_it remote_cb">
-						<input type="checkbox" id="remote">
-						<label for="remote">Remote</label>
-					</div>
-
-					<hr class="solid">
-
-					<!-- visit time calculator -->
+				<div class="inline_it text_bar not_first">
 					<div>
-						<div class="inline_it">
-							<div>
-								<label for="visit_start">Visit Start</label>
-							</div>
-							<input class="form-control datepicker" id="visit_start" type="time">
-						</div>
-
-						<div class="inline_it not_first">
-							<div>
-								<label for="visit_end">Visit End</label>
-							</div>
-							<input class="form-control datepicker" id="visit_end" type="time">
-						</div>
-
-						<div class="inline_it not_first">
-							<div>
-								<label for="visit_hours">Tot Visit Hours</label>
-							</div>
-							<input class="form-control int_bar" id="visit_hours" type="text">
-						</div>
+						<label for="case_type">Case Type</label>
 					</div>
-					
+					<input class="form-control" id="case_type" type="text">
+				</div>
+			</div>
+			
+			<hr class="solid">
+
+			<!-- case details -->
+			<div class="inline_it">
+				<div>
+					<label for="visit_date">Visit Date</label>
+				</div>
+				<input class="form-control datepicker" id="visit_date" type="date">
+			</div>
+
+			<div class="inline_it text_bar not_first">
+				<div>
+					<label for="case_manager">Engineer</label>
+				</div>
+				<input class="form-control" id="case_manager" type="text">
+			</div>
+
+			<div class="inline_it text_bar not_first">
+				<div>
+					<label for="customer">Customer</label>
+				</div>
+				<input class="form-control" id="customer" type="text">
+			</div>
+
+			<div class="inline_it text_bar not_first">
+				<div>
+					<label for="customer_contact">Customer Contact</label>
+				</div>
+				<input class="form-control" id="customer_contact" type="text">
+			</div>
+
+			<div class="form-check inline_it remote_cb">
+				<input type="checkbox" id="remote">
+				<label for="remote">Remote</label>
+			</div>
+
+			<hr class="solid">
+
+			<!-- visit time calculator -->
+			<div>
+				<div class="inline_it">
+					<div>
+						<label for="visit_start">Visit Start</label>
+					</div>
+					<input class="form-control datepicker" id="visit_start" type="time">
+				</div>
+
+				<div class="inline_it not_first">
+					<div>
+						<label for="visit_end">Visit End</label>
+					</div>
+					<input class="form-control datepicker" id="visit_end" type="time">
+				</div>
+
+				<div class="inline_it not_first">
+					<div>
+						<label for="visit_hours">Tot Visit Hours</label>
+					</div>
+					<input class="form-control int_bar" id="visit_hours" type="text">
+				</div>
+			</div>
+			
+			<div class="spacing">
+				<div class="inline_it">
+					<div>
+						<label for="travel_hours">Travel Hours</label>
+					</div>
+					<input class="form-control int_bar" id="travel_hours" type="text">
+				</div>
+
+				<div class="inline_it not_first">
+					<div>
+						<label for="num_of_engineers">Number of Engineers</label>
+					</div>
+					<input class="form-control int_bar" id="num_of_engineers" type="text">
+				</div>
+			</div>
+
+			<!-- parts list -->
+			<!-- <div class="spacing">
+				<label>Parts Used</label>
+				<div class="parts_lst">
+					<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+
+					<div class="inline_it text_bar not_first">
+						<div>
+							<label for="part_num">Part Number</label>
+						</div>
+						<input class="form-control" type="text" id="part_num">
+					</div>
+
+					<div class="inline_it text_bar not_first">
+						<div>
+							<label for="part_description">Description</label>
+						</div>
+						<input class="form-control" id="part_description" type="text">
+					</div>
+
+					<div class="inline_it text_bar not_first">
+						<div>
+							<label for="qty">Quantity</label>
+						</div>
+						<input class="form-control" id="qty" type="text">
+					</div>
+
+					<div class="form-check inline_it charge_cb">
+						<input type="checkbox" id="charge">
+						<label for="charge">Charge</label>
+					</div>
+
 					<div class="spacing">
-						<div class="inline_it">
-							<div>
-								<label for="travel_hours">Travel Hours</label>
-							</div>
-							<input class="form-control int_bar" id="travel_hours" type="text">
-						</div>
-
-						<div class="inline_it not_first">
-							<div>
-								<label for="num_of_engineers">Number of Engineers</label>
-							</div>
-							<input class="form-control int_bar" id="num_of_engineers" type="text">
-						</div>
+						<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
 					</div>
+				</div>
+			</div> -->
+			<div class="spacing">
+				<label>Parts Used</label>
+				<div class="parts_lst">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th scope="col"></th>
+								<th scope="col">Part Number</th>
+					    		<th scope="col">Description</th>
+					    		<th scope="col">Quantity</th>
+					    		<th scope="col"></th>
+					    	</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+								</td>
+								<td>
+									<input class="form-control" type="text" id="part_num">
+								</td>
+								<td>
+									<input class="form-control" id="part_description" type="text">
+								</td>
+								<td>
+									<input class="form-control" id="qty" type="text">
+								</td>
+								<td>
+									<div class="form-check charge_cb">
+										<input type="checkbox" id="charge">
+										<label for="charge">Charge</label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+								</td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-					<!-- parts list -->
-					<!-- <div class="spacing">
-						<label>Parts Used</label>
-						<div class="parts_lst">
-							<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+			<!-- add textarea for description -->
+			<div class="form-group description_bar">
+				<label for="visit_summary">Visit Summary</label>
+				<textarea class="form-control" id="visit_summary" rows="3"></textarea>
+			</div>
 
-							<div class="inline_it text_bar not_first">
-								<div>
-									<label for="part_num">Part Number</label>
-								</div>
-								<input class="form-control" type="text" id="part_num">
-							</div>
+			<div class="action_btn"><!-- visible when in create new or edit mode -->
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button type="submit" class="btn btn-primary">Cancel</button>
+			</div>
 
-							<div class="inline_it text_bar not_first">
-								<div>
-									<label for="part_description">Description</label>
-								</div>
-								<input class="form-control" id="part_description" type="text">
-							</div>
-
-							<div class="inline_it text_bar not_first">
-								<div>
-									<label for="qty">Quantity</label>
-								</div>
-								<input class="form-control" id="qty" type="text">
-							</div>
-
-							<div class="form-check inline_it charge_cb">
-								<input type="checkbox" id="charge">
-								<label for="charge">Charge</label>
-							</div>
-
-							<div class="spacing">
-								<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-							</div>
-						</div>
-					</div> -->
-					<div class="spacing">
-						<label>Parts Used</label>
-						<div class="parts_lst">
-							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th scope="col"></th>
-										<th scope="col">Part Number</th>
-							    		<th scope="col">Description</th>
-							    		<th scope="col">Quantity</th>
-							    		<th scope="col"></th>
-							    	</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>
-											<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
-										</td>
-										<td>
-											<input class="form-control" type="text" id="part_num">
-										</td>
-										<td>
-											<input class="form-control" id="part_description" type="text">
-										</td>
-										<td>
-											<input class="form-control" id="qty" type="text">
-										</td>
-										<td>
-											<div class="form-check charge_cb">
-												<input type="checkbox" id="charge">
-												<label for="charge">Charge</label>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-										</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-					<!-- add textarea for description -->
-					<div class="form-group description_bar">
-						<label for="visit_summary">Visit Summary</label>
-						<textarea class="form-control" id="visit_summary" rows="3"></textarea>
-					</div>
-
-					<div class="action_btn"><!-- visible when in create new or edit mode -->
-						<button type="submit" class="btn btn-primary">Save</button>
-						<button type="submit" class="btn btn-primary">Cancel</button>
-					</div>
-
-				</form>
-			</section>
-		</section>
+		</form>
 	</section>
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>	
-</body>
-</html>
+{% endblock %}

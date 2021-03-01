@@ -1,26 +1,5 @@
-body {
-	background-image: url('/static/images/Background1.jpg');
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	background-size: cover;
-}
-
 .form-container{
-	position: absolute;
-	top: 15vh;
 	margin: 0px 60px 0px;
-	background: #fff;
-	padding: 30px;
-	border-radius: 10px;
-	box-shadow: 0px 0px 20px 0px #191970;
-}
-
-hr.solid {
-  border-top: 1px solid gray;
-}
-
-.inline_it{
-	display: inline-block;
 }
 
 .text_bar{
@@ -33,15 +12,6 @@ hr.solid {
 
 .not_first{
 	margin-left: 40px;
-}
-
-.add_or_del_btn {
-  background-color: white;
-  color: gray;
-  border: 2px solid gray;
-  height: 30px;
-  width: 30px;
-  padding: 3px;
 }
 
 .action_btn{

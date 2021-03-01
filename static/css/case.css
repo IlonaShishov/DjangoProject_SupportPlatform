@@ -1,26 +1,5 @@
-body {
-	background-image: url('/static/images/Background1.jpg');
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	background-size: cover;
-}
-
 .form-container{
-	position: absolute;
-	top: 15vh;
-	margin: 0px 20px 0px;
-	background: #fff;
-	padding: 30px;
-	border-radius: 10px;
-	box-shadow: 0px 0px 20px 0px #191970;
-}
-
-hr.solid {
-  border-top: 1px solid gray;
-}
-
-.inline_it{
-	display: inline-block;
+	margin: 0px 60px 0px;
 }
 
 .select_bar{
@@ -43,19 +22,10 @@ hr.solid {
 	padding-left: 40px;
 }
 
-.equipment_lst{
+.object_table{
 	border: 1px solid gray;
 	padding: 20px;
 	width: 100%;
-}
-
-.add_or_del_btn {
-  background-color: white;
-  color: gray;
-  border: 2px solid gray;
-  height: 30px;
-  width: 30px;
-  padding: 3px;
 }
 
 .description_bar{
@@ -70,6 +40,13 @@ hr.solid {
 .action_btn button{
 	width: 100px;
 	margin: 5px;
+}
+
+.new_visit_btn{
+	width: 100px;
+	background-color: gray;
+	border-color: gray;
+	padding: 3px;
 }
 
 tr td:last-child input{
