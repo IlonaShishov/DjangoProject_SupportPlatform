@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
-# from django.core.urlresolvers import reverse
 from django.urls import reverse
-# Create your models here.
 
 
 # class Employee(models.Model):
@@ -13,10 +11,10 @@ from django.urls import reverse
 # 	email = models.EmailField(max_length=254, unique = True)
 # 	password = models.CharField(max_length=100)
 # 	role = models.CharField(max_length=100)
-# 	is_admin = machine_down =  models.BooleanField(default=False)
+# 	is_admin = models.BooleanField(default=False)
 
 
-# class Customers(models.Model):
+# class Customer(models.Model):
 # 	customer_name = models.CharField(max_length=100, primary_key=True)
 
 
@@ -40,15 +38,15 @@ from django.urls import reverse
 # 	create_date = models.DateTimeField(default = timezone.now())
 # 	target_date = models.DateTimeField()
 # 	actual_date = models.DateTimeField()
-# 	case_manager = models.ForeignKey(Users, on_delete=models.CASCADE)
+# 	case_manager = models.ForeignKey(Employee, on_delete=models.CASCADE)
 # 	machine_down =  models.BooleanField(default=False)
-# 	customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
+# 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 # 	customer_contact = models.CharField(max_length=100)
 # 	case_description = models.TextField()
 # 	on_hold = models.BooleanField(default=False)
 # 	cancellation_reason = models.TextField()
 	
-# 	def closeCase(self):
+# 	def close_case(self):
 # 		self.actual_date = timezone.now()
 # 		self.save()
 
@@ -57,8 +55,8 @@ from django.urls import reverse
 # 	visit_num = models.CharField(max_length=100, primary_key=True)
 # 	case_num = models.ForeignKey(Case, on_delete=models.CASCADE)
 # 	visit_date = models.DateTimeField(default = timezone.now())
-# 	engineer = models.ForeignKey(Users, on_delete=models.CASCADE)
-# 	customer = models.ForeignKey(Customers, on_delete=models.CASCADE)#!!!must be same customer as in case
+# 	engineer = models.ForeignKey(Employee, on_delete=models.CASCADE)
+# 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)#!!!must be same customer as in case
 # 	customer_contact = models.CharField(max_length=100)#!!!must be same customer as in case
 # 	remote =  models.BooleanField(default=False)
 # 	visit_start = models.TimeField() 
@@ -68,13 +66,8 @@ from django.urls import reverse
 # 	num_of_engineers = models.IntegerField()
 # 	visit_summary = models.TextField()
 
-# 	def totVisitHours(self):
+# 	def sum_visit_hours(self):
 # 		self.visit_hours = (self.visit_end - self.visit_start).seconds / 3600
-
-
-# class Parts(models.Model):
-# 	part_pn = models.CharField(max_length=100, primary_key=True)
-# 	part_description = models.TextField()
 
 
 # class Equipment(models.Model):
@@ -85,12 +78,17 @@ from django.urls import reverse
 # 	warranty = models.DecimalField(max_digits=20, decimal_places=2)	
 
 
+# class Parts(models.Model):
+# 	part_pn = models.CharField(max_length=100, primary_key=True)
+# 	part_description = models.TextField()
+
+
 # class CaseEquipment(models.Model):
 # 	case_num = models.ForeignKey(Case, on_delete=models.CASCADE)
-# 	equip_sn = models.ForeignKey(Case, on_delete=models.CASCADE)
+# 	equip_sn = models.ForeignKey(Equipment, on_delete=models.CASCADE)
 
 
 # class VisitParts(models.Model):
-# 	visit_num = models.ForeignKey(Case, on_delete=models.CASCADE)
-# 	part_pn = models.ForeignKey(Case, on_delete=models.CASCADE)
+# 	visit_num = models.ForeignKey(Visit, on_delete=models.CASCADE)
+# 	part_pn = models.ForeignKey(Parts, on_delete=models.CASCADE)
 
