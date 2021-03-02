@@ -4,6 +4,22 @@ from django.utils import timezone
 from django.urls import reverse
 # Create your models here.
 
+
+# class Employee(models.Model):
+# 	employee_id = models.CharField(max_length=100, primary_key=True)
+# 	first_name = models.CharField(max_length=100)
+# 	last_name = models.CharField(max_length=100)
+# 	phone_number = models.CharField(max_length=100)
+# 	email = models.EmailField(max_length=254, unique = True)
+# 	password = models.CharField(max_length=100)
+# 	role = models.CharField(max_length=100)
+# 	is_admin = machine_down =  models.BooleanField(default=False)
+
+
+# class Customers(models.Model):
+# 	customer_name = models.CharField(max_length=100, primary_key=True)
+
+
 # class Case(models.Model):
 # 	TYPES = (
 # 		('Support', 'Support'),
@@ -21,17 +37,19 @@ from django.urls import reverse
 # 	case_num = models.CharField(max_length=100, primary_key=True)
 # 	case_type = models.CharField(max_length=100, choices=TYPES)
 # 	status = models.CharField(max_length=100, choices=STATUSES)
-# 	target_date = models.DateTimeField()
-# 	completion_date = models.DateTimeField()
 # 	create_date = models.DateTimeField(default = timezone.now())
+# 	target_date = models.DateTimeField()
+# 	actual_date = models.DateTimeField()
 # 	case_manager = models.ForeignKey(Users, on_delete=models.CASCADE)
 # 	machine_down =  models.BooleanField(default=False)
 # 	customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
 # 	customer_contact = models.CharField(max_length=100)
-# 	description = models.TextField()
-
+# 	case_description = models.TextField()
+# 	on_hold = models.BooleanField(default=False)
+# 	cancellation_reason = models.TextField()
+	
 # 	def closeCase(self):
-# 		self.completion_date = timezone.now()
+# 		self.actual_date = timezone.now()
 # 		self.save()
 
 
@@ -51,4 +69,28 @@ from django.urls import reverse
 # 	visit_summary = models.TextField()
 
 # 	def totVisitHours(self):
-# 		self.visit_hours = (self.visit_end - self.visit_start).seconds / 60
+# 		self.visit_hours = (self.visit_end - self.visit_start).seconds / 3600
+
+
+# class Parts(models.Model):
+# 	part_pn = models.CharField(max_length=100, primary_key=True)
+# 	part_description = models.TextField()
+
+
+# class Equipment(models.Model):
+# 	equip_sn = models.CharField(max_length=100, primary_key=True)
+# 	equip_pn = models.CharField(max_length=100)
+# 	equip_description = models.TextField()
+# 	installation_date = models.DateTimeField()
+# 	warranty = models.DecimalField(max_digits=20, decimal_places=2)	
+
+
+# class CaseEquipment(models.Model):
+# 	case_num = models.ForeignKey(Case, on_delete=models.CASCADE)
+# 	equip_sn = models.ForeignKey(Case, on_delete=models.CASCADE)
+
+
+# class VisitParts(models.Model):
+# 	visit_num = models.ForeignKey(Case, on_delete=models.CASCADE)
+# 	part_pn = models.ForeignKey(Case, on_delete=models.CASCADE)
+
