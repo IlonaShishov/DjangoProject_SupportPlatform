@@ -22,7 +22,7 @@
 
 			<!-- navigation buttons -->
 			<div class="action_btn">
-				<button type="submit" class="btn btn-primary">New Case</button>
+				<a href="{% url 'ASISupport_app:new_case' %}" class="btn btn-primary">New Case</a>
 				<button type="submit" class="btn btn-primary not_first">Reports</button>
 			</div>
 
@@ -64,38 +64,16 @@
 				    	</tr>
 					</thead>
 					<tbody>
+						{% for case in cases %}
 						<tr>
-							<td>12345</td>
-							<td>01/01/2021</td>
-							<td>Support</td>
-							<td>Open</td>
-							<td>IBM</td>
-							<td>Elton John</td>
+							<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
+							<td>{{ case.create_date }}</td>
+							<td>{{ case.case_type }}</td>
+							<td>{{ case.status }}</td>
+							<td>{{ case.customer }}</td>
+							<td>{{ case.case_manager }}</td>
 						</tr>
-						<tr>
-							<td>12345</td>
-							<td>01/01/2021</td>
-							<td>Support</td>
-							<td>Open</td>
-							<td>IBM</td>
-							<td>Elton John</td>
-						</tr>
-						<tr>
-							<td>12345</td>
-							<td>01/01/2021</td>
-							<td>Support</td>
-							<td>Open</td>
-							<td>IBM</td>
-							<td>Elton John</td>
-						</tr>
-						<tr>
-							<td>12345</td>
-							<td>01/01/2021</td>
-							<td>Support</td>
-							<td>Open</td>
-							<td>IBM</td>
-							<td>Elton John</td>
-						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 		</form>

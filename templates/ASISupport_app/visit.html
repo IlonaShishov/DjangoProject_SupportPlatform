@@ -9,7 +9,7 @@
 
 {% block body_block %}
 	<section class="col-sm-1 col-sm-10 col-sm-1">
-		<form class="form-container" action="{% url 'ASISupport_app:case' %}" method="POST">
+		<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST">
 			{% csrf_token %}
 
 			<!-- show case number -->

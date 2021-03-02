@@ -10,12 +10,16 @@ class Employee(models.Model):
 	phone_number = models.CharField(max_length=100)
 	email = models.EmailField(max_length=254, unique = True)
 	password = models.CharField(max_length=100)
-	role = models.CharField(max_length=100)
-	is_admin = models.BooleanField(default=False)
+
+	def __str__(self):
+		return f'{self.first_name} {self.last_name}'
 
 
 class Customer(models.Model):
 	customer_name = models.CharField(max_length=100, primary_key=True)
+
+	def __str__(self):
+		return self.customer_name
 
 
 class Case(models.Model):
@@ -35,26 +39,28 @@ class Case(models.Model):
 	case_num = models.CharField(max_length=100, primary_key=True)
 	case_type = models.CharField(max_length=100, choices=TYPES)
 	status = models.CharField(max_length=100, choices=STATUSES)
-	create_date = models.DateTimeField(default = timezone.now())
+	create_date = models.DateTimeField(default=timezone.now)
 	target_date = models.DateTimeField()
-	actual_date = models.DateTimeField()
+	actual_date = models.DateTimeField(blank=True, null=True)
 	case_manager = models.ForeignKey(Employee, on_delete=models.CASCADE)
 	machine_down =  models.BooleanField(default=False)
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 	customer_contact = models.CharField(max_length=100)
 	case_description = models.TextField()
-	on_hold = models.BooleanField(default=False)
-	cancellation_reason = models.TextField()
+	cancellation_reason = models.TextField(blank=True, null=True)
 	
 	def close_case(self):
-		self.actual_date = timezone.now()
+		self.actual_date = timezone.now
 		self.save()
+
+	def __str__(self):
+		return self.case_num
 
 
 class Visit(models.Model):
 	visit_num = models.CharField(max_length=100, primary_key=True)
 	case_num = models.ForeignKey(Case, on_delete=models.CASCADE)
-	visit_date = models.DateTimeField(default = timezone.now())
+	visit_date = models.DateTimeField(default = timezone.now)
 	engineer = models.ForeignKey(Employee, on_delete=models.CASCADE)
 	customer = models.ForeignKey(Customer, on_delete=models.CASCADE)#!!!must be same customer as in case
 	customer_contact = models.CharField(max_length=100)#!!!must be same customer as in case
@@ -69,6 +75,9 @@ class Visit(models.Model):
 	def sum_visit_hours(self):
 		self.visit_hours = (self.visit_end - self.visit_start).seconds / 3600
 
+	def __str__(self):
+		return self.visit_num
+
 
 class Equipment(models.Model):
 	equip_sn = models.CharField(max_length=100, primary_key=True)
@@ -77,18 +86,30 @@ class Equipment(models.Model):
 	installation_date = models.DateTimeField()
 	warranty = models.DecimalField(max_digits=20, decimal_places=2) #in months
 
+	def __str__(self):
+		return self.equip_sn
+
 
 class Parts(models.Model):
 	part_pn = models.CharField(max_length=100, primary_key=True)
 	part_description = models.TextField()
+
+	def __str__(self):
+		return self.part_pn
 
 
 class CaseEquipment(models.Model):
 	case_num = models.ForeignKey(Case, on_delete=models.CASCADE)
 	equip_sn = models.ForeignKey(Equipment, on_delete=models.CASCADE)
 
+	def __str__(self):
+		return f'{self.case_num} {self.equip_sn}'
+
 
 class VisitParts(models.Model):
 	visit_num = models.ForeignKey(Visit, on_delete=models.CASCADE)
 	part_pn = models.ForeignKey(Parts, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return f'{self.visit_num} {self.part_pn}'
 
