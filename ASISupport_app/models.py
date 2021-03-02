@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
-from decimal import Decimal
 
 
 class Employee(models.Model):
@@ -62,8 +61,8 @@ class Visit(models.Model):
 	remote =  models.BooleanField(default=False)
 	visit_start = models.TimeField() 
 	visit_end = models.TimeField() 
-	visit_hours = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal('0.00'))
-	travel_hours = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal('0.00'))
+	visit_hours = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+	travel_hours = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 	num_of_engineers = models.IntegerField()
 	visit_summary = models.TextField()
 
@@ -76,7 +75,7 @@ class Equipment(models.Model):
 	equip_pn = models.CharField(max_length=100)
 	equip_description = models.TextField()
 	installation_date = models.DateTimeField()
-	warranty = models.DecimalField(max_digits=20, decimal_places=2)	
+	warranty = models.DecimalField(max_digits=20, decimal_places=2) #in months
 
 
 class Parts(models.Model):
