@@ -14,10 +14,12 @@
 			<!-- show case number -->
 			<h1 class="inline_it">Case C000001</h1>
 
+			{% if state == 'view' %}
 			<div class="action_btn"><!-- visible when in view mode -->
 				<button type="submit" class="btn btn-primary">Edit</button>
 				<button type="submit" class="btn btn-primary">Back</button>
 			</div>
+			{% endif %}
 
 			<hr class="solid">
 
@@ -219,6 +221,7 @@
 			</div>
 
 			<!-- visit list -->
+			{% if state == 'view' %}
 			<div>
 				<label>Visits</label>
 				<div class="object_table">
@@ -230,21 +233,26 @@
 					    	</tr>
 						</thead>
 						<tbody>
+							{% for visit in visits %}
 							<tr>
-								<td>V000001</td>
-								<td>01/01/2020</td>
+								<td><a href="{% url 'ASISupport_app:view_visit' visit.visit_num %}">{{ visit.visit_num }}</a></td>
+								<td>{{ visit.visit_date }}</td>
 							</tr>
+							{% endfor %}
 						</tbody>
 					</table>
-					<button type="submit" class="btn btn-primary btn-sm new_visit_btn">New Visit</button>
+					<a href="{% url 'ASISupport_app:new_visit' %}" class="btn btn-primary btn-sm new_visit_btn">New Visit</a>
 				</div>
 			</div>
+			{% endif %}
 
 
+			{% if state == 'new' %}
 			<div class="action_btn"><!-- visible when in create new or edit mode -->
 				<button type="submit" class="btn btn-primary">Save</button>
 				<button type="submit" class="btn btn-primary">Cancel</button>
 			</div>
+			{% endif %}
 
 		</form>
 	</section>

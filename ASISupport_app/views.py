@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from ASISupport_app.models import Case
+from ASISupport_app.models import Case, Visit
 # from django.views.generic import (TemplateView)
 # from ASISupport_app.models import Case, Visit
 
@@ -35,11 +35,18 @@ def dashboard_view(request):
 	return render(request, 'ASISupport_app/dashboard.html', locals())
 
 def new_case_view(request):
+	state = 'new'
 	return render(request, 'ASISupport_app/case.html', locals())
 
 def case_view(request, id):
+	state = 'view'
 	case = Case.objects.get(case_num=id)
+	visits = Visit.objects.filter(case_num=id)
 	return render(request, 'ASISupport_app/case.html', locals())
 
-def visit_view(request):
-	return render(request, 'ASISupport_app/visit.html')
+def new_visit_view(request):
+	return render(request, 'ASISupport_app/visit.html', locals())
+
+def visit_view(request, id):
+	visit = Visit.objects.get(visit_num=id)
+	return render(request, 'ASISupport_app/visit.html', locals())
