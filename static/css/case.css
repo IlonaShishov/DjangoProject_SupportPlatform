@@ -16,6 +16,10 @@
 	padding: 0px 0px 0px 40px;
 }
 
+.last_row_object{
+	padding-right: 40px;	
+}
+
 .text_bar{
 	width: 160px;
 }
@@ -64,5 +68,5 @@ select:disabled {
 }
 
 td label{
-	padding-left: 5px;
+	padding-left: 3px;
 }

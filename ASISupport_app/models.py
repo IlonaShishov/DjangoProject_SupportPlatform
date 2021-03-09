@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from datetime import datetime
 
 
 class Employee(models.Model):
@@ -67,13 +68,13 @@ class Visit(models.Model):
 	remote =  models.BooleanField(default=False)
 	visit_start = models.TimeField() 
 	visit_end = models.TimeField() 
-	visit_hours = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+	# visit_hours = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 	travel_hours = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
-	num_of_engineers = models.IntegerField()
+	num_of_engineers = models.IntegerField(blank=True, null=True)
 	visit_summary = models.TextField()
 
 	def sum_visit_hours(self):
-		self.visit_hours = (self.visit_end - self.visit_start).seconds / 3600
+		self.visit_hours = (datetime.strptime(str(self.visit_end), '%H:%M:%S') - datetime.strptime(str(self.visit_start), '%H:%M:%S')).seconds / 3600
 
 	def __str__(self):
 		return self.visit_num
@@ -109,6 +110,8 @@ class CaseEquipment(models.Model):
 class VisitParts(models.Model):
 	visit_num = models.ForeignKey(Visit, on_delete=models.CASCADE)
 	part_pn = models.ForeignKey(Parts, on_delete=models.CASCADE)
+	qty = models.IntegerField(blank=True, null=True)
+	charge = models.BooleanField(default=False)
 
 	def __str__(self):
 		return f'{self.visit_num} {self.part_pn}'

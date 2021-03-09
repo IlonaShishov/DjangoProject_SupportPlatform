@@ -2,16 +2,22 @@
 	margin: 0px 60px 0px;
 }
 
+.inline_spacing{
+	margin: 14px 0px;
+	padding: 0px 0px 0px 40px;
+}
+
 .text_bar{
 	width: 160px;
 }
 
-.int_bar{
-	width: 80px;
+.select_bar{
+	width: 160px;
+	height: 35px;
 }
 
-.not_first{
-	margin-left: 40px;
+.int_bar{
+	width: 80px;
 }
 
 .action_btn{
@@ -26,7 +32,6 @@
 
 .remote_cb{
 	color: green;
-	padding-left: 40px;
 }
 
 .charge_cb{
@@ -47,4 +52,8 @@
 
 .description_bar{
 	margin: 15px 0px 15px 0px;
+}
+
+select:disabled {
+  background: #dddddd;
 }

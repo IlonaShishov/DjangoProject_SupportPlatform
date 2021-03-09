@@ -17,7 +17,7 @@
 				{% if state == 'view' %}
 					<h1 class="inline_it">Visit {{ visit.visit_num }}</h1>
 
-					<div class="action_btn"><!-- visible when in view mode -->
+					<div class="action_btn">
 						<button type="submit" class="btn btn-primary">Edit</button>
 						<button type="submit" class="btn btn-primary">Back</button>
 					</div>
@@ -26,55 +26,84 @@
 				{% endif %}
 			</div>
 			
-			<div class="spacing">
-				<div class="inline_it text_bar">
+			<!-- case number -->
+			<div>
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="case_num">Case Number</label>
 					</div>
-					<input class="form-control" id="case_num" type="text">
+						<input class="form-control text_bar" id="case_num" type="text" value="{{ visit.case_num }}" disabled>
 				</div>
 
-				<div class="inline_it text_bar not_first">
+			<!-- case type -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="case_type">Case Type</label>
 					</div>
-					<input class="form-control" id="case_type" type="text">
+						<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" disabled>
 				</div>
 			</div>
 			
 			<hr class="solid">
 
-			<!-- case details -->
-			<div class="inline_it">
+			<!-- visit date -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="visit_date">Visit Date</label>
 				</div>
-				<input class="form-control datepicker" id="visit_date" type="date">
+				{% if state == 'view' %}
+					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" disabled>
+				{% else %}
+					<input class="form-control datepicker" id="visit_date" type="date"> <!-- set default date today -->
+				{% endif %}
 			</div>
 
-			<div class="inline_it text_bar not_first">
+			<!-- engineer -->
+			<div class="inline_it inline_spacing">
 				<div>
-					<label for="case_manager">Engineer</label>
+					<label for="Engineer">Engineer</label>
 				</div>
-				<input class="form-control" id="case_manager" type="text">
+				{% if state == 'view' %}
+					<select class="form-select select_bar" id="Engineer" disabled>
+						<option selected>{{ visit.engineer }}</option>
+					</select>
+				{% else %}
+					<select class="form-select select_bar" id="Engineer">
+						<option selected>Choose...</option>
+						{% for employee in employees %}
+							<option value="{{ employee }}">{{ employee }}</option>
+						{% endfor %}
+					</select>
+				{% endif %}
 			</div>
 
-			<div class="inline_it text_bar not_first">
+			<!-- customer -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="customer">Customer</label>
 				</div>
-				<input class="form-control" id="customer" type="text">
+					<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" disabled>
 			</div>
 
-			<div class="inline_it text_bar not_first">
+			<!-- customer contact -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="customer_contact">Customer Contact</label>
 				</div>
-				<input class="form-control" id="customer_contact" type="text">
+					<input class="form-control text_bar" id="customer_contact" type="text" value="{{ case.customer_contact }}" disabled>
 			</div>
 
-			<div class="form-check inline_it remote_cb">
-				<input type="checkbox" id="remote">
+			<!-- remote check box -->
+			<div class="inline_it inline_spacing remote_cb">
+				{% if state == 'view' %}
+					{% if visit.remote %}
+						<input type="checkbox" id="remote" checked disabled>
+					{% else %}
+						<input type="checkbox" id="remote" disabled>
+					{% endif %}
+				{% else %}
+					<input type="checkbox" id="remote">
+				{% endif %}
 				<label for="remote">Remote</label>
 			</div>
 
@@ -82,41 +111,63 @@
 
 			<!-- visit time calculator -->
 			<div>
-				<div class="inline_it">
+				<!-- visit start -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="visit_start">Visit Start</label>
 					</div>
-					<input class="form-control datepicker" id="visit_start" type="time">
+					{% if state == 'view' %}
+						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" disabled>
+					{% else %}
+						<input class="form-control datepicker" id="visit_start" type="time">
+					{% endif %}
 				</div>
-
-				<div class="inline_it not_first">
+				<!-- visit end -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="visit_end">Visit End</label>
 					</div>
-					<input class="form-control datepicker" id="visit_end" type="time">
+					{% if state == 'view' %}
+						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" disabled>
+					{% else %}
+						<input class="form-control datepicker" id="visit_end" type="time">
+					{% endif %}
 				</div>
-
-				<div class="inline_it not_first">
+				<!-- tot visit hours -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="visit_hours">Tot Visit Hours</label>
 					</div>
-					<input class="form-control int_bar" id="visit_hours" type="text">
+					{% if state == 'view' %}
+						<input class="form-control int_bar" id="visit_hours" type="text" value="{{ visit.visit_hours|floatformat:2 }}" disabled>
+					{% else %}
+						<input class="form-control int_bar" id="visit_hours" type="text" disabled>
+					{% endif %}
 				</div>
 			</div>
 			
-			<div class="spacing">
-				<div class="inline_it">
+			<div>
+				<!-- travel hours -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="travel_hours">Travel Hours</label>
 					</div>
-					<input class="form-control int_bar" id="travel_hours" type="text">
+					{% if state == 'view' %}
+						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" disabled>
+					{% else %}
+						<input class="form-control int_bar" id="travel_hours" type="text">
+					{% endif %}
 				</div>
-
-				<div class="inline_it not_first">
+				<!-- number of engineers -->
+				<div class="inline_it inline_spacing">
 					<div>
 						<label for="num_of_engineers">Number of Engineers</label>
 					</div>
-					<input class="form-control int_bar" id="num_of_engineers" type="text">
+					{% if state == 'view' %}
+						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" disabled>
+					{% else %}
+						<input class="form-control int_bar" id="num_of_engineers" type="text">
+					{% endif %}
 				</div>
 			</div>
 
@@ -134,37 +185,60 @@
 					    		<th scope="col"></th>
 					    	</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
-								</td>
-								<td>
-									<input class="form-control" type="text" id="part_num">
-								</td>
-								<td>
-									<input class="form-control" id="part_description" type="text">
-								</td>
-								<td>
-									<input class="form-control" id="qty" type="text">
-								</td>
-								<td>
-									<div class="form-check charge_cb">
-										<input type="checkbox" id="charge">
-										<label for="charge">Charge</label>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-								</td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-						</tbody>
+						{% if state == 'view' %}
+							<tbody>
+								{% for part in parts %}
+										<tr>
+											<td></td>
+											<td>{{ part.part_pn }}</td>
+											<td>{{ part.part_description }}</td>
+											<td>{{ part.qty }}</td>
+											<td>
+												<div class="form-check charge_cb">
+													{% if part.charge %}
+														<input type="checkbox" id="charge" checked>
+													{% else %}
+														<input type="checkbox" id="charge">
+													{% endif %}
+													<label for="charge">Charge</label>
+												</div>
+											</td>
+										</tr>
+								{% endfor %}
+							</tbody>
+						{% else %}
+							<tbody>
+								<tr>
+									<td>
+										<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+									</td>
+									<td>
+										<input class="form-control" type="text" id="part_num">
+									</td>
+									<td>
+										<input class="form-control" id="part_description" type="text">
+									</td>
+									<td>
+										<input class="form-control" id="qty" type="text">
+									</td>
+									<td>
+										<div class="form-check charge_cb">
+											<input type="checkbox" id="charge">
+											<label for="charge">Charge</label>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						{% endif %}
 					</table>
 				</div>
 			</div>
@@ -172,9 +246,14 @@
 			<!-- add textarea for description -->
 			<div class="form-group description_bar">
 				<label for="visit_summary">Visit Summary</label>
-				<textarea class="form-control" id="visit_summary" rows="3"></textarea>
+				{% if state == 'view' %}
+					<textarea class="form-control" id="visit_summary" rows="3" disabled="">{{ visit.visit_summary }}</textarea>
+				{% else %}
+					<textarea class="form-control" id="visit_summary" rows="3"></textarea>
+				{% endif %}
 			</div>
 
+			<!-- save/ cancel btns -->
 			{% if state == 'new' %}
 				<div class="action_btn"><!-- visible when in create new or edit mode -->
 					<button type="submit" class="btn btn-primary">Save</button>

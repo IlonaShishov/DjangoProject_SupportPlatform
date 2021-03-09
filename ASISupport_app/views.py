@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment
+from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
 # from django.views.generic import (TemplateView)
 # from ASISupport_app.models import Case, Visit
 
@@ -50,15 +50,23 @@ def case_view(request, id):
 	case_equipment_lst = CaseEquipment.objects.filter(case_num=id)
 	equip_lst = [ce.equip_sn for ce in case_equipment_lst]
 	equipment = Equipment.objects.filter(equip_sn__in=equip_lst)
-	
+
 	statuses = Case.STATUSES
 	return render(request, 'ASISupport_app/case.html', locals())
 
 def new_visit_view(request):
 	state = 'new'
+	employees = Employee.objects.all()
 	return render(request, 'ASISupport_app/visit.html', locals())
 
 def visit_view(request, id):
 	state = 'view'
 	visit = Visit.objects.get(visit_num=id)
+	visit.sum_visit_hours()
+	case = Case.objects.get(case_num=visit.case_num)
+
+	visit_parts_lst = VisitParts.objects.filter(visit_num=id)
+	part_lst = [vp.part_pn for vp in visit_parts_lst]
+	parts = Parts.objects.filter(part_pn__in=part_lst)
+
 	return render(request, 'ASISupport_app/visit.html', locals())

@@ -50,22 +50,24 @@
 				<div>
 					<label for="status">Status</label>
 				</div>
-					<select class="form-select select_bar" id="status">
-						{% if state == 'view' %}
+					{% if state == 'view' %}
+						<select class="form-select select_bar" id="status" disabled>
 							<option selected>{{ case.status }}</option>
-						{% else %}
+						</select>
+					{% else %}
+						<select class="form-select select_bar" id="status">
 							<option selected>Choose...</option>
-						{% endif %}
 						{% for val, name in statuses %}
 							<option value="{{ val }}">{{ name }}</option>
 						{% endfor %}
-					</select>
+						</select>
+					{% endif %}
 			</div>
 
 			<!-- projected completion date -->
 			<div class="inline_it inline_spacing">
 				<div>
-					<label class="date_bar" for="projected_date">Estimate Completion Date</label>
+					<label class="date_bar" for="projected_date">Projected Completion Date</label>
 				</div>
 				{% if state == 'view' %}
 					<input class="form-control datepicker date_bar" id="projected_date" type="date" value="{{ case.target_date|date:'Y-m-d' }}" disabled>
@@ -75,11 +77,15 @@
 			</div>
 
 			<!-- actual completion date -->
-			<div class="inline_it inline_spacing">
+			<div class="inline_it inline_spacing last_row_object">
 				<div>
 					<label for="actual_date">Actual Completion Date</label>
 				</div>
-				<input class="form-control datepicker date_bar" id="actual_date" type="date">
+				{% if state == 'view' %}
+					<input class="form-control datepicker date_bar" id="actual_date" type="date" value="{{ case.actual_date|date:'Y-m-d' }}" disabled>
+				{% else %}
+					<input class="form-control datepicker date_bar" id="actual_date" type="date">
+				{% endif %}
 			</div>
 
 			<hr class="solid">
@@ -104,8 +110,16 @@
 			</div>
 
 			<!-- check machine down -->
-			<div class="form-check inline_it inline_spacing machine_down_cb">
-				<input type="checkbox" id="machine_down">
+			<div class="form-check inline_it inline_spacing machine_down_cb last_row_object">
+				{% if state == 'view' %}
+					{% if case.machine_down %}
+						<input type="checkbox" id="machine_down" checked disabled>
+					{% else %}
+						<input type="checkbox" id="machine_down" disabled>
+					{% endif %}
+				{% else %}
+					<input type="checkbox" id="machine_down">
+				{% endif %}
 				<label for="machine_down">Machine Down</label>
 			</div>
 
@@ -131,7 +145,7 @@
 			</div>
 
 			<!-- customer contact -->
-			<div class="inline_it inline_spacing">
+			<div class="inline_it inline_spacing last_row_object">
 				<div>
 					<label for="customer_contact">Customer Contact</label>
 				</div>
@@ -220,11 +234,11 @@
 				</div>
 			</div>
 
-			<!-- add textarea for description -->
+			<!-- case description -->
 			<div class="form-group description_bar">
 				<label for="case_description">Case Description</label>
 				{% if state == 'view' %}
-					<textarea class="form-control" id="case_description" rows="3">{{ case.case_description }}</textarea>
+					<textarea class="form-control" id="case_description" rows="3" disabled>{{ case.case_description }}</textarea>
 				{% else %}
 					<textarea class="form-control" id="case_description" rows="3"></textarea>
 				{% endif %}
