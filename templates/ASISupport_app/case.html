@@ -11,149 +11,140 @@
 	<section class="col-sm-1 col-sm-10 col-sm-1">
 		<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST">
 			{% csrf_token %}
-			<!-- show case number -->
-			<h1 class="inline_it">Case C000001</h1>
 
+			<!-- case number -->
 			{% if state == 'view' %}
-			<div class="action_btn"><!-- visible when in view mode -->
-				<button type="submit" class="btn btn-primary">Edit</button>
-				<button type="submit" class="btn btn-primary">Back</button>
-			</div>
+				<h1 class="inline_it">Case {{ case.case_num }}</h1>
+
+				<div class="action_btn"><!-- visible when in view mode -->
+					<button type="submit" class="btn btn-primary">Edit</button>
+					<button type="submit" class="btn btn-primary">Back</button>
+				</div>
+			{% else %}
+				<h1 class="inline_it">New Case</h1>
 			{% endif %}
 
 			<hr class="solid">
 
-			<!-- choose type and status -->
-			<dir class="inline_it">
+			<!-- case type -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="type">Type</label>
 				</div>
-				<select class="form-select select_bar" id="type">
-					<option selected>Choose...</option>
-					<option value="1">One</option>
-				</select>
-			</dir>
+				{% if state == 'view' %}
+					<select class="form-select select_bar" id="type" disabled>
+						<option selected>{{ case.case_type }}</option>
+					</select>
+				{% else %}
+					<select class="form-select select_bar" id="type">
+						<option selected>Choose...</option>
+						{% for val, name in types %}
+							<option value="{{ val }}">{{ name }}</option>
+						{% endfor %}
+					</select>
+				{% endif %}
+			</div>
 
-			<dir class="inline_it">
+			<!-- case status -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="status">Status</label>
 				</div>
-				<select class="form-select select_bar" id="status">
-					<option selected>Choose...</option>
-					<option value="1">One</option>
-				</select>
-			</dir>
-
-			<!-- choose projected and actual dates -->
-			<div class="inline_it date_bar">
-				<div>
-					<label for="projected_date">Projected Completion Date</label>
-				</div>
-				<input class="form-control datepicker" id="projected_date" type="date">
+					<select class="form-select select_bar" id="status">
+						{% if state == 'view' %}
+							<option selected>{{ case.status }}</option>
+						{% else %}
+							<option selected>Choose...</option>
+						{% endif %}
+						{% for val, name in statuses %}
+							<option value="{{ val }}">{{ name }}</option>
+						{% endfor %}
+					</select>
 			</div>
 
-			<div class="inline_it date_bar">
+			<!-- projected completion date -->
+			<div class="inline_it inline_spacing">
+				<div>
+					<label class="date_bar" for="projected_date">Estimate Completion Date</label>
+				</div>
+				{% if state == 'view' %}
+					<input class="form-control datepicker date_bar" id="projected_date" type="date" value="{{ case.target_date|date:'Y-m-d' }}" disabled>
+				{% else %}
+					<input class="form-control datepicker date_bar" id="projected_date" type="date">
+				{% endif %}
+			</div>
+
+			<!-- actual completion date -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="actual_date">Actual Completion Date</label>
 				</div>
-				<input class="form-control datepicker" id="actual_date" type="date">
+				<input class="form-control datepicker date_bar" id="actual_date" type="date">
 			</div>
 
 			<hr class="solid">
 
-			<!-- choose case manager and check machine down -->
-			<dir class="inline_it">
+			<!-- case manager -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="case_manager">Case Manager</label>
 				</div>
-				<select class="form-select select_bar" id="case_manager">
-					<option selected>Choose...</option>
-					<option value="1">One</option>
-				</select>
-			</dir>
+				{% if state == 'view' %}
+					<select class="form-select select_bar" id="case_manager" disabled>
+						<option selected>{{ case.case_manager }}</option>
+					</select>
+				{% else %}
+					<select class="form-select select_bar" id="case_manager">
+						<option selected>Choose...</option>
+						{% for employee in employees %}
+							<option value="{{ employee }}">{{ employee }}</option>
+						{% endfor %}
+					</select>
+				{% endif %}
+			</div>
 
-			<div class="form-check inline_it machine_down_cb">
+			<!-- check machine down -->
+			<div class="form-check inline_it inline_spacing machine_down_cb">
 				<input type="checkbox" id="machine_down">
 				<label for="machine_down">Machine Down</label>
 			</div>
 
 			<hr class="solid">
 
-			<!-- customer details -->
-			<dir class="inline_it">
+			<!-- customer -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="customer">Customer</label>
 				</div>
-				<select class="form-select select_bar" id="customer">
-					<option selected>Choose...</option>
-					<option value="1">One</option>
-				</select>
-			</dir>
+				{% if state == 'view' %}
+					<select class="form-select select_bar" id="customer" disabled>
+						<option selected>{{ case.customer }}</option>
+					</select>
+				{% else %}
+					<select class="form-select select_bar" id="customer">
+						<option selected>Choose...</option>
+						{% for customer in customers %}
+							<option value="{{ customer }}">{{ customer }}</option>
+						{% endfor %}
+					</select>
+				{% endif %}
+			</div>
 
-			<div class="inline_it text_bar">
+			<!-- customer contact -->
+			<div class="inline_it inline_spacing">
 				<div>
 					<label for="customer_contact">Customer Contact</label>
 				</div>
-				<input class="form-control" id="customer_contact" type="text" placeholder="Enter Name...">
+				{% if state == 'view' %}
+					<input class="form-control text_bar" id="customer_contact" type="text" placeholder="Enter Name..." value="{{ case.customer_contact }}" disabled>
+				{% else %}
+					<input class="form-control text_bar" id="customer_contact" type="text" placeholder="Enter Name...">
+				{% endif %}
 			</div>
 
 			<hr class="solid">
 
 			<!-- Equipment list -->
-			<!-- <div>
-				<label>Equipment</label>
-				<div class="equipment_lst">
-					<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
-
-					<dir class="inline_it">
-						<div>
-							<label for="serial_number">Serial Number</label>
-						</div>
-						<select class="form-select select_bar" id="serial_number">
-							<option selected>Choose...</option>
-							<option value="1">One</option>
-						</select>
-					</dir>
-
-					<dir class="inline_it">
-						<div>
-							<label for="part_number">Part Number</label>
-						</div>
-						<select class="form-select select_bar" id="part_number">
-							<option selected>Choose...</option>
-							<option value="1">One</option>
-						</select>
-					</dir>
-
-					<dir class="inline_it">
-						<div>
-							<label for="equipt_description">Description</label>
-						</div>
-						<select class="form-select select_bar" id="equipt_description">
-							<option selected>Choose...</option>
-							<option value="1">One</option>
-						</select>
-					</dir>
-
-					<div class="inline_it date_bar">
-						<div>
-							<label for="Installation_date">Installation Date</label>
-						</div>
-						<input class="form-control datepicker" id="Installation_date" type="date">
-					</div>
-
-					<div class="inline_it text_bar">
-						<div>
-							<label for="warranty">Warranty Period</label>
-						</div>
-						<input class="form-control" id="warranty" type="text">
-					</div>
-
-					<div>
-						<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-					</div>
-				</div>
-			</div> -->
 			<div>
 				<label>Equipment</label>
 				<div class="object_table">
@@ -168,48 +159,63 @@
 					    		<th scope="col">Warranty Period</th>
 					    	</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
-								</td>
-								<td>
-									<select class="form-select select_bar" id="serial_number">
-										<option selected>Choose...</option>
-										<option value="1">One</option>
-									</select>
-								</td>
-								<td>
-									<select class="form-select select_bar" id="part_number">
-										<option selected>Choose...</option>
-										<option value="1">One</option>
-									</select>
-								</td>
-								<td>
-									<select class="form-select select_bar" id="equipt_description">
-										<option selected>Choose...</option>
-										<option value="1">One</option>
-									</select>
-								</td>
-								<td>
-									<input class="form-control datepicker" id="Installation_date" type="date">
-								</td>
-								<td>
-									<input class="form-control inline_it" id="warranty" type="text">
-									<label>months</label>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-								</td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-						</tbody>
+						{% if state == 'view' %}
+							<tbody>
+								{% for equip in equipment %}
+										<tr>
+											<td></td>
+											<td>{{ equip.equip_sn }}</td>
+											<td>{{ equip.equip_pn }}</td>
+											<td>{{ equip.equip_description }}</td>
+											<td>{{ equip.installation_date|date:'d/m/Y' }}</td>
+											<td>{{ equip.warranty }}<label>months</label></td>
+										</tr>
+								{% endfor %}
+							</tbody>
+						{% else %}
+							<tbody>
+								<tr>
+									<td>
+										<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+									</td>
+									<td>
+										<select class="form-select select_bar" id="serial_number">
+											<option selected>Choose...</option>
+											<option value="1">One</option>
+										</select>
+									</td>
+									<td>
+										<select class="form-select select_bar" id="part_number">
+											<option selected>Choose...</option>
+											<option value="1">One</option>
+										</select>
+									</td>
+									<td>
+										<select class="form-select select_bar" id="equipt_description">
+											<option selected>Choose...</option>
+											<option value="1">One</option>
+										</select>
+									</td>
+									<td>
+										<input class="form-control datepicker" id="Installation_date" type="date">
+									</td>
+									<td>
+										<input class="form-control inline_it" id="warranty" type="text">
+										<label>months</label>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+									</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						{% endif %}
 					</table>
 				</div>
 			</div>
@@ -217,7 +223,12 @@
 			<!-- add textarea for description -->
 			<div class="form-group description_bar">
 				<label for="case_description">Case Description</label>
-				<textarea class="form-control" id="case_description" rows="3"></textarea>
+				{% if state == 'view' %}
+					<textarea class="form-control" id="case_description" rows="3">{{ case.case_description }}</textarea>
+				{% else %}
+					<textarea class="form-control" id="case_description" rows="3"></textarea>
+				{% endif %}
+
 			</div>
 
 			<!-- visit list -->
@@ -236,7 +247,7 @@
 							{% for visit in visits %}
 							<tr>
 								<td><a href="{% url 'ASISupport_app:view_visit' visit.visit_num %}">{{ visit.visit_num }}</a></td>
-								<td>{{ visit.visit_date }}</td>
+								<td>{{ visit.visit_date|date:'d/m/Y' }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -246,13 +257,14 @@
 			</div>
 			{% endif %}
 
-
-			{% if state == 'new' %}
-			<div class="action_btn"><!-- visible when in create new or edit mode -->
+			<!-- save and cancel btns -->
+			<div class="action_btn">
 				<button type="submit" class="btn btn-primary">Save</button>
+				{% if state == 'new' %}
 				<button type="submit" class="btn btn-primary">Cancel</button>
+				{% endif %}
 			</div>
-			{% endif %}
+			
 
 		</form>
 	</section>

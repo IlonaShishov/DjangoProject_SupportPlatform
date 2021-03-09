@@ -14,12 +14,16 @@
 
 			<!-- show case number -->
 			<div>
-				<h1 class="inline_it">Visit V000001</h1>
+				{% if state == 'view' %}
+					<h1 class="inline_it">Visit {{ visit.visit_num }}</h1>
 
-				<div class="action_btn"><!-- visible when in view mode -->
-					<button type="submit" class="btn btn-primary">Edit</button>
-					<button type="submit" class="btn btn-primary">Back</button>
-				</div>
+					<div class="action_btn"><!-- visible when in view mode -->
+						<button type="submit" class="btn btn-primary">Edit</button>
+						<button type="submit" class="btn btn-primary">Back</button>
+					</div>
+				{% else %}
+					<h1 class="inline_it">New Visit</h1>
+				{% endif %}
 			</div>
 			
 			<div class="spacing">
@@ -117,42 +121,6 @@
 			</div>
 
 			<!-- parts list -->
-			<!-- <div class="spacing">
-				<label>Parts Used</label>
-				<div class="parts_lst">
-					<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="part_num">Part Number</label>
-						</div>
-						<input class="form-control" type="text" id="part_num">
-					</div>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="part_description">Description</label>
-						</div>
-						<input class="form-control" id="part_description" type="text">
-					</div>
-
-					<div class="inline_it text_bar not_first">
-						<div>
-							<label for="qty">Quantity</label>
-						</div>
-						<input class="form-control" id="qty" type="text">
-					</div>
-
-					<div class="form-check inline_it charge_cb">
-						<input type="checkbox" id="charge">
-						<label for="charge">Charge</label>
-					</div>
-
-					<div class="spacing">
-						<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
-					</div>
-				</div>
-			</div> -->
 			<div class="spacing">
 				<label>Parts Used</label>
 				<div class="parts_lst">
@@ -207,10 +175,12 @@
 				<textarea class="form-control" id="visit_summary" rows="3"></textarea>
 			</div>
 
-			<div class="action_btn"><!-- visible when in create new or edit mode -->
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button type="submit" class="btn btn-primary">Cancel</button>
-			</div>
+			{% if state == 'new' %}
+				<div class="action_btn"><!-- visible when in create new or edit mode -->
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button type="submit" class="btn btn-primary">Cancel</button>
+				</div>
+			{% endif %}
 
 		</form>
 	</section>

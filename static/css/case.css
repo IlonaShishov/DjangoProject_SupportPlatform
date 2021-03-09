@@ -9,17 +9,19 @@
 
 .date_bar{
 	width: 160px;
-	margin-left: 40px;
+}
+
+.inline_spacing{
+	margin: 14px 0px;
+	padding: 0px 0px 0px 40px;
 }
 
 .text_bar{
 	width: 160px;
-	margin-left: 40px;
 }
 
 .machine_down_cb{
 	color: red;
-	padding-left: 40px;
 }
 
 .object_table{
@@ -55,4 +57,12 @@ tr td:last-child input{
 
 tr td:last-child label{
     color: gray;
+}
+
+select:disabled {
+  background: #dddddd;
+}
+
+td label{
+	padding-left: 5px;
 }

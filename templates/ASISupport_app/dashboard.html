@@ -56,7 +56,7 @@
 						{% for case in cases %}
 						<tr>
 							<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
-							<td>{{ case.create_date }}</td>
+							<td>{{ case.create_date|date:'d/m/Y' }}</td>
 							<td>{{ case.case_type }}</td>
 							<td>{{ case.status }}</td>
 							<td>{{ case.customer }}</td>
