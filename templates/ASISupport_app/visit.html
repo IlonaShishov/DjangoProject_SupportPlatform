@@ -25,6 +25,8 @@
 					<h1 class="inline_it">New Visit</h1>
 				{% endif %}
 			</div>
+
+			<hr class="solid">
 			
 			<!-- case number -->
 			<div>
@@ -187,18 +189,19 @@
 						</thead>
 						{% if state == 'view' %}
 							<tbody>
-								{% for part in parts %}
+								{% for visit_part in visit_parts_lst %}
 										<tr>
 											<td></td>
-											<td>{{ part.part_pn }}</td>
-											<td>{{ part.part_description }}</td>
-											<td>{{ part.qty }}</td>
+											<td>{{ visit_part.part_pn }}</td> 
+											<td>{{ part_description_dict|lookup:visit_part.part_pn }}<!-- why none???? -->
+											</td>
+											<td>{{ visit_part.qty }}</td>
 											<td>
 												<div class="form-check charge_cb">
-													{% if part.charge %}
-														<input type="checkbox" id="charge" checked>
+													{% if visit_part.charge %}
+														<input type="checkbox" id="charge" checked disabled>
 													{% else %}
-														<input type="checkbox" id="charge">
+														<input type="checkbox" id="charge" disabled>
 													{% endif %}
 													<label for="charge">Charge</label>
 												</div>
