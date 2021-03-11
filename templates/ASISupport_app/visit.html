@@ -189,11 +189,11 @@
 						</thead>
 						{% if state == 'view' %}
 							<tbody>
-								{% for visit_part in visit_parts_lst %}
+								{% for visit_part, description in part_description_dict.items %}
 										<tr>
 											<td></td>
 											<td>{{ visit_part.part_pn }}</td> 
-											<td>{{ part_description_dict|lookup:visit_part.part_pn }}<!-- why none???? -->
+											<td>{{ description }}<!-- why none???? -->
 											</td>
 											<td>{{ visit_part.qty }}</td>
 											<td>

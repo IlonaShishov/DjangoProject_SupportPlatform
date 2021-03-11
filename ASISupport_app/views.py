@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
 # from django.views.generic import (TemplateView)
-from django.template.defaulttags import register
 
 
 # Create your views here.
@@ -69,10 +68,6 @@ def visit_view(request, id):
 	visit_parts_lst = VisitParts.objects.filter(visit_num=id)
 	part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
 	parts = Parts.objects.filter(part_pn__in=part_pn_lst)
-	part_description_dict = {part.part_pn:part.part_description for part in parts}
+	part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts}
 
 	return render(request, 'ASISupport_app/visit.html', locals())
-
-@register.filter
-def lookup(dictionary, key):
-    return dictionary.get(key)
