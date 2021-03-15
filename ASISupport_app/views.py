@@ -1,47 +1,59 @@
-from django.shortcuts import render
-
-#imports for login
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
-# from django.views.generic import (TemplateView)
+  
 
+# class MyLoginView(LoginView):
+#     template_name = 'ASISupport_app/login.html'
 
-# Create your views here.
-def login_view(request):
+# def login_view(request):
 
-	if request.method == 'POST':
-		username = request.POST.get('username')
-		password = request.POST.get('password')
+# 	if request.method == 'POST':
+# 		username = request.POST.get('email')
+# 		password = request.POST.get('password')
 
-		user = authenticate(username = username, password = password)
+# 		user = authenticate(username = username, password = password)
 
-		if user:
-			if user.is_active:
-				login(request, user)
-				return HttpResponseRedirect(reverse('dashboard'))
-			else:
-				return HttpResponse('Account not active')
-		else:
-			print('Username: {}'.format(username))
-			return HttpResponse('Invalid credentials')
-	else:
-		return render(request, 'ASISupport_app/login.html', {})
+# 		if user:
+# 			if user.is_active:
+# 				login(request, user)
+# 				return HttpResponseRedirect(reverse('dashboard'))
+# 			else:
+# 				return HttpResponse('Account not active')
+# 		else:
+# 			print('Username: {}'.format(username))
+# 			return HttpResponse('Invalid credentials')
+# 	else:
+# 		return render(request, 'ASISupport_app/login.html', {})
 
+def logout_view(request):
+    logout(request)
+
+@login_required(login_url='/accounts/login/')
 def dashboard_view(request):
 	cases = Case.objects.all()
 	return render(request, 'ASISupport_app/dashboard.html', locals())
 
+@login_required(login_url='/accounts/login/')
 def new_case_view(request):
 	state = 'new'
 	types = Case.TYPES
 	statuses = Case.STATUSES
 	employees = Employee.objects.all()
 	customers = Customer.objects.all()
+
+	# if request.method == 'POST':
+	# 	req_type = request.POST.get('type')
+	# 	req_status = request.POST.get('status')
+	# 	print(f'{req_type}\n{req_status}')
+
 	return render(request, 'ASISupport_app/case.html', locals())
 
+@login_required(login_url='/accounts/login/')
 def case_view(request, id):
 	state = 'view'
 	case = Case.objects.get(case_num=id)
@@ -54,11 +66,13 @@ def case_view(request, id):
 	statuses = Case.STATUSES
 	return render(request, 'ASISupport_app/case.html', locals())
 
+@login_required(login_url='/accounts/login/')
 def new_visit_view(request):
 	state = 'new'
 	employees = Employee.objects.all()
 	return render(request, 'ASISupport_app/visit.html', locals())
 
+@login_required(login_url='/accounts/login/')
 def visit_view(request, id):
 	state = 'view'
 	visit = Visit.objects.get(visit_num=id)

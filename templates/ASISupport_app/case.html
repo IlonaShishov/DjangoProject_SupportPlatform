@@ -32,11 +32,11 @@
 					<label for="type">Type</label>
 				</div>
 				{% if state == 'view' %}
-					<select class="form-select select_bar" id="type" disabled>
+					<select class="form-select select_bar" name="type" disabled>
 						<option selected>{{ case.case_type }}</option>
 					</select>
 				{% else %}
-					<select class="form-select select_bar" id="type">
+					<select class="form-select select_bar" name="type">
 						<option selected>Choose...</option>
 						{% for val, name in types %}
 							<option value="{{ val }}">{{ name }}</option>
@@ -51,11 +51,11 @@
 					<label for="status">Status</label>
 				</div>
 					{% if state == 'view' %}
-						<select class="form-select select_bar" id="status" disabled>
+						<select class="form-select select_bar" name="status" disabled>
 							<option selected>{{ case.status }}</option>
 						</select>
 					{% else %}
-						<select class="form-select select_bar" id="status">
+						<select class="form-select select_bar" name="status">
 							<option selected>Choose...</option>
 						{% for val, name in statuses %}
 							<option value="{{ val }}">{{ name }}</option>
@@ -70,9 +70,9 @@
 					<label class="date_bar" for="projected_date">Projected Completion Date</label>
 				</div>
 				{% if state == 'view' %}
-					<input class="form-control datepicker date_bar" id="projected_date" type="date" value="{{ case.target_date|date:'Y-m-d' }}" disabled>
+					<input class="form-control datepicker date_bar" name="projected_date" type="date" value="{{ case.target_date|date:'Y-m-d' }}" disabled>
 				{% else %}
-					<input class="form-control datepicker date_bar" id="projected_date" type="date">
+					<input class="form-control datepicker date_bar" name="projected_date" type="date">
 				{% endif %}
 			</div>
 
@@ -82,9 +82,9 @@
 					<label for="actual_date">Actual Completion Date</label>
 				</div>
 				{% if state == 'view' %}
-					<input class="form-control datepicker date_bar" id="actual_date" type="date" value="{{ case.actual_date|date:'Y-m-d' }}" disabled>
+					<input class="form-control datepicker date_bar" name="actual_date" type="date" value="{{ case.actual_date|date:'Y-m-d' }}" disabled>
 				{% else %}
-					<input class="form-control datepicker date_bar" id="actual_date" type="date">
+					<input class="form-control datepicker date_bar" name="actual_date" type="date">
 				{% endif %}
 			</div>
 
@@ -96,11 +96,11 @@
 					<label for="case_manager">Case Manager</label>
 				</div>
 				{% if state == 'view' %}
-					<select class="form-select select_bar" id="case_manager" disabled>
+					<select class="form-select select_bar" name="case_manager" disabled>
 						<option selected>{{ case.case_manager }}</option>
 					</select>
 				{% else %}
-					<select class="form-select select_bar" id="case_manager">
+					<select class="form-select select_bar" name="case_manager">
 						<option selected>Choose...</option>
 						{% for employee in employees %}
 							<option value="{{ employee }}">{{ employee }}</option>
@@ -113,12 +113,12 @@
 			<div class="form-check inline_it inline_spacing machine_down_cb last_row_object">
 				{% if state == 'view' %}
 					{% if case.machine_down %}
-						<input type="checkbox" id="machine_down" checked disabled>
+						<input type="checkbox" name="machine_down" checked disabled>
 					{% else %}
-						<input type="checkbox" id="machine_down" disabled>
+						<input type="checkbox" name="machine_down" disabled>
 					{% endif %}
 				{% else %}
-					<input type="checkbox" id="machine_down">
+					<input type="checkbox" name="machine_down">
 				{% endif %}
 				<label for="machine_down">Machine Down</label>
 			</div>
@@ -131,11 +131,11 @@
 					<label for="customer">Customer</label>
 				</div>
 				{% if state == 'view' %}
-					<select class="form-select select_bar" id="customer" disabled>
+					<select class="form-select select_bar" name="customer" disabled>
 						<option selected>{{ case.customer }}</option>
 					</select>
 				{% else %}
-					<select class="form-select select_bar" id="customer">
+					<select class="form-select select_bar" name="customer">
 						<option selected>Choose...</option>
 						{% for customer in customers %}
 							<option value="{{ customer }}">{{ customer }}</option>
@@ -150,9 +150,9 @@
 					<label for="customer_contact">Customer Contact</label>
 				</div>
 				{% if state == 'view' %}
-					<input class="form-control text_bar" id="customer_contact" type="text" placeholder="Enter Name..." value="{{ case.customer_contact }}" disabled>
+					<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name..." value="{{ case.customer_contact }}" disabled>
 				{% else %}
-					<input class="form-control text_bar" id="customer_contact" type="text" placeholder="Enter Name...">
+					<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name...">
 				{% endif %}
 			</div>
 
@@ -238,9 +238,9 @@
 			<div class="form-group description_bar">
 				<label for="case_description">Case Description</label>
 				{% if state == 'view' %}
-					<textarea class="form-control" id="case_description" rows="3" disabled>{{ case.case_description }}</textarea>
+					<textarea class="form-control" name="case_description" rows="3" disabled>{{ case.case_description }}</textarea>
 				{% else %}
-					<textarea class="form-control" id="case_description" rows="3"></textarea>
+					<textarea class="form-control" name="case_description" rows="3"></textarea>
 				{% endif %}
 
 			</div>

@@ -9,6 +9,5 @@ urlpatterns = [
 	path('case/<id>/', views.case_view, name = 'view_case'),
 	path('visit/', views.new_visit_view, name = 'new_visit'),
 	path('visit/<id>/', views.visit_view, name = 'view_visit'),
-	path('login/', views.login_view, name = 'login'),
 ]
 

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+{% extends "ASISupport_app/base.html" %}
+{% load static %}
+
+{% block head_block %}
+	<title>ASI Login</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block body_block %}
+	{% if form.errors %}
+	<p>Your username and password didn't match. Please try again.</p>
+	{% endif %}
+
+	{% if next %}
+	    {% if user.is_authenticated %}
+	    	<p>Your account doesn't have access to this page. To proceed,
+	    please login with an account that has access.</p>
+	    {% else %}
+	    	<p>Please login to see this page.</p>
+	    {% endif %}
+	{% endif %}
+
+	<section class="col-12 col-sm-6 col-md-3">
+		<form class="form-container" action="{% url 'login' %}" method="POST">
+			{% csrf_token %}
+			<h2 align="center">Welcome to ASI</h2>
+			<h4 align="center">Please login</h4>
+
+			<div class="form-group">
+		    	<label for="email"><b>{{ form.username.label_tag }}</b></label>
+		    	{{ form.username }}
+		    	<!-- <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Enter Email"> -->
+		  	</div>
+
+		  	<div class="form-group">
+		    	<label for="password"><b>{{ form.password.label_tag }}</b></label>
+		    	{{ form.password }}
+		    	<!-- <input type="password" class="form-control" name="password" placeholder="Enter Password"> -->
+		  	</div>
+
+		  <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+		</form>
+	</section>
+{% endblock %}
