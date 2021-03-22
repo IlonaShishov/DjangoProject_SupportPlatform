@@ -1,6 +1,3 @@
-/*.bg{
-	background: url('/static/images/Background1.jpg') no-repeat;
-	width: 100%;
-	height: 100vh;
-	background-size: 100%;
-}*/
+.error_message p{
+  color: red;
+}

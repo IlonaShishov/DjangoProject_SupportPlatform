@@ -30,3 +30,16 @@ hr.solid {
   width: 30px;
   padding: 3px;
 }
+
+.logout_btn{
+	position:fixed;
+	right:10px;
+	top:5px;
+	background-color: Transparent;
+	border-color: Transparent;
+}
+
+.logout_btn:hover {
+	background-color: Transparent;
+	border-color: white;
+}

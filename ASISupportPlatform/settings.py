@@ -134,3 +134,4 @@ STATICFILES_DIRS = [STATIC_DIR,]
 LOGIN_URL = '/ASISupport_app/login_view'
 
 LOGIN_REDIRECT_URL = 'ASISupport_app:dashboard'
+LOGOUT_REDIRECT_URL = 'login'

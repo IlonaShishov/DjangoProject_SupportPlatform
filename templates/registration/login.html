@@ -8,24 +8,26 @@
 {% endblock %}
 
 {% block body_block %}
-	{% if form.errors %}
-	<p>Your username and password didn't match. Please try again.</p>
-	{% endif %}
-
-	{% if next %}
-	    {% if user.is_authenticated %}
-	    	<p>Your account doesn't have access to this page. To proceed,
-	    please login with an account that has access.</p>
-	    {% else %}
-	    	<p>Please login to see this page.</p>
-	    {% endif %}
-	{% endif %}
-
 	<section class="col-12 col-sm-6 col-md-3">
 		<form class="form-container" action="{% url 'login' %}" method="POST">
 			{% csrf_token %}
 			<h2 align="center">Welcome to ASI</h2>
 			<h4 align="center">Please login</h4>
+
+			<div align="center" class="error_message">
+				{% if form.errors %}
+					<p><small>Your username and password didn't match. Please try again.</small></p>
+				{% endif %}
+
+				{% if next %}
+				    {% if user.is_authenticated %}
+				    	<p><small>Your account doesn't have access to this page. To proceed,
+				    please login with an account that has access.</small></p>
+				    {% else %}
+				    	<p><small>Please login to see this page.</small></p>
+				    {% endif %}
+				{% endif %}
+			</div>
 
 			<div class="form-group">
 		    	<label for="email"><b>{{ form.username.label_tag }}</b></label>

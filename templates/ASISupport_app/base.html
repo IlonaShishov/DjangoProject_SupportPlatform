@@ -10,6 +10,12 @@
 		{% endblock %}
 	</head>
 	<body>
+		{% if request.resolver_match.url_name != 'login' %}
+			<form class="logout_btn" align='right' action="{% url 'logout' %}" method="POST">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-primary logout_btn">log out</button>
+			</form>
+		{% endif %}
 		<section class="container-fluid">
 			<section class="row justify-content-center">
 				{% block body_block %}

@@ -7,31 +7,9 @@ from django.contrib.auth.views import LoginView
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
   
 
-# class MyLoginView(LoginView):
-#     template_name = 'ASISupport_app/login.html'
-
-# def login_view(request):
-
-# 	if request.method == 'POST':
-# 		username = request.POST.get('email')
-# 		password = request.POST.get('password')
-
-# 		user = authenticate(username = username, password = password)
-
-# 		if user:
-# 			if user.is_active:
-# 				login(request, user)
-# 				return HttpResponseRedirect(reverse('dashboard'))
-# 			else:
-# 				return HttpResponse('Account not active')
-# 		else:
-# 			print('Username: {}'.format(username))
-# 			return HttpResponse('Invalid credentials')
-# 	else:
-# 		return render(request, 'ASISupport_app/login.html', {})
 
 def logout_view(request):
-    logout(request)
+    return auth_views.logout(request)
 
 @login_required(login_url='/accounts/login/')
 def dashboard_view(request):
@@ -40,18 +18,52 @@ def dashboard_view(request):
 
 @login_required(login_url='/accounts/login/')
 def new_case_view(request):
+
+	if request.method == 'POST':
+		cases = Case.objects.all()
+		case_num_lst = [int(case.case_num[1:]) for case in cases]
+		max_case_num = max(case_num_lst)
+
+
+		req_case_num 			= 'C'+str(max_case_num+1).zfill(6)
+		req_case_type 			= request.POST.get('type')
+		req_status 				= request.POST.get('status')
+		# req_create_date 		= 
+		req_target_date 		= request.POST.get('projected_date')
+		req_actual_date 		= request.POST.get('actual_date')
+		req_case_manager 		= request.POST.get('case_manager')
+		req_machine_down 		= request.POST.get('machine_down')
+		req_customer 			= request.POST.get('customer')
+		req_customer_contact 	= request.POST.get('customer_contact')
+		req_case_description 	= request.POST.get('case_description')
+		# req_cancellation_reason = request.POST.get('status')
+		# req_on_hold_reason 		= request.POST.get('status')
+		
+		case_data = Case(case_num=req_case_num, 
+						case_type=req_case_type,
+						status=req_status,
+						# create_date=req_create_date,
+						target_date=req_target_date,
+						actual_date=req_actual_date,
+						case_manager=req_case_manager,
+						machine_down=req_machine_down,
+						customer=req_customer,
+						customer_contact=req_customer_contact,
+						case_description=req_case_description
+						# cancellation_reason=req_cancellation_reason,
+						# on_hold_reason=req_on_hold_reason
+						)		
+		case_data.save()
+		return redirect('case_view', req_case_num)
+
 	state = 'new'
 	types = Case.TYPES
 	statuses = Case.STATUSES
 	employees = Employee.objects.all()
 	customers = Customer.objects.all()
 
-	# if request.method == 'POST':
-	# 	req_type = request.POST.get('type')
-	# 	req_status = request.POST.get('status')
-	# 	print(f'{req_type}\n{req_status}')
-
 	return render(request, 'ASISupport_app/case.html', locals())
+
 
 @login_required(login_url='/accounts/login/')
 def case_view(request, id):

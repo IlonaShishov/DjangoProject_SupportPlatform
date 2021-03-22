@@ -14,7 +14,7 @@
 
 			<!-- welcome header -->
 			<div class="welcome">
-				<h1 class="inline_it">Welcome {{request.user}}</h1>
+				<h1 class="inline_it">Welcome {{request.user.get_full_name}}</h1>
 				<img src="/static/images/ASI_logo.jpg"/>
 			</div>
 
