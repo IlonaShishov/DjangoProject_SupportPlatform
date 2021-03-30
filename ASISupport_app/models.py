@@ -63,20 +63,20 @@ class Case(models.Model):
 class Visit(models.Model):
 	visit_num 				= models.CharField(max_length=100, primary_key=True)
 	case_num 				= models.ForeignKey(Case, on_delete=models.CASCADE)
+	create_date 			= models.DateTimeField(default=timezone.now)
 	visit_date 				= models.DateTimeField(default = timezone.now)
 	engineer 				= models.ForeignKey(Employee, on_delete=models.CASCADE)
-	customer 				= models.ForeignKey(Customer, on_delete=models.CASCADE)#!!!must be same customer as in case
-	customer_contact 		= models.CharField(max_length=100)#!!!must be same customer as in case
+	customer 				= models.ForeignKey(Customer, on_delete=models.CASCADE)
+	customer_contact 		= models.CharField(max_length=100)
 	remote 					=  models.BooleanField(default=False)
 	visit_start 			= models.TimeField() 
 	visit_end 				= models.TimeField() 
-	# visit_hours 			= models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 	travel_hours 			= models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 	num_of_engineers 		= models.IntegerField(blank=True, null=True)
 	visit_summary 			= models.TextField()
 
 	def sum_visit_hours(self):
-		self.visit_hours = (datetime.strptime(str(self.visit_end), '%H:%M:%S') - datetime.strptime(str(self.visit_start), '%H:%M:%S')).seconds / 3600
+		self.tot_visit_hours = (datetime.strptime(str(self.visit_end), '%H:%M:%S') - datetime.strptime(str(self.visit_start), '%H:%M:%S')).seconds / 3600
 
 	def __str__(self):
 		return self.visit_num

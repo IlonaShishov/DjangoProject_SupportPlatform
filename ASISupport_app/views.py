@@ -22,7 +22,7 @@ def new_case_view(request):
 	state = 'new'
 
 	if request.method == 'POST' and 'save_btn' in request.POST:
-		print(request.POST.get('machine_down'))
+		
 		cases = Case.objects.all()
 		case_num_lst = [int(case.case_num[1:]) for case in cases]
 		max_case_num = max(case_num_lst)
@@ -41,7 +41,7 @@ def new_case_view(request):
 		req_case_manager 		= Employee.objects.filter(first_name=request.POST.get('case_manager').split()[0], last_name=request.POST.get('case_manager').split()[1])[0]
 		
 		req_machine_down		= request.POST.get('machine_down')
-		if request.POST.get('machine_down') == 'on':
+		if req_machine_down == 'on':
 			req_machine_down = True
 		else:
 			req_machine_down = False
@@ -80,7 +80,6 @@ def new_case_view(request):
 
 	return render(request, 'ASISupport_app/case.html', locals())
 
-
 @login_required(login_url='/accounts/login/')
 def case_view(request, id):
 	state = 'view'
@@ -99,10 +98,54 @@ def case_view(request, id):
 	return render(request, 'ASISupport_app/case.html', locals())
 
 @login_required(login_url='/accounts/login/')
-def new_visit_view(request, case):
+def new_visit_view(request, id):
 	state = 'new'
 
-	case = Case.objects.get(case_num=case)
+	case = Case.objects.get(case_num=id)
+
+	if request.method == 'POST' and 'save_btn' in request.POST:
+		visits = Visit.objects.all()
+		visit_num_lst = [int(visit.visit_num[1:]) for visit in visits]
+		max_visit_num = max(visit_num_lst)
+
+		req_visit_num 			= 'V'+str(max_visit_num+1).zfill(6)
+		req_case_num			= case
+		req_visit_date 			= datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
+		req_engineer 			= Employee.objects.filter(first_name=request.POST.get('engineer').split()[0], last_name=request.POST.get('engineer').split()[1])[0]
+		req_customer 			= case.customer
+		req_customer_contact 	= request.POST.get('customer_contact')
+
+		req_remote		= request.POST.get('remote')
+		if req_remote == 'on':
+			req_remote = True
+		else:
+			req_remote = False
+
+		req_visit_start 		= request.POST.get('visit_start') + ':00'
+		req_visit_end 			= request.POST.get('visit_end') + ':00'
+		req_travel_hours 		= request.POST.get('travel_hours')
+		req_num_of_engineers 	= request.POST.get('num_of_engineers')
+		req_visit_summary 		= request.POST.get('visit_summary')
+
+		visit_data = Visit(visit_num=req_visit_num, 
+						case_num=req_case_num,
+						visit_date=req_visit_date,
+						engineer=req_engineer,
+						customer=req_customer,
+						customer_contact=req_customer_contact,
+						remote=req_remote,
+						visit_start=req_visit_start,
+						visit_end=req_visit_end,
+						travel_hours=req_travel_hours,
+						num_of_engineers=req_num_of_engineers,
+						visit_summary=req_visit_summary
+						)		
+		visit_data.sum_visit_hours()
+		visit_data.save()
+		return redirect('ASISupport_app:view_visit', id=req_visit_num)
+
+	if request.method == 'POST' and 'cancel_btn' in request.POST:
+		return redirect('ASISupport_app:view_case', id=id)
 
 	employees = Employee.objects.all()
 	return render(request, 'ASISupport_app/visit.html', locals())
@@ -112,7 +155,10 @@ def visit_view(request, id):
 	state = 'view'
 
 	visit = Visit.objects.get(visit_num=id)
-	
+
+	if request.method == 'POST' and 'back_btn' in request.POST:
+		return redirect('ASISupport_app:view_case', id=visit.case_num)
+
 	visit.sum_visit_hours()
 	case = Case.objects.get(case_num=visit.case_num)
 
