@@ -14,6 +14,7 @@ class Employee(models.Model):
 
 	def __str__(self):
 		return f'{self.first_name} {self.last_name}'
+		'''note: must be unique for case creation unique'''
 
 
 class Customer(models.Model):
@@ -44,12 +45,12 @@ class Case(models.Model):
 	target_date 			= models.DateField()
 	actual_date 			= models.DateField(blank=True, null=True)
 	case_manager 			= models.ForeignKey(Employee, on_delete=models.CASCADE)
-	machine_down 			=  models.BooleanField(default=False)
+	machine_down 			= models.BooleanField(default=False)
 	customer 				= models.ForeignKey(Customer, on_delete=models.CASCADE)
 	customer_contact 		= models.CharField(max_length=100)
 	case_description 		= models.TextField()
 	# cancellation_reason 	= models.TextField(blank=True, null=True)
-	# on_hold_reason 			= models.TextField(blank=True, null=True)
+	# on_hold_reason 		= models.TextField(blank=True, null=True)
 	
 	def close_case(self):
 		self.actual_date = timezone.now

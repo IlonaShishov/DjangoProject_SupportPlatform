@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
@@ -18,31 +19,44 @@ def dashboard_view(request):
 
 @login_required(login_url='/accounts/login/')
 def new_case_view(request):
+	state = 'new'
 
-	if request.method == 'POST':
+	if request.method == 'POST' and 'save_btn' in request.POST:
+		print(request.POST.get('machine_down'))
 		cases = Case.objects.all()
 		case_num_lst = [int(case.case_num[1:]) for case in cases]
 		max_case_num = max(case_num_lst)
 
-
 		req_case_num 			= 'C'+str(max_case_num+1).zfill(6)
 		req_case_type 			= request.POST.get('type')
 		req_status 				= request.POST.get('status')
-		# req_create_date 		= 
-		req_target_date 		= request.POST.get('projected_date')
+		req_target_date 		= datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+
 		req_actual_date 		= request.POST.get('actual_date')
-		req_case_manager 		= request.POST.get('case_manager')
-		req_machine_down 		= request.POST.get('machine_down')
-		req_customer 			= request.POST.get('customer')
+		if req_actual_date:
+			req_actual_date = datetime.strptime(request.POST.get('actual_date'),'%Y-%m-%d')
+		else:
+			req_actual_date = None
+		
+		req_case_manager 		= Employee.objects.filter(first_name=request.POST.get('case_manager').split()[0], last_name=request.POST.get('case_manager').split()[1])[0]
+		
+		req_machine_down		= request.POST.get('machine_down')
+		if request.POST.get('machine_down') == 'on':
+			req_machine_down = True
+		else:
+			req_machine_down = False
+		
+		req_customer 			= Customer.objects.filter(customer_name=request.POST.get('customer'))[0]
 		req_customer_contact 	= request.POST.get('customer_contact')
 		req_case_description 	= request.POST.get('case_description')
 		# req_cancellation_reason = request.POST.get('status')
 		# req_on_hold_reason 		= request.POST.get('status')
-		
+
+		'''is valid?'''
+
 		case_data = Case(case_num=req_case_num, 
 						case_type=req_case_type,
 						status=req_status,
-						# create_date=req_create_date,
 						target_date=req_target_date,
 						actual_date=req_actual_date,
 						case_manager=req_case_manager,
@@ -54,9 +68,11 @@ def new_case_view(request):
 						# on_hold_reason=req_on_hold_reason
 						)		
 		case_data.save()
-		return redirect('case_view', req_case_num)
+		return redirect('ASISupport_app:view_case', id=req_case_num)
 
-	state = 'new'
+	if request.method == 'POST' and 'cancel_btn' in request.POST:
+		return redirect('ASISupport_app:dashboard')
+
 	types = Case.TYPES
 	statuses = Case.STATUSES
 	employees = Employee.objects.all()
@@ -68,6 +84,10 @@ def new_case_view(request):
 @login_required(login_url='/accounts/login/')
 def case_view(request, id):
 	state = 'view'
+
+	if request.method == 'POST' and 'back_btn' in request.POST:
+		return redirect('ASISupport_app:dashboard')
+
 	case = Case.objects.get(case_num=id)
 	visits = Visit.objects.filter(case_num=id)
 
@@ -79,15 +99,20 @@ def case_view(request, id):
 	return render(request, 'ASISupport_app/case.html', locals())
 
 @login_required(login_url='/accounts/login/')
-def new_visit_view(request):
+def new_visit_view(request, case):
 	state = 'new'
+
+	case = Case.objects.get(case_num=case)
+
 	employees = Employee.objects.all()
 	return render(request, 'ASISupport_app/visit.html', locals())
 
 @login_required(login_url='/accounts/login/')
 def visit_view(request, id):
 	state = 'view'
+
 	visit = Visit.objects.get(visit_num=id)
+	
 	visit.sum_visit_hours()
 	case = Case.objects.get(case_num=visit.case_num)
 

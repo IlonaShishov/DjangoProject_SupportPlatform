@@ -9,185 +9,144 @@
 
 {% block body_block %}
 	<section class="col-sm-1 col-sm-10 col-sm-1">
-		<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST">
-			{% csrf_token %}
+		{% if state == 'view' %}
+			<form class="form-container" action="{% url 'ASISupport_app:view_visit' visit.visit_num %}" method="POST">
+				{% csrf_token %}
 
-			<!-- show case number -->
-			<div>
-				{% if state == 'view' %}
+				<!-- show case number -->
+				<div>
 					<h1 class="inline_it">Visit {{ visit.visit_num }}</h1>
 
 					<div class="action_btn">
 						<button type="submit" class="btn btn-primary">Edit</button>
 						<button type="submit" class="btn btn-primary">Back</button>
 					</div>
-				{% else %}
-					<h1 class="inline_it">New Visit</h1>
-				{% endif %}
-			</div>
-
-			<hr class="solid">
-			
-			<!-- case number -->
-			<div>
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="case_num">Case Number</label>
-					</div>
-						<input class="form-control text_bar" id="case_num" type="text" value="{{ visit.case_num }}" disabled>
 				</div>
 
-			<!-- case type -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="case_type">Case Type</label>
-					</div>
-						<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" disabled>
-				</div>
-			</div>
-			
-			<hr class="solid">
-
-			<!-- visit date -->
-			<div class="inline_it inline_spacing">
+				<hr class="solid">
+				
+				<!-- case number -->
 				<div>
-					<label for="visit_date">Visit Date</label>
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="case_num">Case Number</label>
+						</div>
+							<input class="form-control text_bar" id="case_num" type="text" value="{{ visit.case_num }}" disabled>
+					</div>
+
+				<!-- case type -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="case_type">Case Type</label>
+						</div>
+							<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" disabled>
+					</div>
 				</div>
-				{% if state == 'view' %}
+				
+				<hr class="solid">
+
+				<!-- visit date -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="visit_date">Visit Date</label>
+					</div>
 					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" disabled>
-				{% else %}
-					<input class="form-control datepicker" id="visit_date" type="date"> <!-- set default date today -->
-				{% endif %}
-			</div>
-
-			<!-- engineer -->
-			<div class="inline_it inline_spacing">
-				<div>
-					<label for="Engineer">Engineer</label>
 				</div>
-				{% if state == 'view' %}
+
+				<!-- engineer -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="Engineer">Engineer</label>
+					</div>
 					<select class="form-select select_bar" id="Engineer" disabled>
 						<option selected>{{ visit.engineer }}</option>
 					</select>
-				{% else %}
-					<select class="form-select select_bar" id="Engineer">
-						<option selected>Choose...</option>
-						{% for employee in employees %}
-							<option value="{{ employee }}">{{ employee }}</option>
-						{% endfor %}
-					</select>
-				{% endif %}
-			</div>
-
-			<!-- customer -->
-			<div class="inline_it inline_spacing">
-				<div>
-					<label for="customer">Customer</label>
 				</div>
-					<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" disabled>
-			</div>
 
-			<!-- customer contact -->
-			<div class="inline_it inline_spacing">
-				<div>
-					<label for="customer_contact">Customer Contact</label>
+				<!-- customer -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="customer">Customer</label>
+					</div>
+						<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" disabled>
 				</div>
-					<input class="form-control text_bar" id="customer_contact" type="text" value="{{ case.customer_contact }}" disabled>
-			</div>
 
-			<!-- remote check box -->
-			<div class="inline_it inline_spacing remote_cb">
-				{% if state == 'view' %}
+				<!-- customer contact -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="customer_contact">Customer Contact</label>
+					</div>
+						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ case.customer_contact }}" disabled>
+				</div>
+
+				<!-- remote check box -->
+				<div class="inline_it inline_spacing remote_cb">
 					{% if visit.remote %}
 						<input type="checkbox" id="remote" checked disabled>
 					{% else %}
 						<input type="checkbox" id="remote" disabled>
 					{% endif %}
-				{% else %}
-					<input type="checkbox" id="remote">
-				{% endif %}
-				<label for="remote">Remote</label>
-			</div>
+					<label for="remote">Remote</label>
+				</div>
 
-			<hr class="solid">
+				<hr class="solid">
 
-			<!-- visit time calculator -->
-			<div>
-				<!-- visit start -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="visit_start">Visit Start</label>
-					</div>
-					{% if state == 'view' %}
+				<!-- visit time calculator -->
+				<div>
+					<!-- visit start -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_start">Visit Start</label>
+						</div>
 						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" disabled>
-					{% else %}
-						<input class="form-control datepicker" id="visit_start" type="time">
-					{% endif %}
-				</div>
-				<!-- visit end -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="visit_end">Visit End</label>
 					</div>
-					{% if state == 'view' %}
+					<!-- visit end -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_end">Visit End</label>
+						</div>
 						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" disabled>
-					{% else %}
-						<input class="form-control datepicker" id="visit_end" type="time">
-					{% endif %}
-				</div>
-				<!-- tot visit hours -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="visit_hours">Tot Visit Hours</label>
 					</div>
-					{% if state == 'view' %}
+					<!-- tot visit hours -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_hours">Tot Visit Hours</label>
+						</div>
 						<input class="form-control int_bar" id="visit_hours" type="text" value="{{ visit.visit_hours|floatformat:2 }}" disabled>
-					{% else %}
-						<input class="form-control int_bar" id="visit_hours" type="text" disabled>
-					{% endif %}
-				</div>
-			</div>
-			
-			<div>
-				<!-- travel hours -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="travel_hours">Travel Hours</label>
 					</div>
-					{% if state == 'view' %}
+				</div>
+				
+				<div>
+					<!-- travel hours -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="travel_hours">Travel Hours</label>
+						</div>
 						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" disabled>
-					{% else %}
-						<input class="form-control int_bar" id="travel_hours" type="text">
-					{% endif %}
-				</div>
-				<!-- number of engineers -->
-				<div class="inline_it inline_spacing">
-					<div>
-						<label for="num_of_engineers">Number of Engineers</label>
 					</div>
-					{% if state == 'view' %}
+					<!-- number of engineers -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="num_of_engineers">Number of Engineers</label>
+						</div>
 						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" disabled>
-					{% else %}
-						<input class="form-control int_bar" id="num_of_engineers" type="text">
-					{% endif %}
+					</div>
 				</div>
-			</div>
 
-			<!-- parts list -->
-			<div class="spacing">
-				<label>Parts Used</label>
-				<div class="parts_lst">
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th scope="col"></th>
-								<th scope="col">Part Number</th>
-					    		<th scope="col">Description</th>
-					    		<th scope="col">Quantity</th>
-					    		<th scope="col"></th>
-					    	</tr>
-						</thead>
-						{% if state == 'view' %}
+				<!-- parts list -->
+				<div class="spacing">
+					<label>Parts Used</label>
+					<div class="parts_lst">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th scope="col"></th>
+									<th scope="col">Part Number</th>
+						    		<th scope="col">Description</th>
+						    		<th scope="col">Quantity</th>
+						    		<th scope="col"></th>
+						    	</tr>
+							</thead>
 							<tbody>
 								{% for visit_part, description in part_description_dict.items %}
 										<tr>
@@ -209,7 +168,148 @@
 										</tr>
 								{% endfor %}
 							</tbody>
-						{% else %}
+						</table>
+					</div>
+				</div>
+
+				<!-- add textarea for description -->
+				<div class="form-group description_bar">
+					<label for="visit_summary">Visit Summary</label>
+					<textarea class="form-control" id="visit_summary" rows="3" disabled="">{{ visit.visit_summary }}</textarea>
+				</div>
+			</form>
+		{% else %}
+			<form class="form-container" action="{% url 'ASISupport_app:new_visit' case.case_num %}" method="POST">
+				{% csrf_token %}
+
+				<!-- show case number -->
+				<div>
+					<h1 class="inline_it">New Visit</h1>
+				</div>
+
+				<hr class="solid">
+				
+				<!-- case number -->
+				<div>
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="case_num">Case Number</label>
+						</div>
+							<input class="form-control text_bar" id="case_num" type="text" value="{{ case.case_num }}" disabled>
+					</div>
+
+				<!-- case type -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="case_type">Case Type</label>
+						</div>
+							<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" disabled>
+					</div>
+				</div>
+				
+				<hr class="solid">
+
+				<!-- visit date -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="visit_date">Visit Date</label>
+					</div>
+					<input class="form-control datepicker" id="visit_date" type="date"> <!-- set default date today -->
+				</div>
+
+				<!-- engineer -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="Engineer">Engineer</label>
+					</div>
+					<select class="form-select select_bar" id="Engineer">
+						<option selected>Choose...</option>
+						{% for employee in employees %}
+							<option value="{{ employee }}">{{ employee }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<!-- customer -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="customer">Customer</label>
+					</div>
+						<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" disabled>
+				</div>
+
+				<!-- customer contact -->
+				<div class="inline_it inline_spacing">
+					<div>
+						<label for="customer_contact">Customer Contact</label>
+					</div>
+						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ case.customer_contact }}" disabled>
+				</div>
+
+				<!-- remote check box -->
+				<div class="inline_it inline_spacing remote_cb">
+					<input type="checkbox" id="remote">
+					<label for="remote">Remote</label>
+				</div>
+
+				<hr class="solid">
+
+				<!-- visit time calculator -->
+				<div>
+					<!-- visit start -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_start">Visit Start</label>
+						</div>
+						<input class="form-control datepicker" id="visit_start" type="time">
+					</div>
+					<!-- visit end -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_end">Visit End</label>
+						</div>
+						<input class="form-control datepicker" id="visit_end" type="time">
+					</div>
+					<!-- tot visit hours -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="visit_hours">Tot Visit Hours</label>
+						</div>
+						<input class="form-control int_bar" id="visit_hours" type="text" disabled>
+					</div>
+				</div>
+				
+				<div>
+					<!-- travel hours -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="travel_hours">Travel Hours</label>
+						</div>
+						<input class="form-control int_bar" id="travel_hours" type="text">
+					</div>
+					<!-- number of engineers -->
+					<div class="inline_it inline_spacing">
+						<div>
+							<label for="num_of_engineers">Number of Engineers</label>
+						</div>
+						<input class="form-control int_bar" id="num_of_engineers" type="text">
+					</div>
+				</div>
+
+				<!-- parts list -->
+				<div class="spacing">
+					<label>Parts Used</label>
+					<div class="parts_lst">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th scope="col"></th>
+									<th scope="col">Part Number</th>
+						    		<th scope="col">Description</th>
+						    		<th scope="col">Quantity</th>
+						    		<th scope="col"></th>
+						    	</tr>
+							</thead>
 							<tbody>
 								<tr>
 									<td>
@@ -241,29 +341,22 @@
 									<td></td>
 								</tr>
 							</tbody>
-						{% endif %}
-					</table>
+						</table>
+					</div>
 				</div>
-			</div>
 
-			<!-- add textarea for description -->
-			<div class="form-group description_bar">
-				<label for="visit_summary">Visit Summary</label>
-				{% if state == 'view' %}
-					<textarea class="form-control" id="visit_summary" rows="3" disabled="">{{ visit.visit_summary }}</textarea>
-				{% else %}
+				<!-- add textarea for description -->
+				<div class="form-group description_bar">
+					<label for="visit_summary">Visit Summary</label>
 					<textarea class="form-control" id="visit_summary" rows="3"></textarea>
-				{% endif %}
-			</div>
+				</div>
 
-			<!-- save/ cancel btns -->
-			{% if state == 'new' %}
+				<!-- save/ cancel btns -->
 				<div class="action_btn"><!-- visible when in create new or edit mode -->
 					<button type="submit" class="btn btn-primary">Save</button>
 					<button type="submit" class="btn btn-primary">Cancel</button>
 				</div>
-			{% endif %}
-
-		</form>
+			</form>
+		{% endif %}
 	</section>
 {% endblock %}
