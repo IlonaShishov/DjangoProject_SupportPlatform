@@ -4,6 +4,8 @@
 
 {% block head_block %}
 	<title>Visit</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="{% static 'js/visit.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/visit.css' %}">
 {% endblock %}
 
@@ -152,7 +154,7 @@
 										<tr>
 											<td></td>
 											<td>{{ visit_part.part_pn }}</td> 
-											<td>{{ description }}<!-- why none???? -->
+											<td>{{ description }}
 											</td>
 											<td>{{ visit_part.qty }}</td>
 											<td>
@@ -303,7 +305,7 @@
 				<div class="spacing">
 					<label>Parts Used</label>
 					<div class="parts_lst">
-						<table class="table table-hover">
+						<table class="table table-hover" id="parts_used_tbl">
 							<thead>
 								<tr>
 									<th scope="col"></th>
@@ -316,27 +318,27 @@
 							<tbody>
 								<tr>
 									<td>
-										<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+										<button onclick="deleteRow(this,'parts_used_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 									</td>
 									<td>
-										<input class="form-control" type="text" id="part_num">
+										<input class="form-control" type="text" name="part_num" oninput="myFunction({{ parts_dict }})" id="part_num">
 									</td>
 									<td>
-										<input class="form-control" id="part_description" type="text">
+										<input class="form-control" type="text" name="part_description" id="part_description" disabled>
 									</td>
 									<td>
-										<input class="form-control" id="qty" type="text">
+										<input class="form-control" type="text" name="qty">
 									</td>
 									<td>
 										<div class="form-check charge_cb">
-											<input type="checkbox" id="charge">
+											<input type="checkbox" name="charge">
 											<label for="charge">Charge</label>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+										<button onclick="addRow('parts_used_tbl')" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
 									</td>
 									<td></td>
 									<td></td>

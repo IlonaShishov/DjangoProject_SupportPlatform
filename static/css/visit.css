@@ -36,8 +36,12 @@
 
 .charge_cb{
 	color: orange;
-	margin-top: 6px;
+	margin-top: 7px;
 	/*padding-left: 40px;*/
+}
+
+.add_row_cb{
+	margin-left: 3px;
 }
 
 .spacing{

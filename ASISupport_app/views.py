@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from datetime import datetime
+import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
@@ -15,7 +16,7 @@ def logout_view(request):
 @login_required(login_url='/accounts/login/')
 def dashboard_view(request):
 	search_case_value = request.POST.get('search_case')
-	
+
 	if request.method == 'POST' and 'search_case_btn' in request.POST:
 		if search_case_value:
 			cases = Case.objects.filter(case_num__contains=search_case_value, status='Open')
@@ -134,6 +135,13 @@ def new_visit_view(request, id):
 		req_num_of_engineers 	= request.POST.get('num_of_engineers')
 		req_visit_summary 		= request.POST.get('visit_summary')
 
+		# part_pn_lst = request.POST.getlist('part_num')
+		# part_qty_lst = request.POST.getlist('qty')
+		# part_charge_lst = request.POST.getlist('charge')
+		# part_tbl = pd.DataFrame(list(zip(part_pn_lst, part_qty_lst, part_charge_lst)))
+
+		
+
 		visit_data = Visit(visit_num=req_visit_num, 
 						case_num=req_case_num,
 						visit_date=req_visit_date,
@@ -154,6 +162,8 @@ def new_visit_view(request, id):
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
 		return redirect('ASISupport_app:view_case', id=id)
 
+	parts = Parts.objects.all()
+	parts_dict = {part.part_pn:part.part_description for part in parts}
 	employees = Employee.objects.all()
 	return render(request, 'ASISupport_app/visit.html', locals())
 
