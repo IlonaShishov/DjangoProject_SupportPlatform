@@ -31,9 +31,9 @@
 				<!-- filter case -->
 				<div class="inline_it search_bar">
 					<div class="input-group">
-						<input type="search" class="form-control" placeholder="Search Case..." aria-lable="Search"/>
+						<input type="search" name="search_case" class="form-control" placeholder="Search Case..." aria-lable="Search" value="{{ search_case_value|default_if_none:'' }}" />
 						<div class="input-group-btn">
-							<button class="btn btn-default" type="submit">
+							<button class="btn btn-default" type="submit" name="search_case_btn">
 								<i class="glyphicon glyphicon-search"></i>
 							</button>
 						</div>

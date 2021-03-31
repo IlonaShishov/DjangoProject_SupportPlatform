@@ -14,7 +14,14 @@ def logout_view(request):
 
 @login_required(login_url='/accounts/login/')
 def dashboard_view(request):
-	cases = Case.objects.all()
+	search_case_value = request.POST.get('search_case')
+	
+	if request.method == 'POST' and 'search_case_btn' in request.POST:
+		if search_case_value:
+			cases = Case.objects.filter(case_num__contains=search_case_value, status='Open')
+			return render(request, 'ASISupport_app/dashboard.html', locals())
+
+	cases = Case.objects.filter(status='Open')
 	return render(request, 'ASISupport_app/dashboard.html', locals())
 
 @login_required(login_url='/accounts/login/')
