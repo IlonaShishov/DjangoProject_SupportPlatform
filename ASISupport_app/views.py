@@ -135,12 +135,26 @@ def new_visit_view(request, id):
 		req_num_of_engineers 	= request.POST.get('num_of_engineers')
 		req_visit_summary 		= request.POST.get('visit_summary')
 
-		# part_pn_lst = request.POST.getlist('part_num')
-		# part_qty_lst = request.POST.getlist('qty')
-		# part_charge_lst = request.POST.getlist('charge')
-		# part_tbl = pd.DataFrame(list(zip(part_pn_lst, part_qty_lst, part_charge_lst)))
-
-		
+		''' in work '''
+		part_pn_lst = request.POST.getlist('part_num')
+		part_description_lst = request.POST.getlist('part_description')		
+		part_qty_lst = request.POST.getlist('qty')
+		part_charge_lst = request.POST.getlist('charge')
+		print(part_pn_lst)
+		print(part_description_lst)
+		print(part_qty_lst)
+		print(part_charge_lst)
+		part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
+		# part_tbl['part_charge'] = part_tbl['part_charge'].astype('bool')
+		print(part_tbl)
+		# if part_tbl.all(axis='columns'):
+		# 	for row in part_tbl.iterrows():
+  #  				part_data = VisitParts(visit_num=req_visit_num,
+  #  									part_pn=row['part_pn'],
+  #  									qty=row['part_qty'],
+  #  									charge=row['part_charge']
+  #  					)
+		''' in work '''
 
 		visit_data = Visit(visit_num=req_visit_num, 
 						case_num=req_case_num,

@@ -1,19 +1,44 @@
-function myFunction(parts) {
-	var input = document.getElementById("part_num").value;
+function completeDesc(me, parts) {
+	// var index = me.parentNode.parentNode.rowIndex
+	var elementId = me.id
+	var elementIndex = elementId.split("_").pop();
+	var input = document.getElementById(elementId).value;
+
 	if( parts[input] ) {
-		document.getElementById("part_description").value = parts[input];
+		document.getElementById("part_description_" + elementIndex).value = parts[input];
 	}
 	else{
-		document.getElementById("part_description").value = '';
+		document.getElementById("part_description_" + elementIndex).value = '';
 	}
 }
 
 
-function addRow(tableID) {
+function toggleHiddenInput(me) {
+	var elementIndex = me.id.split("_").pop();
+
+	if (me.checked) {
+		document.getElementById("hidden_charge_" + elementIndex).remove();
+	}
+	else {
+		var element_hidden_input = document.createElement("input");
+		element_hidden_input.type = "hidden";
+		element_hidden_input.name="charge";
+		element_hidden_input.id="hidden_charge_" + elementIndex;
+		element_hidden_input.value="False";
+		me.parentNode.appendChild(element_hidden_input);
+	}
+}
+
+
+function addRow(tableID, parts) {
 	var table = document.getElementById(tableID);
 
 	var rowCount = table.rows.length;
 	var row = table.insertRow(rowCount-1);
+
+	while (document.getElementById('part_num_' + rowCount) !=null) {
+		rowCount++;
+	}
 
 	// remove button
 	var cell1 = row.insertCell(0);
@@ -23,7 +48,6 @@ function addRow(tableID) {
 	element1.setAttribute('class', 'btn btn-primary add_or_del_btn');
 	element1.innerHTML="-";
 	element1.onclick = function() {deleteRow(this, tableID);};
-	// element1.setAttribute('onclick','deleteRow('+this+', '+tableID+');');
 	cell1.appendChild(element1);
 
 	// part num
@@ -31,8 +55,9 @@ function addRow(tableID) {
 	var element2 = document.createElement("input");
 	element2.type = "text";
 	element2.name="part_num";
-	element2.id="part_num";
+	element2.id="part_num_" + rowCount;
 	element2.setAttribute('class', 'form-control');
+	element2.oninput = function() {completeDesc(this, parts);};
 	cell2.appendChild(element2);
 
 	// part description
@@ -40,8 +65,8 @@ function addRow(tableID) {
 	var element3 = document.createElement("input");
 	element3.type = "text";
 	element3.name="part_description";
-	element3.id="part_description";
-	element3.setAttribute("disabled", true);
+	element3.id="part_description_" + rowCount;
+	element3.setAttribute("readonly", true);
 	element3.setAttribute('class', 'form-control');
 	cell3.appendChild(element3);
 
@@ -58,15 +83,25 @@ function addRow(tableID) {
 	var element_div = document.createElement("div");
 	element_div.setAttribute('class', 'form-check charge_cb');
 
+	var element_hidden_input = document.createElement("input");
+	element_hidden_input.type = "hidden";
+	element_hidden_input.name="charge";
+	element_hidden_input.id="hidden_charge_" + rowCount;
+	element_hidden_input.value="False";
+
 	var element_input = document.createElement("input");
 	element_input.type = "checkbox";
 	element_input.name="charge";
+	element_input.id="charge_" + rowCount;
+	element_input.value="True";
+	element_input.onclick = function() {toggleHiddenInput(this);};
 
 	var element_label = document.createElement("label");
 	element_label.for = "charge";
 	element_label.innerHTML="Charge";
 	element_label.setAttribute('class', 'add_row_cb');
 
+	element_div.appendChild(element_hidden_input);
 	element_div.appendChild(element_input);
 	element_div.appendChild(element_label);
 

@@ -321,24 +321,25 @@
 										<button onclick="deleteRow(this,'parts_used_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 									</td>
 									<td>
-										<input class="form-control" type="text" name="part_num" oninput="myFunction({{ parts_dict }})" id="part_num">
+										<input class="form-control" type="text" name="part_num" oninput="completeDesc(this,{{ parts_dict }})" id="part_num_1">
 									</td>
 									<td>
-										<input class="form-control" type="text" name="part_description" id="part_description" disabled>
+										<input class="form-control" type="text" name="part_description" id="part_description_1" readonly>
 									</td>
 									<td>
 										<input class="form-control" type="text" name="qty">
 									</td>
 									<td>
 										<div class="form-check charge_cb">
-											<input type="checkbox" name="charge">
+											<input type="hidden" name="charge" id="hidden_charge_1" value="False">
+											<input type="checkbox" name="charge" id="charge_1" onclick="toggleHiddenInput(this)" value="True">
 											<label for="charge">Charge</label>
 										</div>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<button onclick="addRow('parts_used_tbl')" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
+										<button onclick="addRow('parts_used_tbl', {{ parts_dict }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
 									</td>
 									<td></td>
 									<td></td>
