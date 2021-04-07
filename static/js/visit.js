@@ -24,7 +24,7 @@ function toggleHiddenInput(me) {
 		element_hidden_input.type = "hidden";
 		element_hidden_input.name="charge";
 		element_hidden_input.id="hidden_charge_" + elementIndex;
-		element_hidden_input.value="False";
+		element_hidden_input.value="0";
 		me.parentNode.appendChild(element_hidden_input);
 	}
 }
@@ -87,13 +87,13 @@ function addRow(tableID, parts) {
 	element_hidden_input.type = "hidden";
 	element_hidden_input.name="charge";
 	element_hidden_input.id="hidden_charge_" + rowCount;
-	element_hidden_input.value="False";
+	element_hidden_input.value="0";
 
 	var element_input = document.createElement("input");
 	element_input.type = "checkbox";
 	element_input.name="charge";
 	element_input.id="charge_" + rowCount;
-	element_input.value="True";
+	element_input.value="1";
 	element_input.onclick = function() {toggleHiddenInput(this);};
 
 	var element_label = document.createElement("label");

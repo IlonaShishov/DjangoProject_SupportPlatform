@@ -31,6 +31,7 @@ def new_case_view(request):
 
 	if request.method == 'POST' and 'save_btn' in request.POST:
 		
+		''' save case data '''
 		cases = Case.objects.all()
 		case_num_lst = [int(case.case_num[1:]) for case in cases]
 		max_case_num = max(case_num_lst)
@@ -60,8 +61,6 @@ def new_case_view(request):
 		# req_cancellation_reason = request.POST.get('status')
 		# req_on_hold_reason 		= request.POST.get('status')
 
-		'''is valid?'''
-
 		case_data = Case(case_num=req_case_num, 
 						case_type=req_case_type,
 						status=req_status,
@@ -76,6 +75,11 @@ def new_case_view(request):
 						# on_hold_reason=req_on_hold_reason
 						)		
 		case_data.save()
+
+		''' save equipment data''' 
+
+
+
 		return redirect('ASISupport_app:view_case', id=req_case_num)
 
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
@@ -85,6 +89,10 @@ def new_case_view(request):
 	statuses = Case.STATUSES
 	employees = Employee.objects.all()
 	customers = Customer.objects.all()
+	equipment = Equipment.objects.all()
+	equip_sn_lst = [equip.equip_sn for equip in equipment]
+	equip_pn_lst = [equip.equip_pn for equip in equipment]
+	equip_description_lst = [equip.equip_description for equip in equipment]
 
 	return render(request, 'ASISupport_app/case.html', locals())
 
@@ -112,6 +120,8 @@ def new_visit_view(request, id):
 	case = Case.objects.get(case_num=id)
 
 	if request.method == 'POST' and 'save_btn' in request.POST:
+
+		''' save visit data '''
 		visits = Visit.objects.all()
 		visit_num_lst = [int(visit.visit_num[1:]) for visit in visits]
 		max_visit_num = max(visit_num_lst)
@@ -122,39 +132,16 @@ def new_visit_view(request, id):
 		req_engineer 			= Employee.objects.filter(first_name=request.POST.get('engineer').split()[0], last_name=request.POST.get('engineer').split()[1])[0]
 		req_customer 			= case.customer
 		req_customer_contact 	= request.POST.get('customer_contact')
-
 		req_remote		= request.POST.get('remote')
 		if req_remote == 'on':
 			req_remote = True
 		else:
 			req_remote = False
-
 		req_visit_start 		= request.POST.get('visit_start') + ':00'
 		req_visit_end 			= request.POST.get('visit_end') + ':00'
 		req_travel_hours 		= request.POST.get('travel_hours')
 		req_num_of_engineers 	= request.POST.get('num_of_engineers')
 		req_visit_summary 		= request.POST.get('visit_summary')
-
-		''' in work '''
-		part_pn_lst = request.POST.getlist('part_num')
-		part_description_lst = request.POST.getlist('part_description')		
-		part_qty_lst = request.POST.getlist('qty')
-		part_charge_lst = request.POST.getlist('charge')
-		print(part_pn_lst)
-		print(part_description_lst)
-		print(part_qty_lst)
-		print(part_charge_lst)
-		part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
-		# part_tbl['part_charge'] = part_tbl['part_charge'].astype('bool')
-		print(part_tbl)
-		# if part_tbl.all(axis='columns'):
-		# 	for row in part_tbl.iterrows():
-  #  				part_data = VisitParts(visit_num=req_visit_num,
-  #  									part_pn=row['part_pn'],
-  #  									qty=row['part_qty'],
-  #  									charge=row['part_charge']
-  #  					)
-		''' in work '''
 
 		visit_data = Visit(visit_num=req_visit_num, 
 						case_num=req_case_num,
@@ -171,6 +158,24 @@ def new_visit_view(request, id):
 						)		
 		visit_data.sum_visit_hours()
 		visit_data.save()
+
+		''' save part data '''
+		part_pn_lst = request.POST.getlist('part_num')
+		part_description_lst = request.POST.getlist('part_description')		
+		part_qty_lst = request.POST.getlist('qty')
+		part_charge_lst = request.POST.getlist('charge')
+		part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
+		d = {'1': True, '0': False}
+		part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
+		# if part_tbl.all(axis='columns').all():
+		for index, row in part_tbl.iterrows():
+			part_data = VisitParts(visit_num=Visit.objects.get(visit_num=req_visit_num),
+								part_pn=Parts.objects.get(part_pn=row['part_pn']),
+								qty=row['part_qty'],
+								charge=row['part_charge']
+				)
+			part_data.save()
+
 		return redirect('ASISupport_app:view_visit', id=req_visit_num)
 
 	if request.method == 'POST' and 'cancel_btn' in request.POST:

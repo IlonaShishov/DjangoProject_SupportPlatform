@@ -4,6 +4,8 @@
 
 {% block head_block %}
 	<title>Case</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="{% static 'js/case.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/case.css' %}">
 {% endblock %}
 
@@ -67,9 +69,7 @@
 					<div>
 						<label for="case_manager">Case Manager</label>
 					</div>
-					<select class="form-select select_bar" name="case_manager" disabled>
-						<option selected>{{ case.case_manager }}</option>
-					</select>
+					<input class="form-control text_bar" type="text" name="case_manager" value="{{ case.case_manager }}" disabled>
 				</div>
 
 				<!-- check machine down -->
@@ -89,9 +89,7 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-					<select class="form-select select_bar" name="customer" disabled>
-						<option selected>{{ case.customer }}</option>
-					</select>
+					<input class="form-control text_bar" type="text" name="customer" value="{{ case.customer }}" disabled>
 				</div>
 
 				<!-- customer contact -->
@@ -228,12 +226,12 @@
 					<div>
 						<label for="case_manager">Case Manager</label>
 					</div>
-					<select class="form-select select_bar" name="case_manager">
-						<option selected>Choose...</option>
+					<input class="form-control text_bar" type="text" name="case_manager" list="case_manager" placeholder="Choose...">
+					<datalist id="case_manager">
 						{% for employee in employees %}
 							<option value="{{ employee }}">{{ employee }}</option>
 						{% endfor %}
-					</select>
+					</datalist>
 				</div>
 
 				<!-- check machine down -->
@@ -249,12 +247,12 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-					<select class="form-select select_bar" name="customer">
-						<option selected>Choose...</option>
+					<input class="form-control text_bar" type="text" name="customer" list="customer" placeholder="Choose...">
+					<datalist id="customer">
 						{% for customer in customers %}
 							<option value="{{ customer }}">{{ customer }}</option>
 						{% endfor %}
-					</select>
+					</datalist>
 				</div>
 
 				<!-- customer contact -->
@@ -271,7 +269,7 @@
 				<div>
 					<label>Equipment</label>
 					<div class="object_table">
-						<table class="table table-hover">
+						<table class="table table-hover" id="equipment_tbl">
 							<thead>
 								<tr>
 									<th scope="col"></th>
@@ -285,37 +283,43 @@
 								<tbody>
 									<tr>
 										<td>
-											<button type="submit" class="btn btn-primary add_or_del_btn">-</button>
+											<button onclick="deleteRow(this,'equipment_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 										</td>
 										<td>
-											<select class="form-select select_bar" id="serial_number">
-												<option selected>Choose...</option>
-												<option value="1">One</option>
-											</select>
+											<input class="form-control text_bar" type="text" name="serial_number" list="serial_number" placeholder="Choose..." id="serial_number_1">
+											<datalist id="serial_number">
+												{% for equip in equip_sn_lst %}
+												<option value="{{ equip }}"></option>
+												{% endfor %}
+											</datalist>
 										</td>
 										<td>
-											<select class="form-select select_bar" id="part_number">
-												<option selected>Choose...</option>
-												<option value="1">One</option>
-											</select>
+											<input class="form-control text_bar" type="text" name="part_number" list="part_number" placeholder="Choose..." id="part_number_1">
+											<datalist id="part_number">
+												{% for equip in equip_pn_lst %}
+												<option value="{{ equip }}"></option>
+												{% endfor %}
+											</datalist>
 										</td>
 										<td>
-											<select class="form-select select_bar" id="equipt_description">
-												<option selected>Choose...</option>
-												<option value="1">One</option>
-											</select>
+											<input class="form-control text_bar" type="text" name="equip_description" list="equip_description" placeholder="Choose..." id="equip_description_1">
+											<datalist id="equip_description">
+												{% for equip in equip_description_lst %}
+												<option value="{{ equip }}"></option>
+												{% endfor %}
+											</datalist>
 										</td>
 										<td>
-											<input class="form-control datepicker" id="Installation_date" type="date">
+											<input class="form-control datepicker" name="installation_date" type="date" id="installation_date_1">
 										</td>
 										<td>
-											<input class="form-control inline_it" id="warranty" type="text">
+											<input class="form-control inline_it" name="warranty" id="warranty_1" type="text">
 											<label>months</label>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<button type="submit" class="btn btn-primary add_or_del_btn">+</button>
+											<button onclick="addRow('equipment_tbl', {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
 										</td>
 										<td></td>
 										<td></td>

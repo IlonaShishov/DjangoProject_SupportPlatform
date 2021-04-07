@@ -60,9 +60,7 @@
 					<div>
 						<label for="Engineer">Engineer</label>
 					</div>
-					<select class="form-select select_bar" id="Engineer" disabled>
-						<option selected>{{ visit.engineer }}</option>
-					</select>
+					<input class="form-control text_bar" type="text" name="engineer" value="{{ visit.engineer }}" disabled>
 				</div>
 
 				<!-- customer -->
@@ -224,12 +222,12 @@
 					<div>
 						<label for="engineer">Engineer</label>
 					</div>
-					<select class="form-select select_bar" name="engineer">
-						<option selected>Choose...</option>
+					<input class="form-control text_bar" type="text" name="engineer" list="engineer" placeholder="Choose...">
+					<datalist id="engineer">
 						{% for employee in employees %}
 							<option value="{{ employee }}">{{ employee }}</option>
 						{% endfor %}
-					</select>
+					</datalist>
 				</div>
 
 				<!-- customer -->
@@ -331,8 +329,8 @@
 									</td>
 									<td>
 										<div class="form-check charge_cb">
-											<input type="hidden" name="charge" id="hidden_charge_1" value="False">
-											<input type="checkbox" name="charge" id="charge_1" onclick="toggleHiddenInput(this)" value="True">
+											<input type="hidden" name="charge" id="hidden_charge_1" value="0">
+											<input type="checkbox" name="charge" id="charge_1" onclick="toggleHiddenInput(this)" value="1">
 											<label for="charge">Charge</label>
 										</div>
 									</td>
