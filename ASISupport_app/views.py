@@ -77,8 +77,13 @@ def new_case_view(request):
 		case_data.save()
 
 		''' save equipment data''' 
+		equip_sn_lst = request.POST.getlist('serial_number')
 
-
+		for sn in equip_sn_lst:
+			equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
+									equip_sn=Equipment.objects.get(equip_sn=sn),
+									)
+			equip_data.save()
 
 		return redirect('ASISupport_app:view_case', id=req_case_num)
 
@@ -93,6 +98,11 @@ def new_case_view(request):
 	equip_sn_lst = [equip.equip_sn for equip in equipment]
 	equip_pn_lst = [equip.equip_pn for equip in equipment]
 	equip_description_lst = [equip.equip_description for equip in equipment]
+	equip_property_lst = [{'sn':equip.equip_sn,
+						 'pn':equip.equip_pn, 
+						 'description':equip.equip_description, 
+						 'date':str(datetime.strptime(str(equip.installation_date)[:19],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S')), 
+						 'warranty':str(equip.warranty)} for equip in equipment]
 
 	return render(request, 'ASISupport_app/case.html', locals())
 
@@ -173,7 +183,7 @@ def new_visit_view(request, id):
 								part_pn=Parts.objects.get(part_pn=row['part_pn']),
 								qty=row['part_qty'],
 								charge=row['part_charge']
-				)
+								)
 			part_data.save()
 
 		return redirect('ASISupport_app:view_visit', id=req_visit_num)

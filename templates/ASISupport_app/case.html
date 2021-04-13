@@ -287,40 +287,40 @@
 											<button onclick="deleteRow(this,'equipment_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 										</td>
 										<td>
-											<input class="form-control text_bar" type="text" name="serial_number" list="serial_number" placeholder="Choose..." id="serial_number_1">
-											<datalist id="serial_number">
+											<input class="form-control text_bar" type="text" name="serial_number" list="serial_number_list_1" placeholder="Choose..." id="serial_number_1" oninput="completeProperties(this, {{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+											<datalist id="serial_number_list_1">
 												{% for equip in equip_sn_lst %}
 												<option value="{{ equip }}"></option>
 												{% endfor %}
 											</datalist>
 										</td>
 										<td>
-											<input class="form-control text_bar" type="text" name="part_number" list="part_number" placeholder="Choose..." id="part_number_1">
-											<datalist id="part_number">
+											<input class="form-control text_bar" type="text" name="part_number" list="part_number_list_1" placeholder="Choose..." id="part_number_1" oninput="completeProperties(this,{{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+											<datalist id="part_number_list_1">
 												{% for equip in equip_pn_lst %}
 												<option value="{{ equip }}"></option>
 												{% endfor %}
 											</datalist>
 										</td>
 										<td>
-											<input class="form-control text_bar" type="text" name="equip_description" list="equip_description" placeholder="Choose..." id="equip_description_1">
-											<datalist id="equip_description">
+											<input class="form-control text_bar" type="text" name="equip_description" list="equip_description_list_1" placeholder="Choose..." id="equip_description_1" oninput="completeProperties(this,{{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+											<datalist id="equip_description_list_1">
 												{% for equip in equip_description_lst %}
 												<option value="{{ equip }}"></option>
 												{% endfor %}
 											</datalist>
 										</td>
 										<td>
-											<input class="form-control datepicker" name="installation_date" type="date" id="installation_date_1">
+											<input class="form-control text_bar" name="installation_date" type="text" id="installation_date_1" readonly>
 										</td>
 										<td>
-											<input class="form-control inline_it" name="warranty" id="warranty_1" type="text">
-											<label>months</label>
+											<input class="form-control inline_it" name="warranty" id="warranty_1" type="text" readonly>
+											<label><small>months</small></label>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<button onclick="addRow('equipment_tbl', {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
+											<button onclick="addRow('equipment_tbl', {{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
 										</td>
 										<td></td>
 										<td></td>

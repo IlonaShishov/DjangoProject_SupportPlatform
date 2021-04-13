@@ -1,10 +1,218 @@
-function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
+function completeProperties(me, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst) {
+
+	var elementId = me.id
+	var elementIndex = elementId.split("_").pop();
+	var input = document.getElementById(elementId).value;
+
+	if (!input) {
+
+		document.getElementById("serial_number_" + elementIndex).value = '';
+		document.getElementById("part_number_" + elementIndex).value = '';
+		document.getElementById("equip_description_" + elementIndex).value = '';
+		document.getElementById("installation_date_" + elementIndex).value = '';
+		document.getElementById("warranty_" + elementIndex).value = '';
+
+		original_sn_element = document.getElementById("serial_number_list_" + elementIndex);
+		parent_sn_element = original_sn_element.parentNode;
+		original_sn_element.remove();
+
+		var new_sn_datalist = document.createElement("datalist");
+		new_sn_datalist.id = "serial_number_list_" + elementIndex;
+		for (i=0; i < equip_sn_lst.length; i ++) {
+			var option = document.createElement('option');
+			option.value = equip_sn_lst[i];
+			new_sn_datalist.appendChild(option);
+		parent_sn_element.appendChild(new_sn_datalist);
+		}
+
+		original_pn_element = document.getElementById("part_number_list_" + elementIndex);
+		parent_pn_element = original_pn_element.parentNode;
+		original_pn_element.remove();
+
+		var new_pn_datalist = document.createElement("datalist");
+		new_pn_datalist.id = "part_number_list_" + elementIndex;
+		for (i=0; i < equip_pn_lst.length; i ++) {
+			var option = document.createElement('option');
+			option.value = equip_pn_lst[i];
+			new_pn_datalist.appendChild(option);
+		parent_pn_element.appendChild(new_pn_datalist);
+		}
+
+		original_desc_element = document.getElementById("equip_description_list_" + elementIndex);
+		parent_desc_element = original_desc_element.parentNode;
+		original_desc_element.remove();
+
+		var new_desc_datalist = document.createElement("datalist");
+		new_desc_datalist.id = "equip_description_list_" + elementIndex;
+		for (i=0; i < equip_description_lst.length; i ++) {
+			var option = document.createElement('option');
+			option.value = equip_description_lst[i];
+			new_desc_datalist.appendChild(option);
+		parent_desc_element.appendChild(new_desc_datalist);
+		}
+	}
+
+	else if(elementId.includes("serial_number")){
+		const items = equip_properties.filter(item => item.sn == input);
+
+		if (items.length == 0){
+			document.getElementById("part_number_" + elementIndex).value = '';
+			document.getElementById("equip_description_" + elementIndex).value = '';
+			document.getElementById("installation_date_" + elementIndex).value = '';
+			document.getElementById("warranty_" + elementIndex).value = '';
+		}
+
+		else{
+			original_pn_element = document.getElementById("part_number_list_" + elementIndex);
+			parent_pn_element = original_pn_element.parentNode;
+			original_pn_element.remove();
+
+			var new_pn_datalist = document.createElement("datalist");
+			new_pn_datalist.id = "part_number_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].pn;
+				new_pn_datalist.appendChild(option);
+			parent_pn_element.appendChild(new_pn_datalist);
+			}
+
+			original_desc_element = document.getElementById("equip_description_list_" + elementIndex);
+			parent_desc_element = original_desc_element.parentNode;
+			original_desc_element.remove();
+
+			var new_desc_datalist = document.createElement("datalist");
+			new_desc_datalist.id = "equip_description_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].description;
+				new_desc_datalist.appendChild(option);
+			parent_desc_element.appendChild(new_desc_datalist);
+			}
+
+			if (items.length == 1){
+			document.getElementById("part_number_" + elementIndex).value = items[0].pn;
+			document.getElementById("equip_description_" + elementIndex).value = items[0].description;
+			document.getElementById("installation_date_" + elementIndex).value = items[0].date;
+			document.getElementById("warranty_" + elementIndex).value = items[0].warranty;
+			}
+		}
+	}
+
+	else if(elementId.includes("part_number")){
+
+		var items = equip_properties.filter(item => item.pn == input);
+
+		if (document.getElementById("equip_description_" + elementIndex).value){
+			items = items.filter(item => item.description.includes(document.getElementById("equip_description_" + elementIndex).value));
+		}
+
+		if (items.length == 0){
+			document.getElementById("serial_number_" + elementIndex).value = '';
+			document.getElementById("equip_description_" + elementIndex).value = '';
+			document.getElementById("installation_date_" + elementIndex).value = '';
+			document.getElementById("warranty_" + elementIndex).value = '';
+		}
+
+		else{
+			original_sn_element = document.getElementById("serial_number_list_" + elementIndex);
+			parent_sn_element = original_sn_element.parentNode;
+			original_sn_element.remove();
+
+			var new_sn_datalist = document.createElement("datalist");
+			new_sn_datalist.id = "serial_number_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].sn;
+				new_sn_datalist.appendChild(option);
+			parent_sn_element.appendChild(new_sn_datalist);
+			}
+
+			original_desc_element = document.getElementById("equip_description_list_" + elementIndex);
+			parent_desc_element = original_desc_element.parentNode;
+			original_desc_element.remove();
+
+			var new_desc_datalist = document.createElement("datalist");
+			new_desc_datalist.id = "equip_description_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].description;
+				new_desc_datalist.appendChild(option);
+			parent_desc_element.appendChild(new_desc_datalist);
+			}
+
+			if (items.length == 1){
+			document.getElementById("serial_number_" + elementIndex).value = items[0].sn;
+			document.getElementById("equip_description_" + elementIndex).value = items[0].description;
+			document.getElementById("installation_date_" + elementIndex).value = items[0].date;
+			document.getElementById("warranty_" + elementIndex).value = items[0].warranty;
+			}
+		}
+	}
+
+	else if(elementId.includes("equip_description")){
+
+		var items = equip_properties.filter(item => item.description.includes(input));
+
+		if (document.getElementById("part_number_" + elementIndex).value){
+			items = items.filter(item => item.pn == document.getElementById("part_number_" + elementIndex).value);
+		}
+
+
+		if (items.length == 0){
+			document.getElementById("serial_number_" + elementIndex).value = '';
+			document.getElementById("part_number_" + elementIndex).value = '';
+			document.getElementById("installation_date_" + elementIndex).value = '';
+			document.getElementById("warranty_" + elementIndex).value = '';
+		}
+
+		else{
+			original_sn_element = document.getElementById("serial_number_list_" + elementIndex);
+			parent_sn_element = original_sn_element.parentNode;
+			original_sn_element.remove();
+
+			var new_sn_datalist = document.createElement("datalist");
+			new_sn_datalist.id = "serial_number_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].sn;
+				new_sn_datalist.appendChild(option);
+			parent_sn_element.appendChild(new_sn_datalist);
+			}
+
+			original_pn_element = document.getElementById("part_number_list_" + elementIndex);
+			parent_pn_element = original_pn_element.parentNode;
+			original_pn_element.remove();
+
+			var new_pn_datalist = document.createElement("datalist");
+			new_pn_datalist.id = "part_number_list_" + elementIndex;
+			for (i=0; i < items.length; i ++) {
+				var option = document.createElement('option');
+				option.value = items[i].pn;
+				new_pn_datalist.appendChild(option);
+			parent_pn_element.appendChild(new_pn_datalist);
+			}
+
+			if (items.length == 1){
+			document.getElementById("serial_number_" + elementIndex).value = items[0].sn;
+			document.getElementById("part_number_" + elementIndex).value = items[0].pn;
+			document.getElementById("installation_date_" + elementIndex).value = items[0].date;
+			document.getElementById("warranty_" + elementIndex).value = items[0].warranty;
+			}
+		}
+	}	
+
+	else{
+		//pass
+	}
+}
+
+function addRow(tableID, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	var table = document.getElementById(tableID);
 
 	var rowCount = table.rows.length;
 	var row = table.insertRow(rowCount-1);
 
-	while (document.getElementById('part_num_' + rowCount) !=null) {
+	while (document.getElementById('serial_number_' + rowCount) !=null) {
 		rowCount++;
 	}
 
@@ -24,13 +232,13 @@ function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	element2_input.setAttribute('class', 'form-control text_bar');
 	element2_input.type = "text";
 	element2_input.name="serial_number";
-	element2_input.setAttribute("list", "serial_number");
+	element2_input.setAttribute("list", "serial_number_list_" + rowCount);
 	element2_input.placeholder="Choose...";
 	element2_input.id="serial_number_" + rowCount;
-	// element2.oninput = function() {completeDesc(this, parts);};
+	element2_input.oninput = function() {completeProperties(this, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst);};
 	
 	var element2_datalist = document.createElement("datalist");
-	element2_datalist.id = "serial_number";
+	element2_datalist.id = "serial_number_list_" + rowCount;
 	for (i=0; i < equip_sn_lst.length; i ++) {
 		var option = document.createElement('option');
 		option.value = equip_sn_lst[i];
@@ -47,13 +255,13 @@ function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	element3_input.setAttribute('class', 'form-control text_bar');
 	element3_input.type = "text";
 	element3_input.name="part_number";
-	element3_input.setAttribute("list", "part_number");
+	element3_input.setAttribute("list", "part_number_list_" + rowCount);
 	element3_input.placeholder="Choose...";
 	element3_input.id="part_number_" + rowCount;
-	// element2.oninput = function() {completeDesc(this, parts);};
+	element3_input.oninput = function() {completeProperties(this, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst);};
 	
 	var element3_datalist = document.createElement("datalist");
-	element2_datalist.id = "part_number";
+	element3_datalist.id = "part_number_list_" + rowCount;
 	for (i=0; i < equip_pn_lst.length; i ++) {
         var option = document.createElement('option');
         option.value = equip_pn_lst[i];
@@ -70,13 +278,13 @@ function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	element4_input.setAttribute('class', 'form-control text_bar');
 	element4_input.type = "text";
 	element4_input.name="equip_description";
-	element4_input.setAttribute("list", "equip_description");
+	element4_input.setAttribute("list", "equip_description_list_" + rowCount);
 	element4_input.placeholder="Choose...";
 	element4_input.id="equip_description_" + rowCount;
-	// element2.oninput = function() {completeDesc(this, parts);};
+	element4_input.oninput = function() {completeProperties(this, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst);};
 	
 	var element4_datalist = document.createElement("datalist");
-	element2_datalist.id = "equip_description";
+	element4_datalist.id = "equip_description_list_" + rowCount;
 	for (i=0; i < equip_description_lst.length; i ++) {
         var option = document.createElement('option');
         option.value = equip_description_lst[i];
@@ -90,10 +298,11 @@ function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	// installation date
 	var cell5 = row.insertCell(4);
 	var element5 = document.createElement("input");
-	element5.setAttribute('class', 'form-control datepicker');
-	element5.type = "date";
+	element5.setAttribute('class', 'form-control text_bar');
+	element5.type = "text";
 	element5.name="installation_date";
 	element5.id="installation_date_" + rowCount;
+	element5.setAttribute("readonly", true);
 
 	cell5.appendChild(element5);
 
@@ -104,16 +313,18 @@ function addRow(tableID, equip_sn_lst, equip_pn_lst, equip_description_lst) {
 	element6_input.type = "text";
 	element6_input.name="warranty";
 	element6_input.id="warranty_" + rowCount;
+	element6_input.setAttribute("readonly", true);
 
 	var element6_label = document.createElement("label");
-	element6_label.innerHTML = "months"
+	var element6_small = document.createElement("small");
+	element6_small.innerHTML = "months";
 
+	element6_label.appendChild(element6_small);
 	cell6.appendChild(element6_input);
 	cell6.appendChild(element6_label);
-
 }
 
-  function deleteRow(me, tableID) {
+function deleteRow(me, tableID) {
 	try {
 	var table = document.getElementById(tableID);
 	table.deleteRow(me.parentNode.parentNode.rowIndex);
