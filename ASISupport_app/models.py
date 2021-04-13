@@ -49,8 +49,8 @@ class Case(models.Model):
 	customer 				= models.ForeignKey(Customer, on_delete=models.CASCADE)
 	customer_contact 		= models.CharField(max_length=100)
 	case_description 		= models.TextField()
-	# cancellation_reason 	= models.TextField(blank=True, null=True)
-	# on_hold_reason 		= models.TextField(blank=True, null=True)
+	cancellation_reason 	= models.TextField(blank=True, null=True)
+	on_hold_reason 			= models.TextField(blank=True, null=True)
 	
 	def close_case(self):
 		self.actual_date = timezone.now

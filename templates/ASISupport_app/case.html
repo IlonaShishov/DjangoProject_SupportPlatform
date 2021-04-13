@@ -62,6 +62,20 @@
 					<input class="form-control datepicker date_bar" name="actual_date" type="date" value="{{ case.actual_date|date:'Y-m-d' }}" disabled>
 				</div>
 
+				<!-- reason -->
+				{% if case.status == 'On Hold' %}
+					<div class="form-group reason_bar" id="reason">
+						<label>On Hold Reason</label>
+						<textarea class="form-control" name="on_hold_reason" rows="3" id="on_hold_reason" disabled>{{ case.on_hold_reason }}</textarea>
+					</div>
+				{% endif %}
+				{% if case.status == 'Cancelled' %}
+					<div class="form-group reason_bar" id="reason">
+						<label>Cancellation Reason</label>
+						<textarea class="form-control" name="cancellation_reason" rows="3" id="cancellation_reason" disabled>{{ case.cancellation_reason }}</textarea>
+					</div>
+				{% endif %}
+
 				<hr class="solid">
 
 				<!-- case manager -->
@@ -195,7 +209,7 @@
 					<div>
 						<label for="status">Status</label>
 					</div>
-					<select class="form-select select_bar" name="status">
+					<select class="form-select select_bar" name="status" id="status" onchange="statusReason()">
 						<option selected>Choose...</option>
 					{% for val, name in statuses %}
 						<option value="{{ val }}">{{ name }}</option>
@@ -219,7 +233,7 @@
 					<input class="form-control datepicker date_bar" name="actual_date" type="date">
 				</div>
 
-				<hr class="solid">
+				<hr class="solid" id="first_solid">
 
 				<!-- case manager -->
 				<div class="inline_it inline_spacing">

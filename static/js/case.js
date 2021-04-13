@@ -333,3 +333,67 @@ function deleteRow(me, tableID) {
 		alert(e);
 	}
 }
+
+function statusReason(){
+
+	if (document.getElementById('reason') !=null){
+			document.getElementById('reason').remove();
+		}
+	
+	var status = document.getElementById("status").value;
+	console.log(status);
+	if (status == "On Hold"){
+		var element_div = document.createElement("div");
+		element_div.setAttribute('class', 'form-group reason_bar');
+		element_div.id="reason";
+		// element_div.style.transition = "left 20s ease-in-out, opacity 20s linear";
+		// element_div.style.left = "0px";
+		// element_div.style.opacity = 1;
+		// element_div.style.transition = "left 2s easi-in-out";
+		// element_div.style.left = "0px";
+
+		var element_label = document.createElement("label");
+		element_label.innerHTML = "On Hold Reason";
+
+		var element_textarea = document.createElement("textarea");
+		element_textarea.setAttribute('class', 'form-control');
+		element_textarea.name="on_hold_reason";
+		element_textarea.rows="3";
+		element_textarea.id="on_hold_reason";
+
+		element_div.appendChild(element_label);
+		element_div.appendChild(element_textarea);
+
+		var placement_node = document.getElementById("first_solid");
+		var status_parent = document.getElementById("status").parentNode.parentNode
+		status_parent.insertBefore(element_div, placement_node);
+
+
+	}
+
+	else if (status == "Cancelled"){
+		var element_div = document.createElement("div");
+		element_div.setAttribute('class', 'form-group reason_bar');
+		element_div.id="reason";
+
+		var element_label = document.createElement("label");
+		element_label.innerHTML = "Cancellation Reason";
+
+		var element_textarea = document.createElement("textarea");
+		element_textarea.setAttribute('class', 'form-control');
+		element_textarea.name="cancellation_reason";
+		element_textarea.rows="3";
+		element_textarea.id="cancellation_reason";
+
+		element_div.appendChild(element_label);
+		element_div.appendChild(element_textarea);
+
+		var placement_node = document.getElementById("first_solid");
+		var status_parent = document.getElementById("status").parentNode.parentNode
+		status_parent.insertBefore(element_div, placement_node);
+	}
+
+	else{
+		//pass
+	}
+}

@@ -38,6 +38,10 @@
 	margin: 15px 0px 15px 0px;
 }
 
+.reason_bar{
+	padding: 0px 40px 0px 40px;
+}
+
 .action_btn{
 	float: right;
 	margin-top: 12px;

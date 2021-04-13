@@ -58,8 +58,15 @@ def new_case_view(request):
 		req_customer 			= Customer.objects.filter(customer_name=request.POST.get('customer'))[0]
 		req_customer_contact 	= request.POST.get('customer_contact')
 		req_case_description 	= request.POST.get('case_description')
-		# req_cancellation_reason = request.POST.get('status')
-		# req_on_hold_reason 		= request.POST.get('status')
+		req_on_hold_reason = ''
+		req_cancellation_reason = ''
+		if req_status == 'On Hold':
+			req_on_hold_reason = request.POST.get('on_hold_reason')
+		elif req_status == 'Cancelled':
+			req_cancellation_reason = request.POST.get('cancellation_reason')
+		else:
+			pass
+			
 
 		case_data = Case(case_num=req_case_num, 
 						case_type=req_case_type,
@@ -70,14 +77,15 @@ def new_case_view(request):
 						machine_down=req_machine_down,
 						customer=req_customer,
 						customer_contact=req_customer_contact,
-						case_description=req_case_description
-						# cancellation_reason=req_cancellation_reason,
-						# on_hold_reason=req_on_hold_reason
+						case_description=req_case_description,
+						cancellation_reason=req_cancellation_reason,
+						on_hold_reason=req_on_hold_reason
 						)		
 		case_data.save()
 
 		''' save equipment data''' 
 		equip_sn_lst = request.POST.getlist('serial_number')
+		equip_sn_lst = filter(lambda x: x != "", equip_sn_lst)
 
 		for sn in equip_sn_lst:
 			equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
