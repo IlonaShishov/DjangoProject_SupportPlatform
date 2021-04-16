@@ -222,3 +222,11 @@ def visit_view(request, id):
 	part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts}
 
 	return render(request, 'ASISupport_app/visit.html', locals())
+
+@login_required(login_url='/accounts/login/')
+def report_view(request):
+
+	if request.method == 'POST' and 'back_btn' in request.POST:
+		return redirect('ASISupport_app:dashboard')
+		
+	return render(request, 'ASISupport_app/report.html', locals())

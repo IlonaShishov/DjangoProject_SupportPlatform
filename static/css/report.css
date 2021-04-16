@@ -1,0 +1,9 @@
+.action_btn{
+	float: right;
+	margin-top: 20px;
+}
+
+.action_btn button{
+	width: 100px;
+	margin: 5px;
+}
