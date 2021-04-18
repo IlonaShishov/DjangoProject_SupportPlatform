@@ -21,48 +21,86 @@
 
 			<hr class="solid">
 
-			<!-- filter case -->
-			<div class="inline_it search_bar">
-				<label>Search Case</label>
-				<div class="input-group">
+			<!-- search case report -->
+			<div>
+				<h3>Case Report</h3>
+
+				<!-- filter case -->
+				<div class="inline_it search_bar">
+					<label>Case</label>
 					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
-					<div class="input-group-btn">
-						<button class="btn btn-default" type="submit" name="search_case_btn">
-							<i class="glyphicon glyphicon-search"></i>
-						</button>
-					</div>
+				</div>
+				<div class="inline_it search_bar">
+					<label>From Date</label>
+					<input class="form-control datepicker date_bar" name="actual_date" type="date">
+				</div>
+				<div class="inline_it search_bar">
+					<label>To date</label>
+					<input class="form-control datepicker date_bar" name="actual_date" type="date">
+				</div>
+				<div class="inline_it search_bar">
+					<label>Type</label>
+					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+				</div>
+				<div class="inline_it search_bar">
+					<label>Status</label>
+					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+				</div>
+				<div class="inline_it search_bar">
+					<label>Assignee</label>
+					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+				</div>
+				<div class="inline_it search_bar">
+					<label>Customer</label>
+					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+				</div>
+				<div class="inline_it search_bar">
+					<label>Machine Down</label>
+					<input type="search" name="search_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+				</div>
+
+				<button class="btn btn-default" type="submit" name="case_report_search_btn">
+					<i class="glyphicon glyphicon-search"></i>
+				</button>
+				
+
+				<!-- case info table -->
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th scope="col">Case Number</th>
+				    		<th scope="col">Creation Date</th>
+				    		<th scope="col">Type</th>
+				    		<th scope="col">Status</th>
+				    		<th scope="col">Assignee</th>
+				    		<th scope="col">Customer</th>
+				    		<th scope="col">Machine Down</th>
+				    	</tr>
+					</thead>
+					<tbody>
+						<!-- {% for case in cases %}
+						<tr>
+							<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
+							<td>{{ case.create_date|date:'d/m/Y' }}</td>
+							<td>{{ case.case_type }}</td>
+							<td>{{ case.status }}</td>
+							<td>{{ case.customer }}</td>
+							<td>{{ case.case_manager }}</td>
+						</tr>
+						{% endfor %} -->
+					</tbody>
+				</table>
+				<div>
+					<button class="btn"><i class="fa fa-download"></i></button>
 				</div>
 			</div>
+			
 
-			<div>
-				<button class="btn"><i class="fa fa-download"></i></button>
-			</div>
+			<h3>Visit Report</h3>
 
-			<!-- case info table -->
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th scope="col">1</th>
-			    		<th scope="col">2</th>
-			    		<th scope="col">3</th>
-			    		<th scope="col">4</th>
-			    		<th scope="col">5</th>
-			    		<th scope="col">6</th>
-			    	</tr>
-				</thead>
-				<tbody>
-					<!-- {% for case in cases %}
-					<tr>
-						<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
-						<td>{{ case.create_date|date:'d/m/Y' }}</td>
-						<td>{{ case.case_type }}</td>
-						<td>{{ case.status }}</td>
-						<td>{{ case.customer }}</td>
-						<td>{{ case.case_manager }}</td>
-					</tr>
-					{% endfor %} -->
-				</tbody>
-			</table>
+			<h3>Equipment Report</h3>
+
+
 		</form>
 	</section>
 {% endblock %}

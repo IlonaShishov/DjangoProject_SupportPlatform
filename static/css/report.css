@@ -7,3 +7,12 @@
 	width: 100px;
 	margin: 5px;
 }
+
+.search_bar {
+	margin-bottom: 12px;
+	margin-right: 5px;
+}
+
+.date_bar{
+	width: 160px;
+}
