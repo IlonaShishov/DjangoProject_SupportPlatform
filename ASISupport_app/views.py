@@ -55,7 +55,7 @@ def new_case_view(request):
 		else:
 			req_machine_down = False
 		
-		req_customer 			= Customer.objects.filter(customer_name=request.POST.get('customer'))[0]
+		req_customer 			= Customer.objects.get(customer_name=request.POST.get('customer'))
 		req_customer_contact 	= request.POST.get('customer_contact')
 		req_case_description 	= request.POST.get('case_description')
 		req_on_hold_reason = ''
@@ -228,5 +228,45 @@ def report_view(request):
 
 	if request.method == 'POST' and 'back_btn' in request.POST:
 		return redirect('ASISupport_app:dashboard')
+
+	if request.method == 'POST' and 'case_report_search_btn' in request.POST:
+		search_case 			= request.POST.get('search_case_case')
+		search_from_date 		= request.POST.get('search_case_from_date')
+		search_to_date 			= request.POST.get('search_case_to_date')
+		search_type 			= request.POST.get('search_case_type')
+		search_status 			= request.POST.get('search_case_status')
+		search_case_manager 	= request.POST.get('search_case_case_manager')
+		search_customer 		= request.POST.get('search_case_customer')
+		search_machine_down 	= request.POST.get('search_case_machine_down')
+
+		cases = Case.objects.all()
+
+		if search_case:
+			cases = cases.filter(case_num=search_case)
+		if search_from_date:
+			cases = cases.filter(create_date__gte=search_from_date)
+		if search_to_date:
+			cases = cases.filter(create_date__lte=search_to_date)
+		if search_type:
+			cases = cases.filter(case_type=search_type)
+		if search_status:
+			cases = cases.filter(status=search_status)
+		if search_case_manager:
+			cases = cases.filter(case_manager=Employee.objects.filter(first_name=search_case_manager.split()[0], last_name=search_case_manager.split()[1])[0])
+		if search_customer:
+			cases = cases.filter(customer=Customer.objects.get(customer_name=search_customer))
+		if search_machine_down:
+			print(search_machine_down)
+			cases = cases.filter(machine_down=True if search_machine_down == 'True' else False)
+
+	if request.method == 'POST' and 'case_report_export_to_excel_btn' in request.POST:
+		# cases = cases.fetch(3)
+		pass
+		
+
+	types = Case.TYPES
+	statuses = Case.STATUSES
+	employees = Employee.objects.all()
+	customers = Customer.objects.all()
 		
 	return render(request, 'ASISupport_app/report.html', locals())
