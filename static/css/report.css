@@ -9,7 +9,8 @@
 }
 
 .search_bar {
-	margin-bottom: 12px;
+	margin-bottom: 5px;
+	margin-top: 5px;
 	margin-right: 5px;
 }
 
@@ -20,4 +21,13 @@
 .select_bar{
 	width: 160px;
 	height: 35px;
+}
+
+small{
+	color: red;
+}
+
+#case_report_filter{
+	margin-bottom: 20px;
+	margin-top: 20px;
 }

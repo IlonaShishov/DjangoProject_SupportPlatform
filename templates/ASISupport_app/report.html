@@ -4,7 +4,25 @@
 
 {% block head_block %}
 	<title>Report</title>
+	<script src="{% static 'js/report.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/report.css' %}">
+
+	<meta name="description" content="Bootstrap.">  
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">   
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+	<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"></style>
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css"></style>
 {% endblock %}
 
 {% block body_block %}
@@ -22,80 +40,90 @@
 			<hr class="solid">
 
 			<!-- search case report -->
-			<div>
+			<div id="case_report">
+
 				<h3>Case Report</h3>
 
 				<!-- filter case -->
-				<div class="inline_it search_bar">
-					<label>Case</label>
-					<input type="search" name="search_case_case" class="form-control" placeholder="Search..." aria-lable="Search" />
-				</div>
-				<div class="inline_it search_bar">
-					<label>From Date (included)</label>
-					<input class="form-control datepicker date_bar" name="search_case_from_date" type="date">
-				</div>
-				<div class="inline_it search_bar">
-					<label>To date (not included)</label>
-					<input class="form-control datepicker date_bar" name="search_case_to_date" type="date">
-				</div>
-				<div class="inline_it search_bar">
-					<div>
-						<label>Type</label>
+				<div id="case_report_filter">
+					<div class="inline_it search_bar">
+						<label>Case</label>
+						<input type="search" name="search_case_case" class="form-control" placeholder="Search..." aria-lable="Search" />
 					</div>
-					<select class="form-select select_bar" name="search_case_type">
-						<option value="" selected>Search...</option>
-						{% for val, name in types %}
+
+					<div class="inline_it search_bar">
+						<label>From Date (included)</label>
+						<input class="form-control datepicker date_bar" name="search_case_from_date" type="date">
+					</div>
+
+					<div class="inline_it search_bar">
+						<label>To date (not included)</label>
+						<input class="form-control datepicker date_bar" name="search_case_to_date" type="date">
+					</div>
+
+					<div class="inline_it search_bar">
+						<div>
+							<label>Type</label>
+						</div>
+						<select class="form-select select_bar" name="search_case_type">
+							<option value="" selected>Search...</option>
+							{% for val, name in types %}
+								<option value="{{ val }}">{{ name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<div class="inline_it search_bar">
+						<div>
+							<label>Status</label>
+						</div>
+						<select class="form-select select_bar" name="search_case_status">
+							<option value="" selected>Search...</option>
+						{% for val, name in statuses %}
 							<option value="{{ val }}">{{ name }}</option>
 						{% endfor %}
-					</select>
-				</div>
-				<div class="inline_it search_bar">
-					<div>
-						<label>Status</label>
+						</select>
 					</div>
-					<select class="form-select select_bar" name="search_case_status">
-						<option value="" selected>Search...</option>
-					{% for val, name in statuses %}
-						<option value="{{ val }}">{{ name }}</option>
-					{% endfor %}
-					</select>
-				</div>
-				<div class="inline_it search_bar">
-					<label>Case Manager</label>
-					<input class="form-control text_bar" type="text" name="search_case_case_manager" list="case_manager" placeholder="Search...">
-					<datalist id="case_manager">
-						{% for employee in employees %}
-							<option value="{{ employee }}">{{ employee }}</option>
-						{% endfor %}
-					</datalist>
-				</div>
-				<div class="inline_it search_bar">
-					<label>Customer</label>
-					<input class="form-control text_bar" type="text" name="search_case_customer" list="customer" placeholder="Search...">
-					<datalist id="customer">
-						{% for customer in customers %}
-							<option value="{{ customer }}">{{ customer }}</option>
-						{% endfor %}
-					</datalist>
-				</div>
-				<div class="inline_it search_bar">
-					<div>
-						<label>Machine Down</label>
-					</div>
-					<select class="form-select select_bar" name="search_case_machine_down">
-						<option value="" selected>All</option>
-						<option value="True">True</option>
-						<option value="False">False</option>
-					</select>
-				</div>
 
-				<button class="btn btn-default" type="submit" name="case_report_search_btn">
-					<i class="glyphicon glyphicon-search"></i>
-				</button>
+					<div class="inline_it search_bar">
+						<label>Case Manager</label>
+						<input class="form-control text_bar" type="text" name="search_case_case_manager" list="case_manager" placeholder="Search...">
+						<datalist id="case_manager">
+							{% for employee in employees %}
+								<option value="{{ employee }}">{{ employee }}</option>
+							{% endfor %}
+						</datalist>
+					</div>
+
+					<div class="inline_it search_bar">
+						<label>Customer</label>
+						<input class="form-control text_bar" type="text" name="search_case_customer" list="customer" placeholder="Search...">
+						<datalist id="customer">
+							{% for customer in customers %}
+								<option value="{{ customer }}">{{ customer }}</option>
+							{% endfor %}
+						</datalist>
+					</div>
+
+					<div class="inline_it search_bar">
+						<div>
+							<label>Machine Down</label>
+						</div>
+						<select class="form-select select_bar" name="search_case_machine_down">
+							<option value="" selected>All</option>
+							<option value="True">True</option>
+							<option value="False">False</option>
+						</select>
+					</div>
+
+					<button class="btn btn-default" type="submit" name="case_report_search_btn">
+						<i class="glyphicon glyphicon-search"></i>
+					</button>
+				</div>
 				
+				<!-- case info table -->
 				{% if cases %}
-					<!-- case info table -->
-					<table class="table table-hover">
+					<table class="table table-hover" id="case_report_table">
 						<thead>
 							<tr>
 								<th scope="col">Case Number</th>
@@ -121,18 +149,19 @@
 							{% endfor %}
 						</tbody>
 					</table>
-
-				<div>
-					<button class="btn" name="case_report_export_to_excel_btn"><i class="fa fa-download"></i></button>
-				</div>
 				{% endif %}
+
 			</div>
-			
 
 			<h3>Visit Report</h3>
 
 			<h3>Equipment Report</h3>
 
+			<script>
+			$(document).ready(function(){
+				$('#case_report_table').dataTable({bFilter: false, dom:"<'row'<'col-sm-12'l>>" + "																<'row'<'col-sm-12'B>>" + "																<'row'<'col-sm-12'frtip>>", 														buttons: ['copy', 'csv', 'excel', 'pdf']});
+			});
+			</script>
 
 		</form>
 	</section>

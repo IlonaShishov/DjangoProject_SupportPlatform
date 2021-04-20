@@ -256,7 +256,6 @@ def report_view(request):
 		if search_customer:
 			cases = cases.filter(customer=Customer.objects.get(customer_name=search_customer))
 		if search_machine_down:
-			print(search_machine_down)
 			cases = cases.filter(machine_down=True if search_machine_down == 'True' else False)
 
 	if request.method == 'POST' and 'case_report_export_to_excel_btn' in request.POST:
