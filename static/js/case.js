@@ -216,7 +216,7 @@ function addRow(tableID, equip_properties, equip_sn_lst, equip_pn_lst, equip_des
 		rowCount++;
 	}
 
-	// remove button
+	// create "remove" button
 	var cell1 = row.insertCell(0);
 	var element1 = document.createElement("button");
 	element1.type = "button";

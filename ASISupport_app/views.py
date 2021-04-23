@@ -226,41 +226,100 @@ def visit_view(request, id):
 @login_required(login_url='/accounts/login/')
 def report_view(request):
 
+	if request.method == 'POST' and 'case_report_clear_btn' in request.POST:
+		spotter	= 'case_report'	
+
+	if request.method == 'POST' and 'visit_report_clear_btn' in request.POST:
+		spotter	= 'visit_report'	
+
+	if request.method == 'POST' and 'Equipment_report_clear_btn' in request.POST:
+		spotter	= 'Equipment_report'	
+
 	if request.method == 'POST' and 'back_btn' in request.POST:
 		return redirect('ASISupport_app:dashboard')
 
 	if request.method == 'POST' and 'case_report_search_btn' in request.POST:
-		search_case 			= request.POST.get('search_case_case')
-		search_from_date 		= request.POST.get('search_case_from_date')
-		search_to_date 			= request.POST.get('search_case_to_date')
-		search_type 			= request.POST.get('search_case_type')
-		search_status 			= request.POST.get('search_case_status')
-		search_case_manager 	= request.POST.get('search_case_case_manager')
-		search_customer 		= request.POST.get('search_case_customer')
-		search_machine_down 	= request.POST.get('search_case_machine_down')
+		case_report_case 			= request.POST.get('case_report_case')
+		case_report_from_date 		= request.POST.get('case_report_from_date')
+		case_report_to_date 		= request.POST.get('case_report_to_date')
+		case_report_type 			= request.POST.get('case_report_type')
+		case_report_status 			= request.POST.get('case_report_status')
+		case_report_case_manager 	= request.POST.get('case_report_case_manager')
+		case_report_customer 		= request.POST.get('case_report_customer')
+		case_report_machine_down 	= request.POST.get('case_report_machine_down')
 
 		cases = Case.objects.all()
 
-		if search_case:
-			cases = cases.filter(case_num=search_case)
-		if search_from_date:
-			cases = cases.filter(create_date__gte=search_from_date)
-		if search_to_date:
-			cases = cases.filter(create_date__lte=search_to_date)
-		if search_type:
-			cases = cases.filter(case_type=search_type)
-		if search_status:
-			cases = cases.filter(status=search_status)
-		if search_case_manager:
-			cases = cases.filter(case_manager=Employee.objects.filter(first_name=search_case_manager.split()[0], last_name=search_case_manager.split()[1])[0])
-		if search_customer:
-			cases = cases.filter(customer=Customer.objects.get(customer_name=search_customer))
-		if search_machine_down:
-			cases = cases.filter(machine_down=True if search_machine_down == 'True' else False)
+		if case_report_case:
+			cases = cases.filter(case_num__contains=case_report_case)
+		if case_report_from_date:
+			cases = cases.filter(create_date__gte=case_report_from_date)
+		if case_report_to_date:
+			cases = cases.filter(create_date__lte=case_report_to_date)
+		if case_report_type:
+			cases = cases.filter(case_type=case_report_type)
+		if case_report_status:
+			cases = cases.filter(status=case_report_status)
+		if case_report_case_manager:
+			cases = cases.filter(case_manager=Employee.objects.filter(first_name=case_report_case_manager.split()[0], last_name=case_report_case_manager.split()[1])[0])
+		if case_report_customer:
+			cases = cases.filter(customer=Customer.objects.get(customer_name=case_report_customer))
+		if case_report_machine_down:
+			cases = cases.filter(machine_down=True if case_report_machine_down == 'True' else False)
 
-	if request.method == 'POST' and 'case_report_export_to_excel_btn' in request.POST:
-		# cases = cases.fetch(3)
-		pass
+	if request.method == 'POST' and 'visit_report_search_btn' in request.POST:
+		visit_report_visit			= request.POST.get('visit_report_visit')
+		visit_report_from_date		= request.POST.get('visit_report_from_date')
+		visit_report_to_date		= request.POST.get('visit_report_to_date')
+		visit_report_engineer		= request.POST.get('visit_report_engineer')
+		visit_report_customer		= request.POST.get('visit_report_customer')
+		visit_report_remote			= request.POST.get('visit_report_remote')
+		visit_report_case			= request.POST.get('visit_report_case')
+
+		visits = Visit.objects.all()
+
+		if visit_report_visit:
+			visits = visits.filter(visit_num__contains=visit_report_visit)
+		if visit_report_from_date:
+			visits = visits.filter(visit_date__gte=visit_report_from_date)
+		if visit_report_to_date:
+			visits = visits.filter(visit_date__lte=visit_report_to_date)
+		if visit_report_engineer:
+			visits = visits.filter(engineer=Employee.objects.filter(first_name=visit_report_engineer.split()[0], last_name=visit_report_engineer.split()[1])[0])
+		if visit_report_customer:
+			visits = visits.filter(customer=Customer.objects.get(customer_name=visit_report_customer))
+		if visit_report_remote:
+			visits = visits.filter(remote=True if visit_report_remote == 'True' else False)
+		if visit_report_case:
+			visits = visits.filter(case_num__in=Case.objects.filter(case_num__contains=visit_report_case))
+
+	if request.method == 'POST' and 'equip_report_search_btn' in request.POST:
+		equip_report_sn				= request.POST.get('equip_report_sn')
+		equip_report_pn				= request.POST.get('equip_report_pn')
+		equip_report_description	= request.POST.get('equip_report_description')
+		equip_report_case			= request.POST.get('equip_report_case')
+		equip_report_customer		= request.POST.get('equip_report_customer')
+		
+		case_equip = CaseEquipment.objects.all()
+
+		if equip_report_sn:
+			case_equip = case_equip.filter(equip_sn__in=Equipment.objects.filter(equip_sn__contains=equip_report_sn))
+		if equip_report_pn:
+			case_equip = case_equip.filter(equip_sn__in=Equipment.objects.filter(equip_pn__contains=equip_report_pn))
+		if equip_report_description:
+			case_equip = case_equip.filter(equip_sn__in=Equipment.objects.filter(equip_description__contains=equip_report_description))
+		if equip_report_case:
+			case_equip = case_equip.filter(case_num__in=Case.objects.filter(case_num__contains=equip_report_case))
+		if equip_report_customer:
+			case_equip = case_equip.filter(case_num__in=Case.objects.filter(customer=Customer.objects.get(customer_name=equip_report_customer)))
+
+		case_equip_lst = [{'sn':ce.equip_sn,
+						 'pn':Equipment.objects.get(equip_sn=ce.equip_sn).equip_pn, 
+						 'description':Equipment.objects.get(equip_sn=ce.equip_sn).equip_description, 
+						 'installation_date':Equipment.objects.get(equip_sn=ce.equip_sn).installation_date, 
+						 'warranty':Equipment.objects.get(equip_sn=ce.equip_sn).warranty, 
+						 'case':ce.case_num, 
+						 'customer':Case.objects.get(case_num=ce.case_num).customer.customer_name} for ce in case_equip]
 		
 
 	types = Case.TYPES

@@ -9,9 +9,10 @@
 }
 
 .search_bar {
-	margin-bottom: 5px;
-	margin-top: 5px;
+	margin-bottom: 3px;
+	margin-top: 3px;
 	margin-right: 5px;
+	width: 160px;
 }
 
 .date_bar{
@@ -27,7 +28,32 @@ small{
 	color: red;
 }
 
-#case_report_filter{
-	margin-bottom: 20px;
-	margin-top: 20px;
+#case_report_filter, #visit_report_filter, #equip_report_filter{
+	padding-bottom: 20px;
+}
+
+#case_report, #visit_report, #Equipment_report{
+	margin: 20px;
+}
+
+.dataTables_wrapper .dt-buttons {
+  float:right;
+}
+
+#clear_btn{
+	border: none;
+	background: none;
+	outline: none;
+}
+
+#clear_btn small{
+	color: blue;
+}
+
+.hide_col{
+	display:none
+}
+
+.panel-heading{
+	width: 1060px;
 }

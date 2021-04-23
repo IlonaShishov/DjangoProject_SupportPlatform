@@ -7,14 +7,12 @@
 	<script src="{% static 'js/report.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/report.css' %}">
 
-	<meta name="description" content="Bootstrap.">  
-	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">   
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">    -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
 	<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -23,6 +21,7 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"></style>
 	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css"></style>
+
 {% endblock %}
 
 {% block body_block %}
@@ -39,127 +38,410 @@
 
 			<hr class="solid">
 
-			<!-- search case report -->
-			<div id="case_report">
-
-				<h3>Case Report</h3>
-
-				<!-- filter case -->
-				<div id="case_report_filter">
-					<div class="inline_it search_bar">
-						<label>Case</label>
-						<input type="search" name="search_case_case" class="form-control" placeholder="Search..." aria-lable="Search" />
+			<div class="panel-group" id="accordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+					  <h4 class="panel-title">
+					    <a data-toggle="collapse" data-parent="#accordion" href="#case_report">Case Report</a>
+					  </h4>
 					</div>
 
-					<div class="inline_it search_bar">
-						<label>From Date (included)</label>
-						<input class="form-control datepicker date_bar" name="search_case_from_date" type="date">
-					</div>
+					<!-- case report -->
+					<div id="case_report" class="panel-collapse collapse">
 
-					<div class="inline_it search_bar">
-						<label>To date (not included)</label>
-						<input class="form-control datepicker date_bar" name="search_case_to_date" type="date">
-					</div>
+						<!-- filter -->
+						<div id="case_report_filter">
+							<div class="inline_it search_bar">
+								<label>Case</label>
+								<input type="search" name="case_report_case" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ case_report_case|default_if_none:'' }}"/>
+							</div>
 
-					<div class="inline_it search_bar">
-						<div>
-							<label>Type</label>
+							<div class="inline_it search_bar">
+								<label>From Date (included)</label>
+								<input class="form-control datepicker date_bar" name="case_report_from_date" type="date" value="{{ case_report_from_date|default_if_none:'' }}">
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>To date (not included)</label>
+								<input class="form-control datepicker date_bar" name="case_report_to_date" type="date" value="{{ case_report_to_date|default_if_none:'' }}">
+							</div>
+
+							<div class="inline_it search_bar">
+								<div>
+									<label>Type</label>
+								</div>
+								<select class="form-select select_bar" name="case_report_type">
+									{% if case_report_type %}
+										<option value="{{ case_report_type }}" selected>{{ case_report_type }}</option>
+									{% else %}
+										<option value="" selected>Search...</option>
+									{% endif %}
+									{% for val, name in types %}
+										<option value="{{ val }}">{{ name }}</option>
+									{% endfor %}
+								</select>
+							</div>
+
+							<div class="inline_it search_bar">
+								<div>
+									<label>Status</label>
+								</div>
+								<select class="form-select select_bar" name="case_report_status">
+									{% if case_report_status %}
+										<option value="{{ case_report_status}}" selected>{{ case_report_status}}</option>
+									{% else %}
+										<option value="" selected>Search...</option>
+									{% endif %}
+									{% for val, name in statuses %}
+										<option value="{{ val }}">{{ name }}</option>
+									{% endfor %}
+								</select>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Case Manager</label>
+								<input class="form-control text_bar" type="text" name="case_report_case_manager" list="case_manager" placeholder="Search..." value="{{ case_report_case_manager|default_if_none:'' }}">
+								<datalist id="case_manager">
+									{% for employee in employees %}
+										<option value="{{ employee }}">{{ employee }}</option>
+									{% endfor %}
+								</datalist>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Customer</label>
+								<input class="form-control text_bar" type="text" name="case_report_customer" list="customer" placeholder="Search..." value="{{ case_report_customer|default_if_none:'' }}">
+								<datalist id="customer">
+									{% for customer in customers %}
+										<option value="{{ customer }}">{{ customer }}</option>
+									{% endfor %}
+								</datalist>
+							</div>
+
+							<div class="inline_it search_bar">
+								<div>
+									<label>Machine Down</label>
+								</div>
+								<select class="form-select select_bar" name="case_report_machine_down">
+									{% if case_report_machine_down %}
+										<option value="{{ case_report_machine_down}}" selected>{{ case_report_machine_down}}</option>
+										<option value="">All</option>
+									{% else %}
+										<option value="" selected>All</option>
+									{% endif %}
+									<option value="True">True</option>
+									<option value="False">False</option>
+								</select>
+							</div>
+
+							<button class="btn btn-default" type="submit" name="case_report_search_btn">
+								<i class="glyphicon glyphicon-search"></i>
+							</button>
+
+							{% if case_report_case or case_report_from_date or case_report_to_date or case_report_type or case_report_status or case_report_case_manager or case_report_customer or case_report_machine_down %}
+								<button class="btn btn-default" type="submit" name="case_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+							{% endif %}
+
 						</div>
-						<select class="form-select select_bar" name="search_case_type">
-							<option value="" selected>Search...</option>
-							{% for val, name in types %}
-								<option value="{{ val }}">{{ name }}</option>
-							{% endfor %}
-						</select>
+						
+						<!-- table -->
+						{% if cases %}
+
+							<script>
+								$( "#case_report" ).addClass( "in" );
+							</script>
+
+							<table class="table table-hover" id="case_report_table">
+								<thead>
+									<tr>
+										<th scope="col">Case Number</th>
+							    		<th scope="col">Type</th>
+							    		<th scope="col">Status</th>
+										<th scope="col">Creation Date</th>
+										<th scope="col" class="hide_col">Target Date</th>
+							    		<th scope="col" class="hide_col">Actual Date</th>
+							    		<th scope="col">Case Manager</th>
+							    		<th scope="col">Customer</th>
+							    		<th scope="col" class="hide_col">Customer Contact</th>
+							    		<th scope="col">Machine Down</th>
+							    		<th scope="col" class="hide_col">Case Description</th>
+							    		<th scope="col" class="hide_col">On Hold Reason</th>
+							    		<th scope="col" class="hide_col">Cancellation Reason</th>
+							    	</tr>
+								</thead>
+								<tbody>
+									{% for case in cases %}
+									<tr>
+										<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
+										<td>{{ case.case_type }}</td>
+										<td>{{ case.status }}</td>
+										<td>{{ case.create_date|date:'d/m/Y' }}</td>
+										<td class="hide_col">{{ case.target_date|date:'d/m/Y' }}</td>
+										<td class="hide_col">{{ case.actual_date|date:'d/m/Y' }}</td>
+										<td>{{ case.case_manager }}</td>
+										<td>{{ case.customer }}</td>
+										<td class="hide_col">{{ case.customer_contact }}</td>
+										<td>{{ case.machine_down }}</td>
+										<td class="hide_col">{{ case.case_description }}</td>
+										<td class="hide_col">{{ case.on_hold_reason }}</td>
+										<td class="hide_col">{{ case.cancellation_reason }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% endif %}
+
 					</div>
 
-					<div class="inline_it search_bar">
-						<div>
-							<label>Status</label>
+
+					</div>
+					<div class="panel panel-default">
+					<div class="panel-heading">
+					  <h4 class="panel-title">
+					    <a data-toggle="collapse" data-parent="#accordion" href="#visit_report">Visit Report</a>
+					  </h4>
+					</div>
+
+					<!-- visit report -->
+					<div id="visit_report" class="panel-collapse collapse">
+
+						<!-- filter -->
+						<div id="visit_report_filter">
+							<div class="inline_it search_bar">
+								<label>Visit</label>
+								<input type="search" name="visit_report_visit" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ visit_report_visit|default_if_none:'' }}"/>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>From Visit Date (included)</label>
+								<input class="form-control datepicker date_bar" name="visit_report_from_date" type="date" value="{{ visit_report_from_date|default_if_none:'' }}">
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>To Visit date (not included)</label>
+								<input class="form-control datepicker date_bar" name="visit_report_to_date" type="date" value="{{ visit_report_to_date|default_if_none:'' }}">
+							</div>
+
+
+							<div class="inline_it search_bar">
+								<label>Engineer</label>
+								<input class="form-control text_bar" type="text" name="visit_report_engineer" list="engineer" placeholder="Search..." value="{{ visit_report_engineer|default_if_none:'' }}">
+								<datalist id="engineer">
+									{% for employee in employees %}
+										<option value="{{ employee }}">{{ employee }}</option>
+									{% endfor %}
+								</datalist>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Customer</label>
+								<input class="form-control text_bar" type="text" name="visit_report_customer" list="customer" placeholder="Search..." value="{{ visit_report_customer|default_if_none:'' }}">
+								<datalist id="customer">
+									{% for customer in customers %}
+										<option value="{{ customer }}">{{ customer }}</option>
+									{% endfor %}
+								</datalist>
+							</div>
+
+							<div class="inline_it search_bar">
+								<div>
+									<label>Remote</label>
+								</div>
+								<select class="form-select select_bar" name="visit_report_remote">
+									{% if visit_report_remote %}
+										<option value="{{ visit_report_remote}}" selected>{{ visit_report_remote}}</option>
+										<option value="">All</option>
+									{% else %}
+										<option value="" selected>All</option>
+									{% endif %}
+									<option value="True">True</option>
+									<option value="False">False</option>
+								</select>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Case</label>
+								<input type="search" name="visit_report_case" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ visit_report_case|default_if_none:'' }}"/>
+							</div>
+
+							<button class="btn btn-default" type="submit" name="visit_report_search_btn">
+								<i class="glyphicon glyphicon-search"></i>
+							</button>
+
+							{% if visit_report_visit or visit_report_from_date or visit_report_to_date or visit_report_engineer or visit_report_customer or visit_report_remote or visit_report_case %}
+								<button class="btn btn-default" type="submit" name="visit_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+							{% endif %}
+
 						</div>
-						<select class="form-select select_bar" name="search_case_status">
-							<option value="" selected>Search...</option>
-						{% for val, name in statuses %}
-							<option value="{{ val }}">{{ name }}</option>
-						{% endfor %}
-						</select>
+
+						<!-- table -->
+						{% if visits %}
+
+							<script>
+								$( "#visit_report" ).addClass( "in" );
+							</script>
+
+							<table class="table table-hover" id="visit_report_table">
+								<thead>
+									<tr>
+										<th scope="col">Visit Number</th>
+										<th scope="col">Visit Date</th>
+										<th scope="col">Engineer</th>
+										<th scope="col">Customer</th>
+										<th scope="col" class="hide_col">Customer Contact</th>
+										<th scope="col">Remote</th>
+										<th scope="col" class="hide_col">Visit Summary</th>
+										<th scope="col">Case Number</th>
+										<th scope="col" class="hide_col">Create Date</th>
+										<th scope="col" class="hide_col">Visit Start</th>
+										<th scope="col" class="hide_col">Visit End</th>
+										<th scope="col" class="hide_col">Travel Hours</th>
+										<th scope="col" class="hide_col">Number Of Engineers</th>
+							    	</tr>
+								</thead>
+								<tbody>
+									{% for visit in visits %}
+									<tr>
+										<td><a href="{% url 'ASISupport_app:view_visit' visit.visit_num %}">{{ visit.visit_num }}</a></td>
+										<td>{{ visit.visit_date|date:'d/m/Y' }}</td>
+										<td>{{ visit.engineer }}</td>
+										<td>{{ visit.customer }}</td>
+										<td class="hide_col">{{ visit.customer_contact }}</td>
+										<td>{{ visit.remote }}</td>
+										<td class="hide_col">{{ visit.visit_summary }}</td>
+										<td>{{ visit.case_num }}</td>
+										<td class="hide_col">{{ visit.create_date|date:'d/m/Y' }}</td>
+										<td class="hide_col">{{ visit.visit_start }}</td>
+										<td class="hide_col">{{ visit.visit_end }}</td>
+										<td class="hide_col">{{ visit.travel_hours }}</td>
+										<td class="hide_col">{{ visit.num_of_engineers }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% endif %}
+
 					</div>
 
-					<div class="inline_it search_bar">
-						<label>Case Manager</label>
-						<input class="form-control text_bar" type="text" name="search_case_case_manager" list="case_manager" placeholder="Search...">
-						<datalist id="case_manager">
-							{% for employee in employees %}
-								<option value="{{ employee }}">{{ employee }}</option>
-							{% endfor %}
-						</datalist>
+					</div>
+					<div class="panel panel-default">
+					<div class="panel-heading">
+					  <h4 class="panel-title">
+					    <a data-toggle="collapse" data-parent="#accordion" href="#Equipment_report">Equipment Report</a>
+					  </h4>
 					</div>
 
-					<div class="inline_it search_bar">
-						<label>Customer</label>
-						<input class="form-control text_bar" type="text" name="search_case_customer" list="customer" placeholder="Search...">
-						<datalist id="customer">
-							{% for customer in customers %}
-								<option value="{{ customer }}">{{ customer }}</option>
-							{% endfor %}
-						</datalist>
-					</div>
+					<!-- Equipment report -->
+					<div id="Equipment_report" class="panel-collapse collapse">
 
-					<div class="inline_it search_bar">
-						<div>
-							<label>Machine Down</label>
+						<!-- filter -->
+						<div id="equip_report_filter">
+							<div class="inline_it search_bar">
+								<label>Equipment SN</label>
+								<input type="search" name="equip_report_sn" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ equip_report_sn|default_if_none:'' }}"/>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Equipment PN</label>
+								<input type="search" name="equip_report_pn" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ equip_report_pn|default_if_none:'' }}"/>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Description</label>
+								<input type="search" name="equip_report_description" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ equip_report_description|default_if_none:'' }}"/>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Case Number</label>
+								<input type="search" name="equip_report_case" class="form-control" placeholder="Search..." aria-lable="Search" value="{{ equip_report_case|default_if_none:'' }}"/>
+							</div>
+
+							<div class="inline_it search_bar">
+								<label>Customer</label>
+								<input class="form-control text_bar" type="text" name="equip_report_customer" list="customer" placeholder="Search..." value="{{ equip_report_customer|default_if_none:'' }}">
+								<datalist id="customer">
+									{% for customer in customers %}
+										<option value="{{ customer }}">{{ customer }}</option>
+									{% endfor %}
+								</datalist>
+							</div>
+
+							<button class="btn btn-default" type="submit" name="equip_report_search_btn">
+								<i class="glyphicon glyphicon-search"></i>
+							</button>
+
+							{% if equip_report_sn or equip_report_pn or equip_report_description or equip_report_case or equip_report_customer %}
+								<button class="btn btn-default" type="submit" name="Equipment_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+							{% endif %}
+
 						</div>
-						<select class="form-select select_bar" name="search_case_machine_down">
-							<option value="" selected>All</option>
-							<option value="True">True</option>
-							<option value="False">False</option>
-						</select>
+
+						<!-- table -->
+						{% if case_equip_lst %}
+
+							<script>
+								$( "#Equipment_report" ).addClass( "in" );
+							</script>
+
+							<table class="table table-hover" id="equip_report_table">
+								<thead>
+									<tr>
+										<th scope="col">Equipment SN</th>
+										<th scope="col">Equipment PN</th>
+										<th scope="col">Description</th>
+										<th scope="col" class="hide_col">Installation Date</th>
+										<th scope="col" class="hide_col">Warranty</th>
+										<th scope="col">Case Number</th>
+										<th scope="col">Customer</th>
+							    	</tr>
+								</thead>
+								<tbody>
+									{% for ce in case_equip_lst %}
+									<tr>
+										<td>{{ ce.sn }}</td>
+										<td>{{ ce.pn }}</td>
+										<td>{{ ce.description }}</td>
+										<td class="hide_col">{{ ce.installation_date|date:'d/m/Y' }}</td>
+										<td class="hide_col">{{ ce.warranty }}</td>
+										<td>{{ ce.case }}</td>
+										<td>{{ ce.customer }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% endif %}
+						
 					</div>
 
-					<button class="btn btn-default" type="submit" name="case_report_search_btn">
-						<i class="glyphicon glyphicon-search"></i>
-					</button>
 				</div>
-				
-				<!-- case info table -->
-				{% if cases %}
-					<table class="table table-hover" id="case_report_table">
-						<thead>
-							<tr>
-								<th scope="col">Case Number</th>
-					    		<th scope="col">Creation Date</th>
-					    		<th scope="col">Type</th>
-					    		<th scope="col">Status</th>
-					    		<th scope="col">Case Manager</th>
-					    		<th scope="col">Customer</th>
-					    		<th scope="col">Machine Down</th>
-					    	</tr>
-						</thead>
-						<tbody>
-							{% for case in cases %}
-							<tr>
-								<td><a href="{% url 'ASISupport_app:view_case' case.case_num %}">{{ case.case_num }}</a></td>
-								<td>{{ case.create_date|date:'d/m/Y' }}</td>
-								<td>{{ case.case_type }}</td>
-								<td>{{ case.status }}</td>
-								<td>{{ case.case_manager }}</td>
-								<td>{{ case.customer }}</td>
-								<td>{{ case.machine_down }}</td>
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				{% endif %}
-
 			</div>
 
-			<h3>Visit Report</h3>
-
-			<h3>Equipment Report</h3>
+			{% if spotter %}
+				<script>
+					$( "#{{ spotter }}" ).addClass( "in" );
+				</script>
+			{% endif %}
 
 			<script>
 			$(document).ready(function(){
-				$('#case_report_table').dataTable({bFilter: false, dom:"<'row'<'col-sm-12'l>>" + "																<'row'<'col-sm-12'B>>" + "																<'row'<'col-sm-12'frtip>>", 														buttons: ['copy', 'csv', 'excel', 'pdf']});
+				$('#case_report_table,#visit_report_table,#equip_report_table').dataTable({bFilter: false, dom: 'lBfrtip', 																		buttons:[
+															{
+												                extend:    'copyHtml5',
+												                text:      '<i class="fa fa-files-o"> Copy</i>',
+												                titleAttr: 'Copy'
+												            },
+												            {
+												                extend:    'excelHtml5',
+												                text:      '<i class="fa fa-file-excel-o"> Excel</i>',
+												                titleAttr: 'Excel'
+												            }, 
+												            {
+												                extend:    'pdfHtml5',
+												                text:      '<i class="fa fa-file-pdf-o"> PDF</i>',
+												                titleAttr: 'PDF'
+												            }
+												        ]
+												});
 			});
 			</script>
 
