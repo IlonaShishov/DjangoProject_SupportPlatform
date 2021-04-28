@@ -261,7 +261,7 @@
 						<div>
 							<label for="visit_start">Visit Start</label>
 						</div>
-						<input class="form-control datepicker" name="visit_start" type="time">
+						<input class="form-control datepicker" name="visit_start" id="visit_start" type="time" onchange="calculateTime()">
 					</div>
 
 					<!-- visit end -->
@@ -269,7 +269,7 @@
 						<div>
 							<label for="visit_end">Visit End</label>
 						</div>
-						<input class="form-control datepicker" name="visit_end" type="time">
+						<input class="form-control datepicker" name="visit_end" id="visit_end" type="time" onchange="calculateTime()">
 					</div>
 
 					<!-- tot visit hours -->
@@ -277,7 +277,7 @@
 						<div>
 							<label for="visit_hours">Tot. Visit Hours</label>
 						</div>
-						<input class="form-control int_bar" name="visit_hours" type="text" disabled>
+						<input class="form-control int_bar" name="visit_hours" id="visit_hours" type="text" disabled>
 					</div>
 				</div>
 				

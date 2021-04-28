@@ -118,3 +118,35 @@ function addRow(tableID, parts) {
 	}
 }
 
+function calculateTime() {
+
+	var start_time = document.getElementById('visit_start');
+	var end_time = document.getElementById('visit_end');
+	var tot_time = document.getElementById('visit_hours');
+
+	if (start_time.value && end_time.value) {
+		console.log('test');
+
+
+		// start_time_lst = start_time.value.split(":");
+		// var start_date = new Date();
+		// start_date.setHours(start_time_lst[0]);
+		// start_date.setMinutes(start_time_lst[1]);
+		// console.log(start_date);
+
+		// end_time_lst = end_time.value.split(":");
+		// var end_date = new Date();
+		// end_date.setHours(end_time_lst[0]);
+		// end_date.setMinutes(end_time_lst[1]);
+		// console.log(end_date);
+
+		// var hours = Math.abs(date1 - date2) / 36e5;
+		// console.log(hours);
+
+
+	}
+	else {
+		tot_time.value = ''
+	}
+
+}

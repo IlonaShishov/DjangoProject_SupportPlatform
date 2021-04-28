@@ -10,16 +10,19 @@
 {% endblock %}
 
 {% block body_block %}
+
 	<section class="col-sm-1 col-sm-10 col-sm-1">
 		{% if state == 'view' %}
-			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST">
+			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST" id="view_case_form">
 				{% csrf_token %}
 
 				<!-- case number -->
 				<h1 class="inline_it">Case {{ case.case_num }}</h1>
 
 				<div class="action_btn"><!-- visible when in view mode -->
-					<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
+					{% if permit_edit %}
+						<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
+					{% endif %}
 					<button type="submit" name="back_btn" class="btn btn-primary">Back</button>
 				</div>
 
@@ -30,9 +33,18 @@
 					<div>
 						<label for="type">Type</label>
 					</div>
-					<select class="form-select select_bar" name="type" disabled>
-						<option selected>{{ case.case_type }}</option>
-					</select>
+					{% if not permit_type %}
+						<select class="form-select select_bar" disabled>
+							<option selected>{{ case.case_type }}</option>
+						</select>
+					{% else %}
+						<select class="form-select select_bar" name="type">
+							<option selected>{{ case.case_type }}</option>
+							{% for val, name in types %}
+								<option value="{{ val }}">{{ name }}</option>
+							{% endfor %}
+						</select>
+					{% endif %}
 				</div>
 
 				<!-- case status -->
@@ -40,9 +52,18 @@
 					<div>
 						<label for="status">Status</label>
 					</div>
-					<select class="form-select select_bar" name="status" disabled>
-						<option selected>{{ case.status }}</option>
-					</select>
+					{% if not permit_status %}
+						<select class="form-select select_bar" disabled>
+							<option selected>{{ case.status }}</option>
+						</select>
+					{% else %}
+						<select class="form-select select_bar" name="status" id="status" onchange="statusReason()">
+							<option selected>{{ case.status }}</option>
+						{% for val, name in statuses %}
+							<option value="{{ val }}">{{ name }}</option>
+						{% endfor %}
+						</select>
+					 {% endif %}
 				</div>
 
 				<!-- projected completion date -->
@@ -50,7 +71,7 @@
 					<div>
 						<label class="date_bar" for="projected_date">Projected Completion Date</label>
 					</div>
-					<input class="form-control datepicker date_bar" name="projected_date" type="date" value="{{ case.target_date|date:'Y-m-d' }}" disabled>
+					<input class="form-control datepicker date_bar" {% if permit_target_date %} name="projected_date" {% endif %} type="date" value="{{ case.target_date|date:'Y-m-d' }}" {% if not permit_target_date %} disabled {% endif %}>
 				</div>
 
 				<!-- actual completion date -->
@@ -58,40 +79,46 @@
 					<div>
 						<label for="actual_date">Actual Completion Date</label>
 					</div>
-					<input class="form-control datepicker date_bar" name="actual_date" type="date" value="{{ case.actual_date|date:'Y-m-d' }}" disabled>
+					<input class="form-control datepicker date_bar" {% if permit_actual_date %} name="actual_date" {% endif %} type="date" value="{{ case.actual_date|date:'Y-m-d' }}" {% if not permit_actual_date %} disabled {% endif %}>
 				</div>
 
 				<!-- reason -->
 				{% if case.status == 'On Hold' %}
 					<div class="form-group reason_bar" id="reason">
 						<label>On Hold Reason</label>
-						<textarea class="form-control" name="on_hold_reason" rows="3" id="on_hold_reason" disabled>{{ case.on_hold_reason }}</textarea>
-					</div>
-				{% endif %}
-				{% if case.status == 'Cancelled' %}
-					<div class="form-group reason_bar" id="reason">
-						<label>Cancellation Reason</label>
-						<textarea class="form-control" name="cancellation_reason" rows="3" id="cancellation_reason" disabled>{{ case.cancellation_reason }}</textarea>
+						<textarea class="form-control" {% if permit_on_hold_reason %} name="on_hold_reason" {% endif %} rows="3" id="on_hold_reason" {% if not permit_on_hold_reason %} disabled {% endif %}>{{ case.on_hold_reason }}</textarea>
 					</div>
 				{% endif %}
 
-				<hr class="solid">
+				{% if case.status == 'Cancelled' %}
+					<div class="form-group reason_bar" id="reason">
+						<label>Cancellation Reason</label>
+						<textarea class="form-control" {% if permit_cancellation_reason %} name="cancellation_reason" {% endif %} rows="3" id="cancellation_reason" {% if not permit_cancellation_reason %} disabled {% endif %}>{{ case.cancellation_reason }}</textarea>
+					</div>
+				{% endif %}
+
+				<hr class="solid"  id="first_solid">
 
 				<!-- case manager -->
 				<div class="inline_it inline_spacing">
 					<div>
 						<label for="case_manager">Case Manager</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="case_manager" value="{{ case.case_manager }}" disabled>
+					{% if not permit_case_manager %}
+						<input class="form-control text_bar" type="text" value="{{ case.case_manager }}" disabled>
+					{% else %}
+						<input class="form-control text_bar" type="text" name="case_manager" list="case_manager" value="{{ case.case_manager }}">
+						<datalist id="case_manager">
+							{% for employee in employees %}
+								<option value="{{ employee }}">{{ employee }}</option>
+							{% endfor %}
+						</datalist>
+					{% endif %}
 				</div>
 
 				<!-- check machine down -->
 				<div class="form-check inline_it inline_spacing machine_down_cb last_row_object">
-					{% if case.machine_down %}
-						<input type="checkbox" name="machine_down" checked disabled>
-					{% else %}
-						<input type="checkbox" name="machine_down" disabled>
-					{% endif %}
+					<input type="checkbox" {% if permit_machine_down %} name="machine_down" {% endif %} {% if case.machine_down %} checked {% endif %} {% if not permit_machine_down %} disabled {% endif %}>
 					<label for="machine_down">Machine Down</label>
 				</div>
 
@@ -102,7 +129,16 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="customer" value="{{ case.customer }}" disabled>
+					{% if not permit_customer %}
+						<input class="form-control text_bar" type="text" value="{{ case.customer }}" disabled>
+					{% else %}
+						<input class="form-control text_bar" type="text" name="customer" list="customer" value="{{ case.customer }}">
+						<datalist id="customer">
+							{% for customer in customers %}
+								<option value="{{ customer }}">{{ customer }}</option>
+							{% endfor %}
+						</datalist>
+					{% endif %}
 				</div>
 
 				<!-- customer contact -->
@@ -110,7 +146,7 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-					<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name..." value="{{ case.customer_contact }}" disabled>
+					<input class="form-control text_bar" {% if permit_customer_contact %} name="customer_contact" {% endif %} type="text" value="{{ case.customer_contact }}" {% if not permit_customer_contact %} disabled {% endif %}>
 				</div>
 
 				<hr class="solid">
@@ -119,7 +155,7 @@
 				<div>
 					<label>Equipment</label>
 					<div class="object_table">
-						<table class="table table-hover">
+						<table class="table table-hover" id="equipment_tbl">
 							<thead>
 								<tr>
 									<th scope="col"></th>
@@ -130,18 +166,71 @@
 						    		<th scope="col">Warranty Period</th>
 						    	</tr>
 							</thead>
-							<tbody>
-								{% for equip in equipment %}
+							{% if not permit_equipment_delete and not permit_equipment_add %} 
+								<tbody>
+									{% for equip in filtered_case_equipment %}
+											<tr>
+												<td></td>
+												<td>{{ equip.equip_sn }}</td>
+												<td>{{ equip.equip_pn }}</td>
+												<td>{{ equip.equip_description }}</td>
+												<td>{{ equip.installation_date|date:'d/m/Y' }}</td>
+												<td>{{ equip.warranty }}<label>months</label></td>
+											</tr>
+									{% endfor %}
+								</tbody>
+							{% else %}
+								<tbody>
+									{% for equip in filtered_case_equipment %}
 										<tr>
-											<td></td>
-											<td>{{ equip.equip_sn }}</td>
-											<td>{{ equip.equip_pn }}</td>
-											<td>{{ equip.equip_description }}</td>
-											<td>{{ equip.installation_date|date:'d/m/Y' }}</td>
-											<td>{{ equip.warranty }}<label>months</label></td>
+											<td>
+												<button onclick="deleteRow(this,'equipment_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
+											</td>
+											<td>
+												<input class="form-control text_bar" type="text" name="serial_number" list="serial_number_list_1" value="{{ equip.equip_sn }}" id="serial_number_1" oninput="completeProperties(this, {{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+												<datalist id="serial_number_list_1">
+													{% for equip in equip_sn_lst %}
+													<option value="{{ equip }}"></option>
+													{% endfor %}
+												</datalist>
+											</td>
+											<td>
+												<input class="form-control text_bar" type="text" name="part_number" list="part_number_list_1" value="{{ equip.equip_pn }}" id="part_number_1" oninput="completeProperties(this,{{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+												<datalist id="part_number_list_1">
+													{% for equip in equip_pn_lst %}
+													<option value="{{ equip }}"></option>
+													{% endfor %}
+												</datalist>
+											</td>
+											<td>
+												<input class="form-control text_bar" type="text" name="equip_description" list="equip_description_list_1" value="{{ equip.equip_description }}" id="equip_description_1" oninput="completeProperties(this,{{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})">
+												<datalist id="equip_description_list_1">
+													{% for equip in equip_description_lst %}
+													<option value="{{ equip }}"></option>
+													{% endfor %}
+												</datalist>
+											</td>
+											<td>
+												<input class="form-control text_bar" name="installation_date" type="text" id="installation_date_1" value="{{ equip.installation_date|date:'d/m/Y' }}" readonly>
+											</td>
+											<td>
+												<input class="form-control inline_it" name="warranty" id="warranty_1" type="text" value="{{ equip.warranty }}" readonly>
+												<label><small>months</small></label>
+											</td>
 										</tr>
-								{% endfor %}
-							</tbody>
+									{% endfor %}
+									<tr>
+										<td>
+											<button onclick="addRow('equipment_tbl', {{ equip_property_lst }}, {{ equip_sn_lst }}, {{ equip_pn_lst }}, {{ equip_description_lst }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
+										</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							{% endif %}
 						</table>
 					</div>
 				</div>
@@ -149,7 +238,7 @@
 				<!-- case description -->
 				<div class="form-group description_bar">
 					<label for="case_description">Case Description</label>
-					<textarea class="form-control" name="case_description" rows="3" disabled>{{ case.case_description }}</textarea>
+					<textarea class="form-control" {% if permit_description %} name="case_description" {% endif %} rows="3" {% if not permit_description %} disabled {% endif %}>{{ case.case_description }}</textarea>
 				</div>
 
 				<!-- visit list -->
@@ -177,9 +266,11 @@
 				</div>
 
 				<!-- save and cancel btns -->
-				<div class="action_btn">
-					<button type="submit" name="save_btn" class="btn btn-primary">Save</button>
-				</div>
+				{% if edit %}
+					<div class="action_btn">
+						<button type="submit" name="save_btn" class="btn btn-primary">Save</button>
+					</div>
+				{% endif %}
 			</form>
 		{% else %}
 			<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST">
@@ -196,7 +287,7 @@
 						<label for="type">Type</label>
 					</div>
 					<select class="form-select select_bar" name="type">
-						<option selected>Choose...</option>
+						<option value="" selected>Choose...</option>
 						{% for val, name in types %}
 							<option value="{{ val }}">{{ name }}</option>
 						{% endfor %}
@@ -209,7 +300,7 @@
 						<label for="status">Status</label>
 					</div>
 					<select class="form-select select_bar" name="status" id="status" onchange="statusReason()">
-						<option selected>Choose...</option>
+						<option value="" selected>Choose...</option>
 					{% for val, name in statuses %}
 						<option value="{{ val }}">{{ name }}</option>
 					{% endfor %}

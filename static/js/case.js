@@ -334,23 +334,17 @@ function deleteRow(me, tableID) {
 	}
 }
 
-function statusReason(){
+function statusReason(on_hold_str='', cancellation_str=''){
 
 	if (document.getElementById('reason') !=null){
 			document.getElementById('reason').remove();
 		}
-	
 	var status = document.getElementById("status").value;
-	console.log(status);
+
 	if (status == "On Hold"){
 		var element_div = document.createElement("div");
 		element_div.setAttribute('class', 'form-group reason_bar');
 		element_div.id="reason";
-		// element_div.style.transition = "left 20s ease-in-out, opacity 20s linear";
-		// element_div.style.left = "0px";
-		// element_div.style.opacity = 1;
-		// element_div.style.transition = "left 2s easi-in-out";
-		// element_div.style.left = "0px";
 
 		var element_label = document.createElement("label");
 		element_label.innerHTML = "On Hold Reason";
@@ -360,6 +354,7 @@ function statusReason(){
 		element_textarea.name="on_hold_reason";
 		element_textarea.rows="3";
 		element_textarea.id="on_hold_reason";
+		element_textarea.innerHTML = on_hold_str;
 
 		element_div.appendChild(element_label);
 		element_div.appendChild(element_textarea);
@@ -384,6 +379,8 @@ function statusReason(){
 		element_textarea.name="cancellation_reason";
 		element_textarea.rows="3";
 		element_textarea.id="cancellation_reason";
+		element_textarea.innerHTML = cancellation_str;
+
 
 		element_div.appendChild(element_label);
 		element_div.appendChild(element_textarea);

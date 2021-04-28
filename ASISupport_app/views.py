@@ -80,12 +80,16 @@ def new_case_view(request):
 						case_description=req_case_description,
 						cancellation_reason=req_cancellation_reason,
 						on_hold_reason=req_on_hold_reason
-						)		
+						)
+
+		if (case_data.status == 'Closed' or case_data.status == 'Resolved') and case_data.actual_date == None:
+			case_data.close_case()
+
 		case_data.save()
 
 		''' save equipment data''' 
 		equip_sn_lst = request.POST.getlist('serial_number')
-		equip_sn_lst = filter(lambda x: x != "", equip_sn_lst)
+		equip_sn_lst = list(set(list(filter(lambda x: x != "", equip_sn_lst))))
 
 		for sn in equip_sn_lst:
 			equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
@@ -95,8 +99,12 @@ def new_case_view(request):
 
 		return redirect('ASISupport_app:view_case', id=req_case_num)
 
+
+
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
 		return redirect('ASISupport_app:dashboard')
+
+
 
 	types = Case.TYPES
 	statuses = Case.STATUSES
@@ -124,11 +132,236 @@ def case_view(request, id):
 	case = Case.objects.get(case_num=id)
 	visits = Visit.objects.filter(case_num=id)
 
-	case_equipment_lst = CaseEquipment.objects.filter(case_num=id)
-	equip_lst = [ce.equip_sn for ce in case_equipment_lst]
-	equipment = Equipment.objects.filter(equip_sn__in=equip_lst)
+	case_equipment = CaseEquipment.objects.filter(case_num=id)
+	case_equipment_sn_lst = [ce.equip_sn for ce in case_equipment]
+	filtered_case_equipment = Equipment.objects.filter(equip_sn__in=case_equipment_sn_lst)
 
+	equipment = Equipment.objects.all()
+	equip_sn_lst = [equip.equip_sn for equip in equipment]
+	equip_pn_lst = [equip.equip_pn for equip in equipment]
+	equip_description_lst = [equip.equip_description for equip in equipment]
+	equip_property_lst = [{'sn':equip.equip_sn,
+						 'pn':equip.equip_pn, 
+						 'description':equip.equip_description, 
+						 'date':str(datetime.strptime(str(equip.installation_date)[:19],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S')), 
+						 'warranty':str(equip.warranty)} for equip in equipment]
+
+	types = Case.TYPES
 	statuses = Case.STATUSES
+	employees = Employee.objects.all()
+	customers = Customer.objects.all()
+
+
+
+	''' roles '''
+	groups = list(request.user.groups.values_list('name',flat = True))
+
+	''' restrict permits '''
+	permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled'])
+	edit = False
+	manager = False
+	support = False
+	secretary = False	
+	permit_type = False
+	permit_status = False
+	permit_target_date = False
+	permit_actual_date = False
+	permit_on_hold_reason = False
+	permit_cancellation_reason = False
+	permit_case_manager = False
+	permit_machine_down = False
+	permit_customer = False
+	permit_customer_contact = False
+	permit_description = False
+	permit_equipment_delete = False
+	permit_equipment_add = False
+
+
+	if (request.method == 'POST' and 'edit_btn' in request.POST) or (request.method == 'POST' and 'save_btn' in request.POST):
+		edit = True
+
+		''' grant permissions per group '''
+		if 'Manager' in groups:
+			manager = True
+			permit_type = True
+			permit_status = True
+			permit_target_date = True
+			permit_actual_date = True
+			permit_on_hold_reason = True
+			permit_cancellation_reason = True
+			permit_case_manager = True
+			permit_machine_down = True
+			permit_customer = True
+			permit_customer_contact = True
+			permit_description = True
+			permit_equipment_delete = True
+			permit_equipment_add = True
+
+		if 'Support' in groups:
+			support = True
+			permit_status = True
+			permit_actual_date = True
+			permit_on_hold_reason = True
+			permit_cancellation_reason = True
+			permit_machine_down = True
+			permit_description = True
+			permit_equipment = True
+			permit_equipment_add = True
+
+		if 'Secretary' in groups:
+			secretary = True	
+
+	
+		if request.method == 'POST' and 'save_btn' in request.POST:
+
+			''' Update case data''' 
+			updated = False
+
+			if permit_type:
+				upd_case_type = request.POST.get('type')
+				if upd_case_type != case.case_type:
+					case.case_type = upd_case_type
+					updated = True
+
+			if permit_status:
+				upd_case_status = request.POST.get('status')
+				if upd_case_status != case.status:
+					case.status = upd_case_status
+					updated = True
+
+			if permit_target_date:
+				upd_target_date = datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+				if upd_target_date != case.target_date:
+					case.target_date = upd_target_date
+					updated = True
+
+			if permit_actual_date:
+				upd_actual_date = request.POST.get('actual_date')
+				if upd_actual_date:
+					upd_actual_date = datetime.strptime(upd_actual_date,'%Y-%m-%d')
+				else:
+					upd_actual_date = None
+
+				if upd_actual_date != case.actual_date:
+					case.actual_date = upd_actual_date
+					updated = True
+
+			if permit_on_hold_reason and case.status == 'On Hold':
+				upd_on_hold_reason = request.POST.get('on_hold_reason')
+				if upd_on_hold_reason != case.on_hold_reason:
+					case.on_hold_reason = upd_on_hold_reason
+					updated = True
+
+			if permit_cancellation_reason and case.status == 'Cancelled':
+				upd_cancellation_reason = request.POST.get('cancellation_reason')
+				if upd_cancellation_reason != case.cancellation_reason:
+					case.cancellation_reason = upd_cancellation_reason
+					updated = True
+
+			if permit_case_manager:
+				upd_case_manager = Employee.objects.filter(first_name=request.POST.get('case_manager').split()[0], last_name=request.POST.get('case_manager').split()[1])[0]
+				if upd_case_manager.employee_id != case.case_manager.employee_id:
+					case.case_manager = upd_case_manager
+					updated = True
+
+			if permit_machine_down:
+				upd_machine_down = request.POST.get('machine_down')
+				if upd_machine_down == 'on':
+					upd_machine_down = True
+				else:
+					upd_machine_down = False
+
+				if upd_machine_down != case.machine_down:
+					case.machine_down = upd_machine_down
+					updated = True
+
+			if permit_customer:
+				upd_customer = Customer.objects.get(customer_name=request.POST.get('customer'))
+				if upd_customer.customer_name != case.customer.customer_name:
+					case.customer = upd_customer
+					for visit in visits:
+						visit.customer = upd_customer
+					updated = True
+
+			if permit_customer_contact:
+				upd_customer_contact = request.POST.get('customer_contact')
+				if upd_customer_contact != case.customer_contact:
+					case.customer_contact = upd_customer_contact
+					updated = True
+
+			if permit_description:
+				upd_case_description = request.POST.get('case_description')
+				if upd_case_description != case.case_description:
+					case.case_description = upd_case_description
+					updated = True
+
+
+			if (case.status == 'Closed' or case.status == 'Resolved') and case.actual_date == None:
+				case.close_case()
+
+
+			if updated:
+				case.save()
+				if permit_customer and visits:
+					for visit in visits:
+						visit.save()
+			
+
+
+
+			''' Update equipment data''' 
+			if permit_equipment_delete or permit_equipment_add:
+				upd_equip_sn_lst = request.POST.getlist('serial_number')
+				upd_equip_sn_lst = list(set(list(filter(lambda x: x != "", upd_equip_sn_lst))))
+
+				current_equip_sn_lst = [str(ce) for ce in case_equipment_sn_lst]
+
+				''' delete equipment from case '''
+				if permit_equipment_delete:
+					for sn in current_equip_sn_lst:
+						if sn not in upd_equip_sn_lst:
+							CaseEquipment.objects.get(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn)).delete()
+							print('deleted')
+
+
+				''' add equipment to case '''
+				if permit_equipment_add:
+					for sn in upd_equip_sn_lst:
+						if sn not in current_equip_sn_lst:
+							new_equip = CaseEquipment(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn))
+							new_equip.save()
+
+
+				''' refresh data collection '''
+				case_equipment = CaseEquipment.objects.filter(case_num=id)
+				case_equipment_sn_lst = [ce.equip_sn for ce in case_equipment]
+				filtered_case_equipment = Equipment.objects.filter(equip_sn__in=case_equipment_sn_lst)
+
+
+
+			''' restrict permits '''
+			permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled'])
+			edit = False
+			manager = False
+			support = False
+			secretary = False	
+			permit_type = False
+			permit_status = False
+			permit_target_date = False
+			permit_actual_date = False
+			permit_on_hold_reason = False
+			permit_cancellation_reason = False
+			permit_case_manager = False
+			permit_machine_down = False
+			permit_customer = False
+			permit_customer_contact = False
+			permit_description = False
+			permit_equipment_delete = False
+			permit_equipment_add = False
+
+
+			
+
 	return render(request, 'ASISupport_app/case.html', locals())
 
 @login_required(login_url='/accounts/login/')

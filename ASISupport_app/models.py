@@ -53,8 +53,7 @@ class Case(models.Model):
 	on_hold_reason 			= models.TextField(blank=True, null=True)
 	
 	def close_case(self):
-		self.actual_date = timezone.now
-		self.save()
+		self.actual_date = datetime.now()
 
 	def __str__(self):
 		return self.case_num
