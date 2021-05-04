@@ -1,31 +1,27 @@
 function completeDesc(me, parts) {
-	// var index = me.parentNode.parentNode.rowIndex
-	var elementId = me.id
-	var elementIndex = elementId.split("_").pop();
-	var input = document.getElementById(elementId).value;
+	var input = me.value;
 
 	if( parts[input] ) {
-		document.getElementById("part_description_" + elementIndex).value = parts[input];
+		me.parentNode.nextElementSibling.firstElementChild.value = parts[input];
 	}
 	else{
-		document.getElementById("part_description_" + elementIndex).value = '';
+		me.parentNode.nextElementSibling.firstElementChild.value = '';
 	}
 }
 
 
 function toggleHiddenInput(me) {
-	var elementIndex = me.id.split("_").pop();
 
 	if (me.checked) {
-		document.getElementById("hidden_charge_" + elementIndex).remove();
+		me.parentNode.firstElementChild.remove();
 	}
 	else {
 		var element_hidden_input = document.createElement("input");
 		element_hidden_input.type = "hidden";
 		element_hidden_input.name="charge";
-		element_hidden_input.id="hidden_charge_" + elementIndex;
 		element_hidden_input.value="0";
-		me.parentNode.appendChild(element_hidden_input);
+		me.parentNode.insertBefore(element_hidden_input, me);
+
 	}
 }
 
@@ -36,9 +32,6 @@ function addRow(tableID, parts) {
 	var rowCount = table.rows.length;
 	var row = table.insertRow(rowCount-1);
 
-	while (document.getElementById('part_num_' + rowCount) !=null) {
-		rowCount++;
-	}
 
 	// remove button
 	var cell1 = row.insertCell(0);
@@ -55,7 +48,6 @@ function addRow(tableID, parts) {
 	var element2 = document.createElement("input");
 	element2.type = "text";
 	element2.name="part_num";
-	element2.id="part_num_" + rowCount;
 	element2.setAttribute('class', 'form-control');
 	element2.oninput = function() {completeDesc(this, parts);};
 	cell2.appendChild(element2);
@@ -65,7 +57,6 @@ function addRow(tableID, parts) {
 	var element3 = document.createElement("input");
 	element3.type = "text";
 	element3.name="part_description";
-	element3.id="part_description_" + rowCount;
 	element3.setAttribute("readonly", true);
 	element3.setAttribute('class', 'form-control');
 	cell3.appendChild(element3);
@@ -86,13 +77,11 @@ function addRow(tableID, parts) {
 	var element_hidden_input = document.createElement("input");
 	element_hidden_input.type = "hidden";
 	element_hidden_input.name="charge";
-	element_hidden_input.id="hidden_charge_" + rowCount;
 	element_hidden_input.value="0";
 
 	var element_input = document.createElement("input");
 	element_input.type = "checkbox";
 	element_input.name="charge";
-	element_input.id="charge_" + rowCount;
 	element_input.value="1";
 	element_input.onclick = function() {toggleHiddenInput(this);};
 
@@ -108,7 +97,8 @@ function addRow(tableID, parts) {
 	cell5.appendChild(element_div);
 }
 
-  function deleteRow(me, tableID) {
+
+function deleteRow(me, tableID) {
 	try {
 	var table = document.getElementById(tableID);
 	table.deleteRow(me.parentNode.parentNode.rowIndex);
@@ -118,6 +108,7 @@ function addRow(tableID, parts) {
 	}
 }
 
+
 function calculateTime() {
 
 	var start_time = document.getElementById('visit_start');
@@ -125,28 +116,32 @@ function calculateTime() {
 	var tot_time = document.getElementById('visit_hours');
 
 	if (start_time.value && end_time.value) {
-		console.log('test');
 
+		start_time_lst = start_time.value.split(":");
+		var start_date = new Date();
+		start_date.setHours(start_time_lst[0]);
+		start_date.setMinutes(start_time_lst[1]);
 
-		// start_time_lst = start_time.value.split(":");
-		// var start_date = new Date();
-		// start_date.setHours(start_time_lst[0]);
-		// start_date.setMinutes(start_time_lst[1]);
-		// console.log(start_date);
+		end_time_lst = end_time.value.split(":");
+		var end_date = new Date();
+		end_date.setHours(end_time_lst[0]);
+		end_date.setMinutes(end_time_lst[1]);
 
-		// end_time_lst = end_time.value.split(":");
-		// var end_date = new Date();
-		// end_date.setHours(end_time_lst[0]);
-		// end_date.setMinutes(end_time_lst[1]);
-		// console.log(end_date);
-
-		// var hours = Math.abs(date1 - date2) / 36e5;
-		// console.log(hours);
-
+		if (end_date > start_date) {
+			var hours = (Math.abs(end_date - start_date) / 36e5).toFixed(2);
+			tot_time.value = hours;	
+		}
+		else {
+			var hours = (Math.abs(end_date.setDate(end_date.getDate() + 1) - start_date) / 36e5).toFixed(2)
+			tot_time.value = hours;	
+		}
 
 	}
+
 	else {
+
 		tot_time.value = ''
+
 	}
 
 }

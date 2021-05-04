@@ -71,7 +71,7 @@ class Visit(models.Model):
 	visit_start 			= models.TimeField() 
 	visit_end 				= models.TimeField() 
 	travel_hours 			= models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
-	num_of_engineers 		= models.IntegerField(blank=True, null=True)
+	num_of_engineers 		= models.IntegerField(blank=True, null=True, default=1)
 	visit_summary 			= models.TextField()
 
 	def sum_visit_hours(self):

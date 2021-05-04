@@ -20,7 +20,9 @@
 					<h1 class="inline_it">Visit {{ visit.visit_num }}</h1>
 
 					<div class="action_btn">
-						<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
+						{% if permit_edit %}
+							<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
+						{% endif %}
 						<button type="submit" name="back_btn" class="btn btn-primary">Back</button>
 					</div>
 				</div>
@@ -52,7 +54,7 @@
 					<div>
 						<label for="visit_date">Visit Date</label>
 					</div>
-					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" disabled>
+					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" {% if permit_visit_date %} name="visit_date" {% else %} disabled {% endif %}>
 				</div>
 
 				<!-- engineer -->
@@ -60,7 +62,16 @@
 					<div>
 						<label for="Engineer">Engineer</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="engineer" value="{{ visit.engineer }}" disabled>
+					{% if not permit_engineer %}
+						<input class="form-control text_bar" type="text" value="{{ visit.engineer }}" disabled>
+					{% else %}
+						<input class="form-control text_bar" type="text" name="engineer" list="engineer" value="{{ visit.engineer }}">
+						<datalist id="engineer">
+							{% for employee in employees %}
+								<option value="{{ employee }}">{{ employee }}</option>
+							{% endfor %}
+						</datalist>
+					{% endif %}
 				</div>
 
 				<!-- customer -->
@@ -76,16 +87,12 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ visit.customer_contact }}" disabled>
+						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ visit.customer_contact }}" {% if permit_customer_contact %} name="customer_contact" {% else %} disabled {% endif %}>
 				</div>
 
 				<!-- remote check box -->
 				<div class="inline_it inline_spacing remote_cb">
-					{% if visit.remote %}
-						<input type="checkbox" id="remote" checked disabled>
-					{% else %}
-						<input type="checkbox" id="remote" disabled>
-					{% endif %}
+					<input type="checkbox" id="remote" {% if visit.remote %} checked {% endif %} {% if permit_remote %} name="remote" {% else %} disabled {% endif %}>
 					<label for="remote">Remote</label>
 				</div>
 
@@ -98,14 +105,14 @@
 						<div>
 							<label for="visit_start">Visit Start</label>
 						</div>
-						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" disabled>
+						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" {% if permit_visit_start %} name="visit_start" onchange="calculateTime()" {% else %} disabled {% endif %}>
 					</div>
 					<!-- visit end -->
 					<div class="inline_it inline_spacing">
 						<div>
 							<label for="visit_end">Visit End</label>
 						</div>
-						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" disabled>
+						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" {% if permit_visit_end %} name="visit_end" onchange="calculateTime()" {% else %} disabled {% endif %}>
 					</div>
 					<!-- tot visit hours -->
 					<div class="inline_it inline_spacing">
@@ -122,14 +129,14 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" disabled>
+						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" {% if permit_travel_hours %} name="travel_hours" {% else %} disabled {% endif %}>
 					</div>
 					<!-- number of engineers -->
 					<div class="inline_it inline_spacing">
 						<div>
 							<label for="num_of_engineers">Number of Engineers</label>
 						</div>
-						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" disabled>
+						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" {% if permit_num_of_engineers %} name="num_of_engineers" {% else %} disabled {% endif %}>
 					</div>
 				</div>
 
@@ -137,7 +144,7 @@
 				<div class="spacing">
 					<label>Parts Used</label>
 					<div class="parts_lst">
-						<table class="table table-hover">
+						<table class="table table-hover" id="parts_used_tbl">
 							<thead>
 								<tr>
 									<th scope="col"></th>
@@ -147,27 +154,63 @@
 						    		<th scope="col"></th>
 						    	</tr>
 							</thead>
-							<tbody>
-								{% for visit_part, description in part_description_dict.items %}
+							{% if not permit_parts_delete and not permit_parts_add %} 
+								<tbody>
+									{% for visit_part, description in part_description_dict.items %}
+											<tr>
+												<td></td>
+												<td>{{ visit_part.part_pn }}</td> 
+												<td>{{ description }}</td>
+												<td>{{ visit_part.qty }}</td>
+												<td>
+													<div class="form-check charge_cb">
+														<input type="checkbox" id="charge" {% if visit_part.charge %} checked {% endif %} disabled>
+														<label for="charge">Charge</label>
+													</div>
+												</td>
+											</tr>
+									{% endfor %}
+								</tbody>
+							{% else %}
+								<tbody>
+									{% for visit_part, description in part_description_dict.items %}
 										<tr>
-											<td></td>
-											<td>{{ visit_part.part_pn }}</td> 
-											<td>{{ description }}
+											<td>
+												<button onclick="deleteRow(this,'parts_used_tbl')" type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 											</td>
-											<td>{{ visit_part.qty }}</td>
+											<td>
+												<input class="form-control" type="text" name="part_num" oninput="completeDesc(this,{{ parts_dict }})" value="{{ visit_part.part_pn }}">
+											</td>
+											<td>
+												<input class="form-control" type="text" name="part_description" value="{{ description }}" readonly>
+											</td>
+											<td>
+												<input class="form-control" type="text" name="qty" value="{{ visit_part.qty }}">
+											</td>
 											<td>
 												<div class="form-check charge_cb">
 													{% if visit_part.charge %}
-														<input type="checkbox" id="charge" checked disabled>
+														<input type="checkbox" name="charge" onclick="toggleHiddenInput(this)" value="1" checked>
 													{% else %}
-														<input type="checkbox" id="charge" disabled>
+														<input type="hidden" name="charge" value="0">
+														<input type="checkbox" name="charge" onclick="toggleHiddenInput(this)" value="1">
 													{% endif %}
 													<label for="charge">Charge</label>
 												</div>
 											</td>
 										</tr>
-								{% endfor %}
-							</tbody>
+									{% endfor %}
+									<tr>
+										<td>
+											<button onclick="addRow('parts_used_tbl', {{ parts_dict }})" type="button" name="add_btn" class="btn btn-primary add_or_del_btn">+</button>
+										</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							{% endif %}
 						</table>
 					</div>
 				</div>
@@ -175,8 +218,15 @@
 				<!-- add textarea for description -->
 				<div class="form-group description_bar">
 					<label for="visit_summary">Visit Summary</label>
-					<textarea class="form-control" id="visit_summary" rows="3" disabled="">{{ visit.visit_summary }}</textarea>
+					<textarea class="form-control" id="visit_summary" rows="3" {% if permit_visit_summary %} name="visit_summary" {% else %} disabled {% endif %}>{{ visit.visit_summary }}</textarea>
 				</div>
+
+				<!-- save btn -->
+				{% if edit %}
+					<div class="action_btn">
+						<button type="submit" name="save_btn" class="btn btn-primary">Save</button>
+					</div>
+				{% endif %}
 			</form>
 		{% else %}
 			<form class="form-container" action="{% url 'ASISupport_app:new_visit' case.case_num %}" method="POST">
@@ -319,18 +369,18 @@
 										<button onclick="deleteRow(this,'parts_used_tbl')"  type="button" name="remove_btn" class="btn btn-primary add_or_del_btn">-</button>
 									</td>
 									<td>
-										<input class="form-control" type="text" name="part_num" oninput="completeDesc(this,{{ parts_dict }})" id="part_num_1">
+										<input class="form-control" type="text" name="part_num" oninput="completeDesc(this,{{ parts_dict }})">
 									</td>
 									<td>
-										<input class="form-control" type="text" name="part_description" id="part_description_1" readonly>
+										<input class="form-control" type="text" name="part_description" readonly>
 									</td>
 									<td>
 										<input class="form-control" type="text" name="qty">
 									</td>
 									<td>
 										<div class="form-check charge_cb">
-											<input type="hidden" name="charge" id="hidden_charge_1" value="0">
-											<input type="checkbox" name="charge" id="charge_1" onclick="toggleHiddenInput(this)" value="1">
+											<input type="hidden" name="charge" value="0">
+											<input type="checkbox" name="charge" onclick="toggleHiddenInput(this)" value="1">
 											<label for="charge">Charge</label>
 										</div>
 									</td>

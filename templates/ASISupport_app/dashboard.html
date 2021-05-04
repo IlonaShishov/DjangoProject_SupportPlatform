@@ -23,7 +23,9 @@
 
 			<!-- navigation buttons -->
 			<div>
-				<a href="{% url 'ASISupport_app:new_case' %}" class="btn btn-primary">New Case</a>
+				{% if permit_new_case %}
+					<a href="{% url 'ASISupport_app:new_case' %}" class="btn btn-primary">New Case</a>
+				{% endif %}
 				<a href="{% url 'ASISupport_app:report' %}" class="btn btn-primary not_first">Reports</a>
 			</div>
 

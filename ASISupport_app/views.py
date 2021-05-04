@@ -23,6 +23,12 @@ def dashboard_view(request):
 			return render(request, 'ASISupport_app/dashboard.html', locals())
 
 	cases = Case.objects.filter(status='Open')
+
+	''' roles '''
+	groups = list(request.user.groups.values_list('name',flat = True))
+ 	
+	permit_new_case = ('Manager' in groups) or ('Support' in groups)
+
 	return render(request, 'ASISupport_app/dashboard.html', locals())
 
 @login_required(login_url='/accounts/login/')
@@ -104,10 +110,31 @@ def new_case_view(request):
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
 		return redirect('ASISupport_app:dashboard')
 
+	''' roles '''
+	groups = list(request.user.groups.values_list('name',flat = True))
+
+	''' status list by roles '''
+	statuses = []
+	if ('Support' in groups ):
+		statuses.extend((
+						('Open', 'Open'),
+						('Resolved', 'Resolved'),
+						('On Hold','On Hold'),
+						('Cancelled','Cancelled')
+						))
+
+	if ('Secretary' in groups):
+		statuses.extend((
+						('Closed', 'Closed'),
+						))
+
+	if ('Manager' in groups):
+		statuses.extend(Case.STATUSES)
+
+	statuses = list(set(statuses))
 
 
 	types = Case.TYPES
-	statuses = Case.STATUSES
 	employees = Employee.objects.all()
 	customers = Customer.objects.all()
 	equipment = Equipment.objects.all()
@@ -147,7 +174,6 @@ def case_view(request, id):
 						 'warranty':str(equip.warranty)} for equip in equipment]
 
 	types = Case.TYPES
-	statuses = Case.STATUSES
 	employees = Employee.objects.all()
 	customers = Customer.objects.all()
 
@@ -156,12 +182,30 @@ def case_view(request, id):
 	''' roles '''
 	groups = list(request.user.groups.values_list('name',flat = True))
 
+	''' status list by roles '''
+	statuses = []
+	if ('Support' in groups ):
+		statuses.extend((
+						('Open', 'Open'),
+						('Resolved', 'Resolved'),
+						('On Hold','On Hold'),
+						('Cancelled','Cancelled')
+						))
+
+	if ('Secretary' in groups):
+		statuses.extend((
+						('Closed', 'Closed'),
+						))
+
+	if ('Manager' in groups):
+		statuses.extend(Case.STATUSES)
+
+	statuses = list(set(statuses))
+
+
 	''' restrict permits '''
-	permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled'])
+	permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled']) or ('Secretary' in groups and case.status in ['Resolved'])
 	edit = False
-	manager = False
-	support = False
-	secretary = False	
 	permit_type = False
 	permit_status = False
 	permit_target_date = False
@@ -182,7 +226,6 @@ def case_view(request, id):
 
 		''' grant permissions per group '''
 		if 'Manager' in groups:
-			manager = True
 			permit_type = True
 			permit_status = True
 			permit_target_date = True
@@ -198,7 +241,6 @@ def case_view(request, id):
 			permit_equipment_add = True
 
 		if 'Support' in groups:
-			support = True
 			permit_status = True
 			permit_actual_date = True
 			permit_on_hold_reason = True
@@ -209,7 +251,7 @@ def case_view(request, id):
 			permit_equipment_add = True
 
 		if 'Secretary' in groups:
-			secretary = True	
+			permit_status = True
 
 	
 		if request.method == 'POST' and 'save_btn' in request.POST:
@@ -226,6 +268,10 @@ def case_view(request, id):
 			if permit_status:
 				upd_case_status = request.POST.get('status')
 				if upd_case_status != case.status:
+					if case.status == 'On Hold':
+						case.on_hold_reason = ''
+					if case.status == 'Cancelled':
+						case.cancellation_reason = ''
 					case.status = upd_case_status
 					updated = True
 
@@ -321,7 +367,6 @@ def case_view(request, id):
 					for sn in current_equip_sn_lst:
 						if sn not in upd_equip_sn_lst:
 							CaseEquipment.objects.get(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn)).delete()
-							print('deleted')
 
 
 				''' add equipment to case '''
@@ -332,7 +377,7 @@ def case_view(request, id):
 							new_equip.save()
 
 
-				''' refresh data collection '''
+				''' refresh equipment data collection '''
 				case_equipment = CaseEquipment.objects.filter(case_num=id)
 				case_equipment_sn_lst = [ce.equip_sn for ce in case_equipment]
 				filtered_case_equipment = Equipment.objects.filter(equip_sn__in=case_equipment_sn_lst)
@@ -340,11 +385,8 @@ def case_view(request, id):
 
 
 			''' restrict permits '''
-			permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled'])
+			permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled']) or ('Secretary' in groups and case.status in ['Resolved'])
 			edit = False
-			manager = False
-			support = False
-			secretary = False	
 			permit_type = False
 			permit_status = False
 			permit_target_date = False
@@ -410,6 +452,8 @@ def new_visit_view(request, id):
 		visit_data.sum_visit_hours()
 		visit_data.save()
 
+
+
 		''' save part data '''
 		part_pn_lst = request.POST.getlist('part_num')
 		part_description_lst = request.POST.getlist('part_description')		
@@ -418,14 +462,17 @@ def new_visit_view(request, id):
 		part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
 		d = {'1': True, '0': False}
 		part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
-		# if part_tbl.all(axis='columns').all():
+		
 		for index, row in part_tbl.iterrows():
-			part_data = VisitParts(visit_num=Visit.objects.get(visit_num=req_visit_num),
-								part_pn=Parts.objects.get(part_pn=row['part_pn']),
-								qty=row['part_qty'],
-								charge=row['part_charge']
-								)
-			part_data.save()
+			if Parts.objects.filter(part_pn=row['part_pn']).exists():
+				part_data = VisitParts(visit_num=Visit.objects.get(visit_num=req_visit_num),
+									part_pn=Parts.objects.get(part_pn=row['part_pn']),
+									qty=row['part_qty'],
+									charge=row['part_charge']
+									)
+				part_data.save()
+
+
 
 		return redirect('ASISupport_app:view_visit', id=req_visit_num)
 
@@ -442,6 +489,8 @@ def visit_view(request, id):
 	state = 'view'
 
 	visit = Visit.objects.get(visit_num=id)
+	employees = Employee.objects.all()
+
 
 	if request.method == 'POST' and 'back_btn' in request.POST:
 		return redirect('ASISupport_app:view_case', id=visit.case_num)
@@ -450,9 +499,197 @@ def visit_view(request, id):
 	case = Case.objects.get(case_num=visit.case_num)
 
 	visit_parts_lst = VisitParts.objects.filter(visit_num=id)
-	part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
-	parts = Parts.objects.filter(part_pn__in=part_pn_lst)
-	part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts}
+	visit_part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
+	parts_in_visit = Parts.objects.filter(part_pn__in=visit_part_pn_lst)
+	part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts_in_visit}
+
+	parts = Parts.objects.all()
+	parts_dict = {part.part_pn:part.part_description for part in parts}
+
+	''' roles '''
+	groups = list(request.user.groups.values_list('name',flat = True))
+
+	''' restrict permits '''
+	permit_edit = ('Manager' in groups) or ('Support' in groups)
+	edit = False
+	permit_visit_date = False
+	permit_engineer = False
+	permit_customer_contact = False
+	permit_remote = False
+	permit_visit_start = False
+	permit_visit_end = False
+	permit_travel_hours = False
+	permit_num_of_engineers = False
+	permit_visit_summary = False
+	permit_parts_add = False
+	permit_parts_delete = False
+		
+
+
+
+	if (request.method == 'POST' and 'edit_btn' in request.POST) or (request.method == 'POST' and 'save_btn' in request.POST):
+		edit = True
+
+		''' grant permissions per group '''
+		if 'Manager' in groups:
+			permit_visit_date = True
+			permit_engineer = True
+			permit_customer_contact = True
+			permit_remote = True
+			permit_visit_start = True
+			permit_visit_end = True
+			permit_travel_hours = True
+			permit_num_of_engineers = True
+			permit_visit_summary = True
+			permit_parts_add = True
+			permit_parts_delete = True
+
+
+		if 'Support' in groups:
+			permit_customer_contact = True
+			permit_remote = True
+			permit_visit_summary = True
+			permit_parts_add = True
+
+
+		if 'Secretary' in groups:
+			pass
+	
+
+		if request.method == 'POST' and 'save_btn' in request.POST:
+
+			''' Update case data''' 
+			updated = False
+
+			if permit_visit_date:
+				upd_visit_date = datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
+				if upd_visit_date != visit.visit_date:
+					visit.visit_date = upd_visit_date
+					updated = True
+
+
+			if permit_engineer:
+				upd_engineer = Employee.objects.filter(first_name=request.POST.get('engineer').split()[0], last_name=request.POST.get('engineer').split()[1])[0]
+				if upd_engineer != visit.engineer:
+					visit.engineer = upd_engineer
+					updated = True
+
+			if permit_customer_contact:
+				upd_customer_contact = request.POST.get('customer_contact')
+				if upd_customer_contact != visit.customer_contact:
+					visit.customer_contact = upd_customer_contact
+					updated = True
+
+			if permit_remote:
+				upd_remote = request.POST.get('remote')
+				if upd_remote == 'on':
+					upd_remote = True
+				else:
+					upd_remote = False
+
+				if upd_remote != visit.remote:
+					visit.remote = upd_remote
+					updated = True
+
+			if permit_visit_start:
+				upd_visit_start = request.POST.get('visit_start') + ':00'
+				if upd_visit_start != visit.visit_start:
+					visit.visit_start = upd_visit_start
+					updated = True
+
+			if permit_visit_end:
+				upd_visit_end = request.POST.get('visit_end') + ':00'
+				if upd_visit_end != visit.visit_end:
+					visit.visit_end = upd_visit_end
+					updated = True
+
+			if permit_travel_hours:
+				upd_travel_hours = request.POST.get('travel_hours')
+				if upd_travel_hours != visit.travel_hours:
+					visit.travel_hours = upd_travel_hours
+					updated = True
+
+			if permit_num_of_engineers:
+				upd_num_of_engineers = request.POST.get('num_of_engineers')
+				if upd_num_of_engineers != visit.num_of_engineers:
+					visit.num_of_engineers = upd_num_of_engineers
+					updated = True
+
+			if permit_visit_summary:
+				upd_visit_summary = request.POST.get('visit_summary')
+				if upd_visit_summary != visit.visit_summary:
+					visit.visit_summary = upd_visit_summary
+					updated = True
+
+			if updated:
+				visit.save()
+
+
+
+			''' Update parts data''' 
+			if permit_parts_delete or permit_parts_add:
+				part_pn_lst = request.POST.getlist('part_num')
+				part_description_lst = request.POST.getlist('part_description')		
+				part_qty_lst = request.POST.getlist('qty')
+				part_charge_lst = request.POST.getlist('charge')
+				print(part_pn_lst)
+				print(part_description_lst)
+				print(part_qty_lst)
+				print(part_charge_lst)
+				part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
+				d = {'1': True, '0': False}
+				part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
+
+
+
+				''' delete parts from visit '''
+				if permit_parts_delete:
+					for vp in visit_parts_lst:
+						if part_tbl.loc[(part_tbl['part_pn'] == vp.part_pn) & (part_tbl['part_qty'] == vp.qty) & (part_tbl['part_charge'] == vp.charge)].empty:
+							VisitParts.objects.get(visit_num=Visit.objects.get(visit_num=vp.visit_num), part_pn=Parts.objects.get(part_pn=vp.part_pn)).delete()
+							print(f'deleted {vp.part_pn}')
+
+
+				''' add parts to visit '''
+				if permit_parts_add:
+					for index, row in part_tbl.iterrows():
+						if Parts.objects.filter(part_pn=row['part_pn']).exists() and not visit_parts_lst.filter(part_pn=row['part_pn'], qty=row['part_qty'], charge=row['part_charge']).exists():
+							part_data = VisitParts(visit_num=Visit.objects.get(visit_num=visit.visit_num),
+												part_pn=Parts.objects.get(part_pn=row['part_pn']),
+												qty=row['part_qty'],
+												charge=row['part_charge']
+												)
+							part_data.save()
+
+
+
+				''' refresh part data collection '''
+				visit_parts_lst = VisitParts.objects.filter(visit_num=id)
+				visit_part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
+				parts_in_visit = Parts.objects.filter(part_pn__in=visit_part_pn_lst)
+				part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts_in_visit}
+
+
+			''' restrict permits '''
+			permit_edit = ('Manager' in groups) or ('Support' in groups)
+			edit = False
+			permit_visit_date = False
+			permit_engineer = False
+			permit_customer_contact = False
+			permit_remote = False
+			permit_visit_start = False
+			permit_visit_end = False
+			permit_travel_hours = False
+			permit_num_of_engineers = False
+			permit_visit_summary = False
+			permit_parts_add = False
+			permit_parts_delete = False
+
+			''' refresh visit data collection '''
+			visit = Visit.objects.get(visit_num=id)
+			visit.sum_visit_hours()
+
+
 
 	return render(request, 'ASISupport_app/visit.html', locals())
 
