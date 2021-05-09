@@ -12,7 +12,7 @@
 {% block body_block %}
 	<section class="col-sm-1 col-sm-10 col-sm-1">
 		{% if state == 'view' %}
-			<form class="form-container" action="{% url 'ASISupport_app:view_visit' visit.visit_num %}" method="POST">
+			<form class="form-container" action="{% url 'ASISupport_app:view_visit' visit.visit_num %}" method="POST" autocomplete="off">
 				{% csrf_token %}
 
 				<!-- show case number -->
@@ -20,10 +20,10 @@
 					<h1 class="inline_it">Visit {{ visit.visit_num }}</h1>
 
 					<div class="action_btn">
-						{% if permit_edit %}
+						{% if permit_edit and not edit %}
 							<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
 						{% endif %}
-						<button type="submit" name="back_btn" class="btn btn-primary">Back</button>
+						<button type="submit" name="back_btn" class="btn btn-primary" formnovalidate>Back</button>
 					</div>
 				</div>
 
@@ -35,7 +35,7 @@
 						<div>
 							<label for="case_num">Case Number</label>
 						</div>
-							<input class="form-control text_bar" id="case_num" type="text" value="{{ visit.case_num }}" disabled>
+							<input class="form-control text_bar" id="case_num" type="text" value="{{ visit.case_num }}" readonly>
 					</div>
 
 				<!-- case type -->
@@ -43,7 +43,7 @@
 						<div>
 							<label for="case_type">Case Type</label>
 						</div>
-							<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" disabled>
+							<input class="form-control text_bar" id="case_type" type="text" value="{{ case.case_type }}" readonly>
 					</div>
 				</div>
 				
@@ -54,7 +54,7 @@
 					<div>
 						<label for="visit_date">Visit Date</label>
 					</div>
-					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" {% if permit_visit_date %} name="visit_date" {% else %} disabled {% endif %}>
+					<input class="form-control datepicker" id="visit_date" type="date" value="{{ visit.visit_date|date:'Y-m-d' }}" {% if permit_visit_date %} name="visit_date" {% else %} readonly {% endif %} required>
 				</div>
 
 				<!-- engineer -->
@@ -63,9 +63,9 @@
 						<label for="Engineer">Engineer</label>
 					</div>
 					{% if not permit_engineer %}
-						<input class="form-control text_bar" type="text" value="{{ visit.engineer }}" disabled>
+						<input class="form-control text_bar" type="text" value="{{ visit.engineer }}" readonly>
 					{% else %}
-						<input class="form-control text_bar" type="text" name="engineer" list="engineer" value="{{ visit.engineer }}">
+						<input class="form-control text_bar" type="text" name="engineer" list="engineer" value="{{ visit.engineer }}" onchange="listValueValidation(this)" required>
 						<datalist id="engineer">
 							{% for employee in employees %}
 								<option value="{{ employee }}">{{ employee }}</option>
@@ -79,7 +79,7 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-						<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" disabled>
+						<input class="form-control text_bar" id="customer" type="text" value="{{ case.customer }}" readonly>
 				</div>
 
 				<!-- customer contact -->
@@ -87,7 +87,7 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ visit.customer_contact }}" {% if permit_customer_contact %} name="customer_contact" {% else %} disabled {% endif %}>
+						<input class="form-control text_bar" id="customer_contact" type="text" value="{{ visit.customer_contact }}" {% if permit_customer_contact %} name="customer_contact" {% else %} readonly {% endif %} required>
 				</div>
 
 				<!-- remote check box -->
@@ -105,14 +105,14 @@
 						<div>
 							<label for="visit_start">Visit Start</label>
 						</div>
-						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" {% if permit_visit_start %} name="visit_start" onchange="calculateTime()" {% else %} disabled {% endif %}>
+						<input class="form-control datepicker" id="visit_start" type="time" value="{{ visit.visit_start|time:'H:i' }}" {% if permit_visit_start %} name="visit_start" onchange="calculateTime()" {% else %} readonly {% endif %} required>
 					</div>
 					<!-- visit end -->
 					<div class="inline_it inline_spacing">
 						<div>
 							<label for="visit_end">Visit End</label>
 						</div>
-						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" {% if permit_visit_end %} name="visit_end" onchange="calculateTime()" {% else %} disabled {% endif %}>
+						<input class="form-control datepicker" id="visit_end" type="time" value="{{ visit.visit_end|time:'H:i' }}" {% if permit_visit_end %} name="visit_end" onchange="calculateTime()" {% else %} readonly {% endif %} required>
 					</div>
 					<!-- tot visit hours -->
 					<div class="inline_it inline_spacing">
@@ -129,16 +129,18 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" {% if permit_travel_hours %} name="travel_hours" {% else %} disabled {% endif %}>
+						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" {% if permit_travel_hours %} name="travel_hours" {% else %} readonly {% endif %} required>
 					</div>
 					<!-- number of engineers -->
 					<div class="inline_it inline_spacing">
 						<div>
 							<label for="num_of_engineers">Number of Engineers</label>
 						</div>
-						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" {% if permit_num_of_engineers %} name="num_of_engineers" {% else %} disabled {% endif %}>
+						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" {% if permit_num_of_engineers %} name="num_of_engineers" {% else %} readonly {% endif %} required>
 					</div>
 				</div>
+
+				<hr class="solid">
 
 				<!-- parts list -->
 				<div class="spacing">
@@ -164,7 +166,7 @@
 												<td>{{ visit_part.qty }}</td>
 												<td>
 													<div class="form-check charge_cb">
-														<input type="checkbox" id="charge" {% if visit_part.charge %} checked {% endif %} disabled>
+														<input type="checkbox" id="charge" {% if visit_part.charge %} checked {% endif %} readonly>
 														<label for="charge">Charge</label>
 													</div>
 												</td>
@@ -218,7 +220,7 @@
 				<!-- add textarea for description -->
 				<div class="form-group description_bar">
 					<label for="visit_summary">Visit Summary</label>
-					<textarea class="form-control" id="visit_summary" rows="3" {% if permit_visit_summary %} name="visit_summary" {% else %} disabled {% endif %}>{{ visit.visit_summary }}</textarea>
+					<textarea class="form-control" id="visit_summary" rows="3" {% if permit_visit_summary %} name="visit_summary" {% else %} readonly {% endif %} required>{{ visit.visit_summary }}</textarea>
 				</div>
 
 				<!-- save btn -->
@@ -229,7 +231,7 @@
 				{% endif %}
 			</form>
 		{% else %}
-			<form class="form-container" action="{% url 'ASISupport_app:new_visit' case.case_num %}" method="POST">
+			<form class="form-container" action="{% url 'ASISupport_app:new_visit' case.case_num %}" method="POST"  autocomplete="off">
 				{% csrf_token %}
 
 				<!-- show case number -->
@@ -245,7 +247,7 @@
 						<div>
 							<label for="case_num">Case Number</label>
 						</div>
-							<input class="form-control text_bar" name="case_num" type="text" value="{{ case.case_num }}" disabled>
+							<input class="form-control text_bar" name="case_num" type="text" value="{{ case.case_num }}" readonly>
 					</div>
 
 				<!-- case type -->
@@ -253,7 +255,7 @@
 						<div>
 							<label for="case_type">Case Type</label>
 						</div>
-							<input class="form-control text_bar" name="case_type" type="text" value="{{ case.case_type }}" disabled>
+							<input class="form-control text_bar" name="case_type" type="text" value="{{ case.case_type }}" readonly>
 					</div>
 				</div>
 				
@@ -264,7 +266,11 @@
 					<div>
 						<label for="visit_date">Visit Date</label>
 					</div>
-					<input class="form-control datepicker" name="visit_date" type="date"> <!-- set default date today -->
+					<input class="form-control datepicker" name="visit_date" type="date" id="visit_date" required>
+					<script>
+						document.getElementById('visit_date').value = new Date().toISOString().substring(0, 10);
+					</script> 
+
 				</div>
 
 				<!-- engineer -->
@@ -272,7 +278,7 @@
 					<div>
 						<label for="engineer">Engineer</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="engineer" list="engineer" placeholder="Choose...">
+					<input class="form-control text_bar" type="text" name="engineer" list="engineer" placeholder="Choose..." onchange="listValueValidation(this)" required>
 					<datalist id="engineer">
 						{% for employee in employees %}
 							<option value="{{ employee }}">{{ employee }}</option>
@@ -285,7 +291,7 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-						<input class="form-control text_bar" name="customer" type="text" value="{{ case.customer }}" disabled>
+						<input class="form-control text_bar" name="customer" type="text" value="{{ case.customer }}" readonly>
 				</div>
 
 				<!-- customer contact -->
@@ -293,7 +299,7 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-						<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name...">
+						<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name..." required>
 				</div>
 
 				<!-- remote check box -->
@@ -311,7 +317,7 @@
 						<div>
 							<label for="visit_start">Visit Start</label>
 						</div>
-						<input class="form-control datepicker" name="visit_start" id="visit_start" type="time" onchange="calculateTime()">
+						<input class="form-control datepicker" name="visit_start" id="visit_start" type="time" onchange="calculateTime()" required>
 					</div>
 
 					<!-- visit end -->
@@ -319,7 +325,7 @@
 						<div>
 							<label for="visit_end">Visit End</label>
 						</div>
-						<input class="form-control datepicker" name="visit_end" id="visit_end" type="time" onchange="calculateTime()">
+						<input class="form-control datepicker" name="visit_end" id="visit_end" type="time" onchange="calculateTime()" required>
 					</div>
 
 					<!-- tot visit hours -->
@@ -337,7 +343,10 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" name="travel_hours" type="text">
+						<input class="form-control int_bar" name="travel_hours" id="travel_hours" type="text" required>
+						<script>
+							document.getElementById('travel_hours').value = 0;
+						</script> 
 					</div>
 
 					<!-- number of engineers -->
@@ -345,9 +354,14 @@
 						<div>
 							<label for="num_of_engineers">Number of Engineers</label>
 						</div>
-						<input class="form-control int_bar" name="num_of_engineers" type="text">
+						<input class="form-control int_bar" name="num_of_engineers" id="num_of_engineers" type="text" required>
+						<script>
+							document.getElementById('num_of_engineers').value = 1;
+						</script>
 					</div>
 				</div>
+
+				<hr class="solid">
 
 				<!-- parts list -->
 				<div class="spacing">
@@ -402,13 +416,13 @@
 				<!-- add textarea for description -->
 				<div class="form-group description_bar">
 					<label for="visit_summary">Visit Summary</label>
-					<textarea class="form-control" name="visit_summary" rows="3"></textarea>
+					<textarea class="form-control" name="visit_summary" rows="3" required></textarea>
 				</div>
 
 				<!-- save/ cancel btns -->
 				<div class="action_btn"><!-- visible when in create new or edit mode -->
 					<button type="submit" name="save_btn" class="btn btn-primary">Save</button>
-					<button type="submit" name="cancel_btn" class="btn btn-primary">Cancel</button>
+					<button type="submit" name="cancel_btn" class="btn btn-primary" formnovalidate>Cancel</button>
 				</div>
 			</form>
 		{% endif %}

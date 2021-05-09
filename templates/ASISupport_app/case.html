@@ -13,17 +13,17 @@
 
 	<section class="col-sm-1 col-sm-10 col-sm-1">
 		{% if state == 'view' %}
-			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST" id="view_case_form">
+			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST" id="view_case_form"  autocomplete="off">
 				{% csrf_token %}
 
 				<!-- case number -->
 				<h1 class="inline_it">Case {{ case.case_num }}</h1>
 
 				<div class="action_btn"><!-- visible when in view mode -->
-					{% if permit_edit %}
+					{% if permit_edit and not edit %}
 						<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
 					{% endif %}
-					<button type="submit" name="back_btn" class="btn btn-primary">Back</button>
+					<button type="submit" name="back_btn" class="btn btn-primary" formnovalidate>Back</button>
 				</div>
 
 				<hr class="solid">
@@ -38,8 +38,8 @@
 							<option selected>{{ case.case_type }}</option>
 						</select>
 					{% else %}
-						<select class="form-select select_bar" name="type">
-							<option selected>{{ case.case_type }}</option>
+						<select class="form-select select_bar" name="type" required>
+							<option selected hidden value="{{ case.case_type }}">{{ case.case_type }}</option>
 							{% for val, name in types %}
 								<option value="{{ val }}">{{ name }}</option>
 							{% endfor %}
@@ -57,8 +57,8 @@
 							<option selected>{{ case.status }}</option>
 						</select>
 					{% else %}
-						<select class="form-select select_bar" name="status" id="status" onchange="statusReason()">
-							<option selected>{{ case.status }}</option>
+						<select class="form-select select_bar" name="status" id="status" onchange="statusReason()" required>
+							<option selected hidden value="{{ case.status }}">{{ case.status }}</option>
 						{% for val, name in statuses %}
 							<option value="{{ val }}">{{ name }}</option>
 						{% endfor %}
@@ -71,7 +71,7 @@
 					<div>
 						<label class="date_bar" for="projected_date">Projected Completion Date</label>
 					</div>
-					<input class="form-control datepicker date_bar" {% if permit_target_date %} name="projected_date" {% endif %} type="date" value="{{ case.target_date|date:'Y-m-d' }}" {% if not permit_target_date %} disabled {% endif %}>
+					<input class="form-control datepicker date_bar" {% if permit_target_date %} name="projected_date" {% endif %} type="date" value="{{ case.target_date|date:'Y-m-d' }}" {% if not permit_target_date %} readonly {% endif %} required>
 				</div>
 
 				<!-- actual completion date -->
@@ -79,21 +79,21 @@
 					<div>
 						<label for="actual_date">Actual Completion Date</label>
 					</div>
-					<input class="form-control datepicker date_bar" {% if permit_actual_date %} name="actual_date" {% endif %} type="date" value="{{ case.actual_date|date:'Y-m-d' }}" {% if not permit_actual_date %} disabled {% endif %}>
+					<input class="form-control datepicker date_bar" {% if permit_actual_date %} name="actual_date" {% endif %} type="date" value="{{ case.actual_date|date:'Y-m-d' }}" {% if not permit_actual_date %} readonly {% endif %}>
 				</div>
 
 				<!-- reason -->
 				{% if case.status == 'On Hold' %}
 					<div class="form-group reason_bar" id="reason">
 						<label>On Hold Reason</label>
-						<textarea class="form-control" {% if permit_on_hold_reason %} name="on_hold_reason" {% endif %} rows="3" id="on_hold_reason" {% if not permit_on_hold_reason %} disabled {% endif %}>{{ case.on_hold_reason }}</textarea>
+						<textarea class="form-control" {% if permit_on_hold_reason %} name="on_hold_reason" {% endif %} rows="3" id="on_hold_reason" {% if not permit_on_hold_reason %} readonly {% endif %}>{{ case.on_hold_reason }}</textarea>
 					</div>
 				{% endif %}
 
 				{% if case.status == 'Cancelled' %}
 					<div class="form-group reason_bar" id="reason">
 						<label>Cancellation Reason</label>
-						<textarea class="form-control" {% if permit_cancellation_reason %} name="cancellation_reason" {% endif %} rows="3" id="cancellation_reason" {% if not permit_cancellation_reason %} disabled {% endif %}>{{ case.cancellation_reason }}</textarea>
+						<textarea class="form-control" {% if permit_cancellation_reason %} name="cancellation_reason" {% endif %} rows="3" id="cancellation_reason" {% if not permit_cancellation_reason %} readonly {% endif %}>{{ case.cancellation_reason }}</textarea>
 					</div>
 				{% endif %}
 
@@ -105,9 +105,9 @@
 						<label for="case_manager">Case Manager</label>
 					</div>
 					{% if not permit_case_manager %}
-						<input class="form-control text_bar" type="text" value="{{ case.case_manager }}" disabled>
+						<input class="form-control text_bar" type="text" value="{{ case.case_manager }}" readonly>
 					{% else %}
-						<input class="form-control text_bar" type="text" name="case_manager" list="case_manager" value="{{ case.case_manager }}">
+						<input class="form-control text_bar" type="text" name="case_manager" list="case_manager" value="{{ case.case_manager }}" onchange="listValueValidation(this)" required>
 						<datalist id="case_manager">
 							{% for employee in employees %}
 								<option value="{{ employee }}">{{ employee }}</option>
@@ -130,9 +130,9 @@
 						<label for="customer">Customer</label>
 					</div>
 					{% if not permit_customer %}
-						<input class="form-control text_bar" type="text" value="{{ case.customer }}" disabled>
+						<input class="form-control text_bar" type="text" value="{{ case.customer }}" readonly>
 					{% else %}
-						<input class="form-control text_bar" type="text" name="customer" list="customer" value="{{ case.customer }}">
+						<input class="form-control text_bar" type="text" name="customer" list="customer" value="{{ case.customer }}" onchange="listValueValidation(this)" required>
 						<datalist id="customer">
 							{% for customer in customers %}
 								<option value="{{ customer }}">{{ customer }}</option>
@@ -146,7 +146,7 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-					<input class="form-control text_bar" {% if permit_customer_contact %} name="customer_contact" {% endif %} type="text" value="{{ case.customer_contact }}" {% if not permit_customer_contact %} disabled {% endif %}>
+					<input class="form-control text_bar" {% if permit_customer_contact %} name="customer_contact" {% endif %} type="text" value="{{ case.customer_contact }}" {% if not permit_customer_contact %} readonly {% endif %} required>
 				</div>
 
 				<hr class="solid">
@@ -238,7 +238,7 @@
 				<!-- case description -->
 				<div class="form-group description_bar">
 					<label for="case_description">Case Description</label>
-					<textarea class="form-control" {% if permit_description %} name="case_description" {% endif %} rows="3" {% if not permit_description %} disabled {% endif %}>{{ case.case_description }}</textarea>
+					<textarea class="form-control" {% if permit_description %} name="case_description" {% endif %} rows="3" {% if not permit_description %} readonly {% endif %} required>{{ case.case_description }}</textarea>
 				</div>
 
 				<!-- visit list -->
@@ -261,7 +261,9 @@
 								{% endfor %}
 							</tbody>
 						</table>
-						<a href="{% url 'ASISupport_app:new_visit' case.case_num %}" class="btn btn-primary btn-sm new_visit_btn">New Visit</a>
+						{% if 'Manager' in groups or permit_edit and case.status != 'On Hold' %}
+							<a href="{% url 'ASISupport_app:new_visit' case.case_num %}" class="btn btn-primary btn-sm new_visit_btn">New Visit</a>
+						{% endif %}
 					</div>
 				</div>
 
@@ -273,7 +275,7 @@
 				{% endif %}
 			</form>
 		{% else %}
-			<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST">
+			<form class="form-container" action="{% url 'ASISupport_app:new_case' %}" method="POST" autocomplete="off">
 				{% csrf_token %}
 
 				<!-- case number -->
@@ -286,8 +288,8 @@
 					<div>
 						<label for="type">Type</label>
 					</div>
-					<select class="form-select select_bar" name="type">
-						<option value="" selected>Choose...</option>
+					<select class="form-select select_bar" name="type" required>
+						<option value="" selected hidden>Choose...</option>
 						{% for val, name in types %}
 							<option value="{{ val }}">{{ name }}</option>
 						{% endfor %}
@@ -299,8 +301,8 @@
 					<div>
 						<label for="status">Status</label>
 					</div>
-					<select class="form-select select_bar" name="status" id="status" onchange="statusReason()">
-						<option value="" selected>Choose...</option>
+					<select class="form-select select_bar" name="status" id="status" onchange="statusReason()" required>
+						<option value="" selected hidden>Choose...</option>
 					{% for val, name in statuses %}
 						<option value="{{ val }}">{{ name }}</option>
 					{% endfor %}
@@ -312,7 +314,7 @@
 					<div>
 						<label class="date_bar" for="projected_date">Projected Completion Date</label>
 					</div>
-					<input class="form-control datepicker date_bar" name="projected_date" type="date">
+					<input class="form-control datepicker date_bar" name="projected_date" type="date" required>
 				</div>
 
 				<!-- actual completion date -->
@@ -330,7 +332,7 @@
 					<div>
 						<label for="case_manager">Case Manager</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="case_manager" list="case_manager" placeholder="Choose...">
+					<input class="form-control text_bar" type="text"  name="case_manager" list="case_manager" placeholder="Choose..." onchange="listValueValidation(this)" required>
 					<datalist id="case_manager">
 						{% for employee in employees %}
 							<option value="{{ employee }}">{{ employee }}</option>
@@ -352,7 +354,7 @@
 					<div>
 						<label for="customer">Customer</label>
 					</div>
-					<input class="form-control text_bar" type="text" name="customer" list="customer" placeholder="Choose...">
+					<input class="form-control text_bar" type="text" name="customer" list="customer" placeholder="Choose..." onchange="listValueValidation(this)" required>
 					<datalist id="customer">
 						{% for customer in customers %}
 							<option value="{{ customer }}">{{ customer }}</option>
@@ -365,7 +367,7 @@
 					<div>
 						<label for="customer_contact">Customer Contact</label>
 					</div>
-					<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name...">
+					<input class="form-control text_bar" name="customer_contact" type="text" placeholder="Enter Name..." required>
 				</div>
 
 				<hr class="solid">
@@ -440,13 +442,13 @@
 				<!-- case description -->
 				<div class="form-group description_bar">
 					<label for="case_description">Case Description</label>
-					<textarea class="form-control" name="case_description" rows="3"></textarea>
+					<textarea class="form-control" name="case_description" rows="3" required></textarea>
 				</div>
 
 				<!-- save and cancel btns -->
 				<div class="action_btn">
 					<button type="submit" name="save_btn" class="btn btn-primary">Save</button>
-					<button type="submit" name="cancel_btn" class="btn btn-primary">Cancel</button>
+					<button type="submit" name="cancel_btn" class="btn btn-primary" formnovalidate>Cancel</button>
 				</div>
 			</form>
 		{% endif %}

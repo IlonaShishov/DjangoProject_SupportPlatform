@@ -136,6 +136,7 @@ def new_case_view(request):
 
 	types = Case.TYPES
 	employees = Employee.objects.all()
+	employees_dict = {employee.employee_id:employee for employee in employees}
 	customers = Customer.objects.all()
 	equipment = Equipment.objects.all()
 	equip_sn_lst = [equip.equip_sn for equip in equipment]
@@ -510,7 +511,7 @@ def visit_view(request, id):
 	groups = list(request.user.groups.values_list('name',flat = True))
 
 	''' restrict permits '''
-	permit_edit = ('Manager' in groups) or ('Support' in groups)
+	permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled'])
 	edit = False
 	permit_visit_date = False
 	permit_engineer = False

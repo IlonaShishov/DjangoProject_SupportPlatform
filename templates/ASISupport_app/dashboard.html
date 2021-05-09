@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block body_block %}
-	<section class="col-sm-3 col-sm-6 col-sm-3">
+	<section class="col-sm-2 col-sm-8 col-sm-2">
 		<form class="form-container" action="{% url 'ASISupport_app:dashboard' %}" method="POST">
 			{% csrf_token %}
 
@@ -17,6 +17,9 @@
 			<div class="welcome">
 				<h1 class="inline_it">Welcome {{request.user.get_full_name}}</h1>
 				<img src="/static/images/ASI_logo.jpg"/>
+			</div>
+			<div class="roles">
+				<small>Role: {% if groups %} {{ groups|join:", " }} {% else %} None {% endif %}</small>
 			</div>
 
 			<hr class="solid">
@@ -71,6 +74,7 @@
 						{% endfor %}
 					</tbody>
 				</table>
+
 		</form>
 	</section>
 {% endblock %}

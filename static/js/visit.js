@@ -145,3 +145,13 @@ function calculateTime() {
 	}
 
 }
+
+function listValueValidation(me) {
+	
+	if(me.value && document.querySelector("#"+me.getAttribute('list') + " option[value='" + me.value+ "']") === null){
+		me.setCustomValidity("Please select a valid value.");
+	}
+	else{
+		me.setCustomValidity("");
+	}
+}

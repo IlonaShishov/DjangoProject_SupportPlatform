@@ -355,6 +355,7 @@ function statusReason(on_hold_str='', cancellation_str=''){
 		element_textarea.rows="3";
 		element_textarea.id="on_hold_reason";
 		element_textarea.innerHTML = on_hold_str;
+		element_textarea.required = true;
 
 		element_div.appendChild(element_label);
 		element_div.appendChild(element_textarea);
@@ -380,6 +381,7 @@ function statusReason(on_hold_str='', cancellation_str=''){
 		element_textarea.rows="3";
 		element_textarea.id="cancellation_reason";
 		element_textarea.innerHTML = cancellation_str;
+		element_textarea.required = true;
 
 
 		element_div.appendChild(element_label);
@@ -392,5 +394,15 @@ function statusReason(on_hold_str='', cancellation_str=''){
 
 	else{
 		//pass
+	}
+}
+
+function listValueValidation(me) {
+	
+	if(me.value && document.querySelector("#"+me.getAttribute('list') + " option[value='" + me.value+ "']") === null){
+		me.setCustomValidity("Please select a valid value.");
+	}
+	else{
+		me.setCustomValidity("");
 	}
 }
