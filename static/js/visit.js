@@ -172,5 +172,3 @@ function IntValueValidation(me) {
 		me.setCustomValidity("Please enter a whole number");
 	}
 }
-
-// text comment
