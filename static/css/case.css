@@ -74,3 +74,7 @@ select:disabled {
 td label{
 	padding-left: 3px;
 }
+
+.alert_row{
+	background-color: #FFA07A;
+}

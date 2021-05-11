@@ -204,6 +204,29 @@ function completeProperties(me, equip_properties, equip_sn_lst, equip_pn_lst, eq
 	else{
 		//pass
 	}
+
+
+	// set custom validation message if any field in row is invalid
+	if( equip_properties.filter(item => 
+		item.sn == document.getElementById("serial_number_" + elementIndex).value &&
+		item.pn == document.getElementById("part_number_" + elementIndex).value &&
+		item.description == document.getElementById("equip_description_" + elementIndex).value &&
+		item.date == document.getElementById("installation_date_" + elementIndex).value &&
+		item.warranty == document.getElementById("warranty_" + elementIndex).value).length == 0 ) {
+
+		me.setCustomValidity("Please make sure all fields are selected correctly");
+		me.parentNode.parentNode.setAttribute('class', 'alert_row');
+
+	}
+	else{
+		document.getElementById("serial_number_" + elementIndex).setCustomValidity("");
+		document.getElementById("part_number_" + elementIndex).setCustomValidity("");
+		document.getElementById("equip_description_" + elementIndex).setCustomValidity("");
+		document.getElementById("installation_date_" + elementIndex).setCustomValidity("");
+		document.getElementById("warranty_" + elementIndex).setCustomValidity("");
+		me.parentNode.parentNode.classList.remove("alert_row");
+	}
+
 }
 
 function addRow(tableID, equip_properties, equip_sn_lst, equip_pn_lst, equip_description_lst) {

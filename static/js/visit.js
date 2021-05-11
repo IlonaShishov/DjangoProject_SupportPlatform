@@ -1,11 +1,18 @@
 function completeDesc(me, parts) {
 	var input = me.value;
+	me.setCustomValidity("");
 
 	if( parts[input] ) {
 		me.parentNode.nextElementSibling.firstElementChild.value = parts[input];
+		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = true;
+
 	}
 	else{
 		me.parentNode.nextElementSibling.firstElementChild.value = '';
+		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = false;
+		if(me.value){
+			me.setCustomValidity("Please Select a valid part number");
+		}
 	}
 }
 
@@ -67,6 +74,7 @@ function addRow(tableID, parts) {
 	element4.type = "text";
 	element4.name="qty";
 	element4.setAttribute('class', 'form-control');
+	element4.oninput = function() {IntValueValidation(this);};
 	cell4.appendChild(element4);
 
 	// charge checkbox
@@ -155,3 +163,14 @@ function listValueValidation(me) {
 		me.setCustomValidity("");
 	}
 }
+
+function IntValueValidation(me) {
+	if (!me.value || me.value >>> 0 === parseFloat(me.value)){
+		me.setCustomValidity("");
+	}
+	else{
+		me.setCustomValidity("Please enter a whole number");
+	}
+}
+
+// text comment

@@ -187,10 +187,10 @@
 												<input class="form-control" type="text" name="part_description" value="{{ description }}" readonly>
 											</td>
 											<td>
-												<input class="form-control" type="text" name="qty" value="{{ visit_part.qty }}">
+												<input class="form-control" type="text" name="qty" value="{{ visit_part.qty }}" oninput="IntValueValidation(this)">
 											</td>
 											<td>
-												<div class="form-check charge_cb">
+												<div class="form-check charge_cb">	
 													{% if visit_part.charge %}
 														<input type="checkbox" name="charge" onclick="toggleHiddenInput(this)" value="1" checked>
 													{% else %}
@@ -389,7 +389,7 @@
 										<input class="form-control" type="text" name="part_description" readonly>
 									</td>
 									<td>
-										<input class="form-control" type="text" name="qty">
+										<input class="form-control" type="text" name="qty" oninput="IntValueValidation(this)">
 									</td>
 									<td>
 										<div class="form-check charge_cb">
