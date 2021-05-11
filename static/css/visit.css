@@ -61,3 +61,11 @@
 select:disabled {
   background: #dddddd;
 }
+
+.alert_row_desc{
+	background-color: #FFA07A;
+}
+
+.alert_row_qty{
+	background-color: #FFA07A;
+}

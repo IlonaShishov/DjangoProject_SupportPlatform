@@ -2,16 +2,19 @@ function completeDesc(me, parts) {
 	var input = me.value;
 	me.setCustomValidity("");
 
+
+	me.parentNode.parentNode.classList.remove("alert_row_desc");
 	if( parts[input] ) {
 		me.parentNode.nextElementSibling.firstElementChild.value = parts[input];
 		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = true;
-
 	}
 	else{
 		me.parentNode.nextElementSibling.firstElementChild.value = '';
 		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = false;
 		if(me.value){
 			me.setCustomValidity("Please Select a valid part number");
+			me.parentNode.parentNode.classList.add('class', 'alert_row_desc');
+
 		}
 	}
 }
@@ -165,10 +168,14 @@ function listValueValidation(me) {
 }
 
 function IntValueValidation(me) {
-	if (!me.value || me.value >>> 0 === parseFloat(me.value)){
+	me.parentNode.parentNode.classList.remove("alert_row_qty");
+	// if (!me.value || me.value >>> 0 === parseFloat(me.value)){
+	if (!me.value || me.value.match("^[1-9][0-9]*$")){
 		me.setCustomValidity("");
 	}
 	else{
 		me.setCustomValidity("Please enter a whole number");
+		me.parentNode.parentNode.classList.add('class', 'alert_row_qty');
+
 	}
 }

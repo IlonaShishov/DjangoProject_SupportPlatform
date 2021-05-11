@@ -215,7 +215,7 @@ function completeProperties(me, equip_properties, equip_sn_lst, equip_pn_lst, eq
 		item.warranty == document.getElementById("warranty_" + elementIndex).value).length == 0 ) {
 
 		me.setCustomValidity("Please make sure all fields are selected correctly");
-		me.parentNode.parentNode.setAttribute('class', 'alert_row');
+		me.parentNode.parentNode.classList.add('class', 'alert_row');
 
 	}
 	else{
