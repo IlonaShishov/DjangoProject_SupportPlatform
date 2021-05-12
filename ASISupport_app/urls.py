@@ -10,5 +10,6 @@ urlpatterns = [
 	path('new_visit/<id>/', views.new_visit_view, name = 'new_visit'),
 	path('visit/<id>/', views.visit_view, name = 'view_visit'),
 	path('report/', views.report_view, name = 'report'),
+	path('error/<error_message>/', views.error_page_view, name = 'error_page'),
 ]
 

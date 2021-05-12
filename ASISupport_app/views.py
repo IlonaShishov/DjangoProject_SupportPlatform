@@ -35,81 +35,6 @@ def dashboard_view(request):
 def new_case_view(request):
 	state = 'new'
 
-	if request.method == 'POST' and 'save_btn' in request.POST:
-		
-		''' save case data '''
-		cases = Case.objects.all()
-		case_num_lst = [int(case.case_num[1:]) for case in cases]
-		max_case_num = max(case_num_lst)
-
-		req_case_num 			= 'C'+str(max_case_num+1).zfill(6)
-		req_case_type 			= request.POST.get('type')
-		req_status 				= request.POST.get('status')
-		req_target_date 		= datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
-
-		req_actual_date 		= request.POST.get('actual_date')
-		if req_actual_date:
-			req_actual_date = datetime.strptime(request.POST.get('actual_date'),'%Y-%m-%d')
-		else:
-			req_actual_date = None
-		
-		req_case_manager 		= Employee.objects.filter(first_name=request.POST.get('case_manager').split()[0], last_name=request.POST.get('case_manager').split()[1])[0]
-		
-		req_machine_down		= request.POST.get('machine_down')
-		if req_machine_down == 'on':
-			req_machine_down = True
-		else:
-			req_machine_down = False
-		
-		req_customer 			= Customer.objects.get(customer_name=request.POST.get('customer'))
-		req_customer_contact 	= request.POST.get('customer_contact')
-		req_case_description 	= request.POST.get('case_description')
-		req_on_hold_reason = ''
-		req_cancellation_reason = ''
-		if req_status == 'On Hold':
-			req_on_hold_reason = request.POST.get('on_hold_reason')
-		elif req_status == 'Cancelled':
-			req_cancellation_reason = request.POST.get('cancellation_reason')
-		else:
-			pass
-			
-
-		case_data = Case(case_num=req_case_num, 
-						case_type=req_case_type,
-						status=req_status,
-						target_date=req_target_date,
-						actual_date=req_actual_date,
-						case_manager=req_case_manager,
-						machine_down=req_machine_down,
-						customer=req_customer,
-						customer_contact=req_customer_contact,
-						case_description=req_case_description,
-						cancellation_reason=req_cancellation_reason,
-						on_hold_reason=req_on_hold_reason
-						)
-
-		if (case_data.status == 'Closed' or case_data.status == 'Resolved') and case_data.actual_date == None:
-			case_data.close_case()
-
-		case_data.save()
-
-		''' save equipment data''' 
-		equip_sn_lst = request.POST.getlist('serial_number')
-		equip_sn_lst = list(set(list(filter(lambda x: x != "", equip_sn_lst))))
-
-		for sn in equip_sn_lst:
-			equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
-									equip_sn=Equipment.objects.get(equip_sn=sn),
-									)
-			equip_data.save()
-
-		return redirect('ASISupport_app:view_case', id=req_case_num)
-
-
-
-	if request.method == 'POST' and 'cancel_btn' in request.POST:
-		return redirect('ASISupport_app:dashboard')
-
 	''' roles '''
 	groups = list(request.user.groups.values_list('name',flat = True))
 
@@ -136,7 +61,6 @@ def new_case_view(request):
 
 	types = Case.TYPES
 	employees = Employee.objects.all()
-	employees_dict = {employee.employee_id:employee for employee in employees}
 	customers = Customer.objects.all()
 	equipment = Equipment.objects.all()
 	equip_sn_lst = [equip.equip_sn for equip in equipment]
@@ -148,6 +72,138 @@ def new_case_view(request):
 						 'date':str(datetime.strptime(str(equip.installation_date)[:19],'%Y-%m-%d %H:%M:%S').strftime('%d/%m/%Y %H:%M:%S')), 
 						 'warranty':str(equip.warranty)} for equip in equipment]
 
+
+	if request.method == 'POST' and 'save_btn' in request.POST:
+		
+		try:
+
+			''' save case data '''
+			check_point = ''
+
+			''' init case number '''
+			cases = Case.objects.all()
+			case_num_lst = [int(case.case_num[1:]) for case in cases]
+			max_case_num = max(case_num_lst)
+			req_case_num 			= 'C'+str(max_case_num+1).zfill(6)
+
+			''' get case type '''
+			req_case_type 			= request.POST.get('type')
+			types_val = (tup[0] for tup in types)
+			if req_case_type not in types_val:
+				raise ValueError(f'<{req_case_type}> is an invalid case type')
+
+			''' get case status '''
+			req_status 				= request.POST.get('status')
+			statuses_val = (tup[0] for tup in statuses)
+			if req_status not in statuses_val:
+				raise ValueError(f'<{req_status}> is an invalid case status')
+
+			''' get target date '''
+			req_target_date 		= datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+
+			''' get actual date '''
+			req_actual_date 		= request.POST.get('actual_date')
+			if req_actual_date:
+				req_actual_date = datetime.strptime(request.POST.get('actual_date'),'%Y-%m-%d')
+			else:
+				req_actual_date = None
+
+			''' get case manager '''
+			check_point = 'case manager'
+			req_case_manager 		= Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
+			
+			''' get machine down state '''
+			req_machine_down		= request.POST.get('machine_down')
+			if req_machine_down == 'on':
+				req_machine_down = True
+			else:
+				req_machine_down = False
+			
+			''' get customer '''
+			check_point = 'customer'
+			req_customer 			= Customer.objects.get(customer_name=request.POST.get('customer'))
+
+			''' get cutomer contact '''
+			req_customer_contact 	= request.POST.get('customer_contact')
+			if not req_customer_contact:
+				raise ValueError('Customer contact is required')
+
+			''' get description '''
+			req_case_description 	= request.POST.get('case_description')
+			if not req_case_description:
+				raise ValueError('Case description is required')
+
+			req_on_hold_reason = ''
+			req_cancellation_reason = ''
+
+			if req_status == 'On Hold':
+				''' get on hold reason '''
+				req_on_hold_reason = request.POST.get('on_hold_reason')
+				if not req_on_hold_reason:
+					raise ValueError('On Hold reason is required')
+
+			elif req_status == 'Cancelled':
+				''' get Cancellation reason '''
+				req_cancellation_reason = request.POST.get('cancellation_reason')
+				if not req_cancellation_reason:
+					raise ValueError('Cancellation reason is required')
+
+			else:
+				pass
+				
+
+			case_data = Case(case_num=req_case_num, 
+							case_type=req_case_type,
+							status=req_status,
+							target_date=req_target_date,
+							actual_date=req_actual_date,
+							case_manager=req_case_manager,
+							machine_down=req_machine_down,
+							customer=req_customer,
+							customer_contact=req_customer_contact,
+							case_description=req_case_description,
+							cancellation_reason=req_cancellation_reason,
+							on_hold_reason=req_on_hold_reason
+							)
+
+			if (case_data.status == 'Closed' or case_data.status == 'Resolved') and case_data.actual_date == None:
+				case_data.close_case()
+
+			case_data.save()
+
+			''' save equipment data''' 
+			equip_sn_lst = request.POST.getlist('serial_number')
+			equip_sn_lst = list(set(list(filter(lambda x: x != "", equip_sn_lst))))
+
+			for sn in equip_sn_lst:
+				equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
+										equip_sn=Equipment.objects.get(equip_sn=sn),
+										)
+				equip_data.save()
+
+			return redirect('ASISupport_app:view_case', id=req_case_num)
+
+
+
+
+		except ValueError as err:
+			return redirect('ASISupport_app:error_page', error_message=err.args[0])
+
+		except Exception as err:
+			if check_point == 'case manager':
+				error_message = 'Invalid case manager'
+			elif check_point == 'customer':
+				error_message = 'Invalid Customer'
+			else:
+				error_message = err
+			return redirect('ASISupport_app:error_page', error_message=error_message)
+
+
+
+	if request.method == 'POST' and 'cancel_btn' in request.POST:
+		return redirect('ASISupport_app:dashboard')
+
+	
 	return render(request, 'ASISupport_app/case.html', locals())
 
 @login_required(login_url='/accounts/login/')
@@ -306,7 +362,7 @@ def case_view(request, id):
 					updated = True
 
 			if permit_case_manager:
-				upd_case_manager = Employee.objects.filter(first_name=request.POST.get('case_manager').split()[0], last_name=request.POST.get('case_manager').split()[1])[0]
+				upd_case_manager = Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
 				if upd_case_manager.employee_id != case.case_manager.employee_id:
 					case.case_manager = upd_case_manager
 					updated = True
@@ -423,7 +479,7 @@ def new_visit_view(request, id):
 		req_visit_num 			= 'V'+str(max_visit_num+1).zfill(6)
 		req_case_num			= case
 		req_visit_date 			= datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
-		req_engineer 			= Employee.objects.filter(first_name=request.POST.get('engineer').split()[0], last_name=request.POST.get('engineer').split()[1])[0]
+		req_engineer 			= Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
 		req_customer 			= case.customer
 		req_customer_contact 	= request.POST.get('customer_contact')
 		req_remote		= request.POST.get('remote')
@@ -570,7 +626,7 @@ def visit_view(request, id):
 
 
 			if permit_engineer:
-				upd_engineer = Employee.objects.filter(first_name=request.POST.get('engineer').split()[0], last_name=request.POST.get('engineer').split()[1])[0]
+				upd_engineer = Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
 				if upd_engineer != visit.engineer:
 					visit.engineer = upd_engineer
 					updated = True
@@ -732,7 +788,7 @@ def report_view(request):
 		if case_report_status:
 			cases = cases.filter(status=case_report_status)
 		if case_report_case_manager:
-			cases = cases.filter(case_manager=Employee.objects.filter(first_name=case_report_case_manager.split()[0], last_name=case_report_case_manager.split()[1])[0])
+			cases = cases.filter(case_manager=Employee.objects.get(employee_id=case_report_case_manager.split()[2]))
 		if case_report_customer:
 			cases = cases.filter(customer=Customer.objects.get(customer_name=case_report_customer))
 		if case_report_machine_down:
@@ -756,7 +812,7 @@ def report_view(request):
 		if visit_report_to_date:
 			visits = visits.filter(visit_date__lte=visit_report_to_date)
 		if visit_report_engineer:
-			visits = visits.filter(engineer=Employee.objects.filter(first_name=visit_report_engineer.split()[0], last_name=visit_report_engineer.split()[1])[0])
+			visits = visits.filter(engineer=Employee.objects.get(employee_id=visit_report_engineer.split()[2]))
 		if visit_report_customer:
 			visits = visits.filter(customer=Customer.objects.get(customer_name=visit_report_customer))
 		if visit_report_remote:
@@ -799,3 +855,8 @@ def report_view(request):
 	customers = Customer.objects.all()
 		
 	return render(request, 'ASISupport_app/report.html', locals())
+
+@login_required(login_url='/accounts/login/')
+def error_page_view(request, error_message):
+
+	return render(request, 'ASISupport_app/error_page.html', locals())

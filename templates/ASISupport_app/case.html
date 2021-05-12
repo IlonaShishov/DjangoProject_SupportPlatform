@@ -13,13 +13,13 @@
 
 	<section class="col-sm-1 col-sm-10 col-sm-1">
 		{% if state == 'view' %}
-			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST" id="view_case_form"  autocomplete="off">
+			<form class="form-container" action="{% url 'ASISupport_app:view_case' case.case_num %}" method="POST" id="view_case_form" autocomplete="off">
 				{% csrf_token %}
 
 				<!-- case number -->
 				<h1 class="inline_it">Case {{ case.case_num }}</h1>
 
-				<div class="action_btn"><!-- visible when in view mode -->
+				<div class="action_btn">
 					{% if permit_edit and not edit %}
 						<button type="submit" name="edit_btn" class="btn btn-primary">Edit</button>
 					{% endif %}
