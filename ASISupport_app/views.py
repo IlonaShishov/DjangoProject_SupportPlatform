@@ -6,8 +6,9 @@ from datetime import datetime
 import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from ASISupport_app.models import Case, Visit, Employee, Customer, CaseEquipment, Equipment, VisitParts, Parts
-  
+
 
 
 def logout_view(request):
@@ -77,8 +78,7 @@ def new_case_view(request):
 		
 		try:
 
-			''' save case data '''
-			check_point = ''
+			''' get case data '''
 
 			''' init case number '''
 			cases = Case.objects.all()
@@ -90,48 +90,63 @@ def new_case_view(request):
 			req_case_type 			= request.POST.get('type')
 			types_val = (tup[0] for tup in types)
 			if req_case_type not in types_val:
-				raise ValueError(f'<{req_case_type}> is an invalid case type')
+				messages.error(request, f'Type field error: <{req_case_type}> is an invalid case type')
 
 			''' get case status '''
 			req_status 				= request.POST.get('status')
 			statuses_val = (tup[0] for tup in statuses)
 			if req_status not in statuses_val:
-				raise ValueError(f'<{req_status}> is an invalid case status')
+				messages.error(request, f'Status field error: <{req_status}> is an invalid case status')
 
 			''' get target date '''
-			req_target_date 		= datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+			try:
+				req_target_date 		= datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+			except Exception as err:
+				messages.error(request, f'Projected completion date field error: {err}')
 
 			''' get actual date '''
-			req_actual_date 		= request.POST.get('actual_date')
-			if req_actual_date:
-				req_actual_date = datetime.strptime(request.POST.get('actual_date'),'%Y-%m-%d')
-			else:
-				req_actual_date = None
+			try:
+				req_actual_date 		= request.POST.get('actual_date')
+				if req_actual_date:
+					req_actual_date = datetime.strptime(request.POST.get('actual_date'),'%Y-%m-%d')
+				else:
+					req_actual_date = None
+			except Exception as err:
+				messages.error(request, f'Actual completion date field error: {err}')
 
 			''' get case manager '''
-			check_point = 'case manager'
-			req_case_manager 		= Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
-			
+			try:
+				req_case_manager 		= Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
+			except Exception as err:
+				messages.error(request, 'Case manager field error: Invalid case manager')
+
 			''' get machine down state '''
-			req_machine_down		= request.POST.get('machine_down')
-			if req_machine_down == 'on':
-				req_machine_down = True
-			else:
-				req_machine_down = False
+			try:
+				req_machine_down		= request.POST.get('machine_down')
+				if req_machine_down == 'on':
+					req_machine_down = True
+				else:
+					req_machine_down = False
+			except Exception as err:
+				messages.error(request, f'Machine down field error: {err}')
 			
 			''' get customer '''
-			check_point = 'customer'
-			req_customer 			= Customer.objects.get(customer_name=request.POST.get('customer'))
+			try:
+				req_customer 			= Customer.objects.get(customer_name=request.POST.get('customer'))
+			except Exception as err:
+				messages.error(request, 'Customer field error: Invalid customer')
 
 			''' get cutomer contact '''
 			req_customer_contact 	= request.POST.get('customer_contact')
 			if not req_customer_contact:
-				raise ValueError('Customer contact is required')
+				messages.error(request, 'Customer contact field error: Customer contact is required')
+
 
 			''' get description '''
 			req_case_description 	= request.POST.get('case_description')
 			if not req_case_description:
-				raise ValueError('Case description is required')
+				messages.error(request, 'Case description field error: Case description is required')
+
 
 			req_on_hold_reason = ''
 			req_cancellation_reason = ''
@@ -140,18 +155,33 @@ def new_case_view(request):
 				''' get on hold reason '''
 				req_on_hold_reason = request.POST.get('on_hold_reason')
 				if not req_on_hold_reason:
-					raise ValueError('On Hold reason is required')
+					messages.error(request, 'On Hold Reason field error: On Hold reason is required')
+
 
 			elif req_status == 'Cancelled':
 				''' get Cancellation reason '''
 				req_cancellation_reason = request.POST.get('cancellation_reason')
 				if not req_cancellation_reason:
-					raise ValueError('Cancellation reason is required')
+					messages.error(request, 'Cancellation Reason field error: Cancellation reason is required')
 
 			else:
 				pass
 				
 
+			''' get equipment data''' 
+			add_equip_sn_lst = request.POST.getlist('serial_number')
+			add_equip_sn_lst = list(set(list(filter(lambda x: x != "", add_equip_sn_lst))))
+			if not all(sn in equip_sn_lst  for sn in add_equip_sn_lst):
+				messages.error(request, 'Equipment field error: Equipment list contains items not found in database')
+
+
+			''' display validation errors '''
+			message_list = messages.get_messages(request)
+			if message_list:
+				return redirect('ASISupport_app:new_case')
+
+			
+			''' save case data '''
 			case_data = Case(case_num=req_case_num, 
 							case_type=req_case_type,
 							status=req_status,
@@ -168,37 +198,31 @@ def new_case_view(request):
 
 			if (case_data.status == 'Closed' or case_data.status == 'Resolved') and case_data.actual_date == None:
 				case_data.close_case()
-
+			
 			case_data.save()
 
-			''' save equipment data''' 
-			equip_sn_lst = request.POST.getlist('serial_number')
-			equip_sn_lst = list(set(list(filter(lambda x: x != "", equip_sn_lst))))
 
-			for sn in equip_sn_lst:
+			''' save equipment data'''
+			for sn in add_equip_sn_lst:
 				equip_data = CaseEquipment(case_num=Case.objects.get(case_num=req_case_num),
 										equip_sn=Equipment.objects.get(equip_sn=sn),
 										)
 				equip_data.save()
 
+			messages.success(request, 'Case Created Successfully')
 			return redirect('ASISupport_app:view_case', id=req_case_num)
 
 
 
-
-		except ValueError as err:
-			return redirect('ASISupport_app:error_page', error_message=err.args[0])
-
 		except Exception as err:
-			if check_point == 'case manager':
-				error_message = 'Invalid case manager'
-			elif check_point == 'customer':
-				error_message = 'Invalid Customer'
-			else:
-				error_message = err
-			return redirect('ASISupport_app:error_page', error_message=error_message)
+			''' display errors '''
+			if Case.objects.filter(case_num=req_case_num):
+				messages.warning(request, f'Equipment field error: {err}')
+				return redirect('ASISupport_app:view_case', id=req_case_num)
 
-
+			messages.error(request, err)
+			return redirect('ASISupport_app:new_case')
+			
 
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
 		return redirect('ASISupport_app:dashboard')
@@ -313,151 +337,211 @@ def case_view(request, id):
 	
 		if request.method == 'POST' and 'save_btn' in request.POST:
 
-			''' Update case data''' 
-			updated = False
-
-			if permit_type:
-				upd_case_type = request.POST.get('type')
-				if upd_case_type != case.case_type:
-					case.case_type = upd_case_type
-					updated = True
-
-			if permit_status:
-				upd_case_status = request.POST.get('status')
-				if upd_case_status != case.status:
-					if case.status == 'On Hold':
-						case.on_hold_reason = ''
-					if case.status == 'Cancelled':
-						case.cancellation_reason = ''
-					case.status = upd_case_status
-					updated = True
-
-			if permit_target_date:
-				upd_target_date = datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
-				if upd_target_date != case.target_date:
-					case.target_date = upd_target_date
-					updated = True
-
-			if permit_actual_date:
-				upd_actual_date = request.POST.get('actual_date')
-				if upd_actual_date:
-					upd_actual_date = datetime.strptime(upd_actual_date,'%Y-%m-%d')
-				else:
-					upd_actual_date = None
-
-				if upd_actual_date != case.actual_date:
-					case.actual_date = upd_actual_date
-					updated = True
-
-			if permit_on_hold_reason and case.status == 'On Hold':
-				upd_on_hold_reason = request.POST.get('on_hold_reason')
-				if upd_on_hold_reason != case.on_hold_reason:
-					case.on_hold_reason = upd_on_hold_reason
-					updated = True
-
-			if permit_cancellation_reason and case.status == 'Cancelled':
-				upd_cancellation_reason = request.POST.get('cancellation_reason')
-				if upd_cancellation_reason != case.cancellation_reason:
-					case.cancellation_reason = upd_cancellation_reason
-					updated = True
-
-			if permit_case_manager:
-				upd_case_manager = Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
-				if upd_case_manager.employee_id != case.case_manager.employee_id:
-					case.case_manager = upd_case_manager
-					updated = True
-
-			if permit_machine_down:
-				upd_machine_down = request.POST.get('machine_down')
-				if upd_machine_down == 'on':
-					upd_machine_down = True
-				else:
-					upd_machine_down = False
-
-				if upd_machine_down != case.machine_down:
-					case.machine_down = upd_machine_down
-					updated = True
-
-			if permit_customer:
-				upd_customer = Customer.objects.get(customer_name=request.POST.get('customer'))
-				if upd_customer.customer_name != case.customer.customer_name:
-					case.customer = upd_customer
-					for visit in visits:
-						visit.customer = upd_customer
-					updated = True
-
-			if permit_customer_contact:
-				upd_customer_contact = request.POST.get('customer_contact')
-				if upd_customer_contact != case.customer_contact:
-					case.customer_contact = upd_customer_contact
-					updated = True
-
-			if permit_description:
-				upd_case_description = request.POST.get('case_description')
-				if upd_case_description != case.case_description:
-					case.case_description = upd_case_description
-					updated = True
+			try:
 
 
-			if (case.status == 'Closed' or case.status == 'Resolved') and case.actual_date == None:
-				case.close_case()
+				''' get updated case data''' 
+				updated = False
 
+				''' update type '''
+				if permit_type:
+					upd_case_type = request.POST.get('type')
+					if upd_case_type != case.case_type:
+						types_val = (tup[0] for tup in types)
+						if upd_case_type not in types_val:
+							messages.error(request, f'Type field error: <{upd_case_type}> is an invalid case type')
+						else:
+							case.case_type = upd_case_type
+							updated = True
 
-			if updated:
-				case.save()
-				if permit_customer and visits:
-					for visit in visits:
-						visit.save()
-			
+				''' update status '''
+				if permit_status:
+					upd_case_status = request.POST.get('status')
+					if upd_case_status != case.status:
+						statuses_val = (tup[0] for tup in statuses)
+						if upd_case_status not in statuses_val:
+							messages.error(request, f'Status field error: <{upd_case_status}> is an invalid case status')
+						else:
+							if case.status == 'On Hold':
+								case.on_hold_reason = ''
+							if case.status == 'Cancelled':
+								case.cancellation_reason = ''
+							case.status = upd_case_status
+							updated = True
 
+				''' update target date '''
+				if permit_target_date:
+					try:
+						upd_target_date = datetime.strptime(request.POST.get('projected_date'),'%Y-%m-%d')
+						if upd_target_date != case.target_date:
+							case.target_date = upd_target_date
+							updated = True
+					except Exception as err:
+						messages.error(request, f'Projected completion date field error: {err}')
 
+				''' update actual date '''
+				if permit_actual_date:
+					try:
+						upd_actual_date = request.POST.get('actual_date')
+						if upd_actual_date:
+							upd_actual_date = datetime.strptime(upd_actual_date,'%Y-%m-%d')
+						else:
+							upd_actual_date = None
 
-			''' Update equipment data''' 
-			if permit_equipment_delete or permit_equipment_add:
+						if upd_actual_date != case.actual_date:
+							case.actual_date = upd_actual_date
+							updated = True
+					except Exception as err:
+							messages.error(request, f'Actual completion date field error: {err}')
+
+				''' update on hold reason '''
+				if permit_on_hold_reason and case.status == 'On Hold':
+					upd_on_hold_reason = request.POST.get('on_hold_reason')
+					if upd_on_hold_reason != case.on_hold_reason:
+						if not upd_on_hold_reason:
+							messages.error(request, 'On Hold Reason field error: On Hold reason is required')
+						else:
+							case.on_hold_reason = upd_on_hold_reason
+							updated = True
+
+				''' update cancellation reason '''
+				if permit_cancellation_reason and case.status == 'Cancelled':
+					upd_cancellation_reason = request.POST.get('cancellation_reason')
+					if upd_cancellation_reason != case.cancellation_reason:
+						if not upd_cancellation_reason:
+							messages.error(request, 'Cancellation Reason field error: Cancellation reason is required')
+						else:
+							case.cancellation_reason = upd_cancellation_reason
+							updated = True
+
+				''' update case manager '''
+				if permit_case_manager:
+					try:
+						upd_case_manager = Employee.objects.get(employee_id=request.POST.get('case_manager').split()[2])
+						if upd_case_manager.employee_id != case.case_manager.employee_id:
+							case.case_manager = upd_case_manager
+							updated = True
+					except Exception as err:
+						messages.error(request, 'Case manager field error: Invalid case manager')
+
+				''' update machine down '''
+				if permit_machine_down:
+					try:
+						upd_machine_down = request.POST.get('machine_down')
+						if upd_machine_down == 'on':
+							upd_machine_down = True
+						else:
+							upd_machine_down = False
+
+						if upd_machine_down != case.machine_down:
+							case.machine_down = upd_machine_down
+							updated = True
+					except Exception as err:
+						messages.error(request, f'Machine down field error: {err}')
+
+				''' update customer (in case and in case visits ) '''
+				if permit_customer:
+					try:
+						upd_customer = Customer.objects.get(customer_name=request.POST.get('customer'))
+						if upd_customer.customer_name != case.customer.customer_name:
+							case.customer = upd_customer
+							for visit in visits:
+								visit.customer = upd_customer
+							updated = True
+					except Exception as err:
+						messages.error(request, 'Customer field error: Invalid customer')
+
+				''' update customer contact '''
+				if permit_customer_contact:
+					upd_customer_contact = request.POST.get('customer_contact')
+					if upd_customer_contact != case.customer_contact:
+						if not upd_customer_contact:
+							messages.error(request, 'Customer contact field error: Customer contact is required')
+						else:
+							case.customer_contact = upd_customer_contact
+							updated = True
+
+				''' update description '''
+				if permit_description:
+					upd_case_description = request.POST.get('case_description')
+					if upd_case_description != case.case_description:
+						if not upd_case_description:
+							messages.error(request, 'Case description field error: Case description is required')
+						else:
+							case.case_description = upd_case_description
+							updated = True
+
+				''' get updated equipment data''' 
 				upd_equip_sn_lst = request.POST.getlist('serial_number')
 				upd_equip_sn_lst = list(set(list(filter(lambda x: x != "", upd_equip_sn_lst))))
-
-				current_equip_sn_lst = [str(ce) for ce in case_equipment_sn_lst]
-
-				''' delete equipment from case '''
-				if permit_equipment_delete:
-					for sn in current_equip_sn_lst:
-						if sn not in upd_equip_sn_lst:
-							CaseEquipment.objects.get(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn)).delete()
+				if not all(sn in equip_sn_lst  for sn in upd_equip_sn_lst):
+					messages.error(request, 'Equipment field error: Equipment list contains items not found in database')
 
 
-				''' add equipment to case '''
-				if permit_equipment_add:
-					for sn in upd_equip_sn_lst:
-						if sn not in current_equip_sn_lst:
-							new_equip = CaseEquipment(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn))
-							new_equip.save()
+				''' check for existsing validation errors '''
+				message_list = messages.get_messages(request)
+				if message_list:
+					return redirect('ASISupport_app:view_case', id=id)
+				
+				''' save updated case data '''
+				if (case.status == 'Closed' or case.status == 'Resolved') and case.actual_date == None:
+					case.close_case()
+
+				if updated:
+					case.save()
+					if permit_customer and visits:
+						for visit in visits:
+							visit.save()
+				
+
+				''' save updated equipment data''' 
+				if permit_equipment_delete or permit_equipment_add:
+
+					current_equip_sn_lst = [str(ce) for ce in case_equipment_sn_lst]
+
+					''' delete equipment from case '''
+					if permit_equipment_delete:
+						for sn in current_equip_sn_lst:
+							if sn not in upd_equip_sn_lst:
+								CaseEquipment.objects.get(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn)).delete()
+
+					''' add equipment to case '''
+					if permit_equipment_add:
+						for sn in upd_equip_sn_lst:
+							if sn not in current_equip_sn_lst:
+								new_equip = CaseEquipment(case_num=Case.objects.get(case_num=id), equip_sn=Equipment.objects.get(equip_sn=sn))
+								new_equip.save()
 
 
-				''' refresh equipment data collection '''
-				case_equipment = CaseEquipment.objects.filter(case_num=id)
-				case_equipment_sn_lst = [ce.equip_sn for ce in case_equipment]
-				filtered_case_equipment = Equipment.objects.filter(equip_sn__in=case_equipment_sn_lst)
+					''' refresh equipment data collection '''
+					case_equipment = CaseEquipment.objects.filter(case_num=id)
+					case_equipment_sn_lst = [ce.equip_sn for ce in case_equipment]
+					filtered_case_equipment = Equipment.objects.filter(equip_sn__in=case_equipment_sn_lst)
 
 
 
-			''' restrict permits '''
-			permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled']) or ('Secretary' in groups and case.status in ['Resolved'])
-			edit = False
-			permit_type = False
-			permit_status = False
-			permit_target_date = False
-			permit_actual_date = False
-			permit_on_hold_reason = False
-			permit_cancellation_reason = False
-			permit_case_manager = False
-			permit_machine_down = False
-			permit_customer = False
-			permit_customer_contact = False
-			permit_description = False
-			permit_equipment_delete = False
-			permit_equipment_add = False
+				''' restrict permits '''
+				permit_edit = ('Manager' in groups) or ('Support' in groups and case.status not in ['Resolved','Closed','Cancelled']) or ('Secretary' in groups and case.status in ['Resolved'])
+				edit = False
+				permit_type = False
+				permit_status = False
+				permit_target_date = False
+				permit_actual_date = False
+				permit_on_hold_reason = False
+				permit_cancellation_reason = False
+				permit_case_manager = False
+				permit_machine_down = False
+				permit_customer = False
+				permit_customer_contact = False
+				permit_description = False
+				permit_equipment_delete = False
+				permit_equipment_add = False
 
+
+			except Exception as err:
+				''' display errors '''
+				messages.error(request, err)
+				return redirect('ASISupport_app:view_case', id=id)
 
 			
 

@@ -26,6 +26,31 @@
 					<button type="submit" name="back_btn" class="btn btn-primary" formnovalidate>Back</button>
 				</div>
 
+				{% if messages %}
+				<ul class="messages">
+				    {% for message in messages %}
+					    {% if message.tags == 'success' %}
+	                    	<div class="alert alert-success" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% elif message.tags == 'error' %}
+	                    	<div class="alert alert-danger" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% elif message.tags == 'warning' %}
+	                    	<div class="alert alert-warning" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% else %}
+	                    	<div class="alert alert-info" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% endif %}
+				    {% endfor %}
+				</ul>
+				{% endif %}
+
+
 				<hr class="solid">
 
 				<!-- case type -->
@@ -280,6 +305,30 @@
 
 				<!-- case number -->
 				<h1 class="inline_it">New Case</h1>
+
+				{% if messages %}
+				<ul class="messages">
+				    {% for message in messages %}
+					    {% if message.tags == 'success' %}
+	                    	<div class="alert alert-success" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% elif message.tags == 'error' %}
+	                    	<div class="alert alert-danger" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% elif message.tags == 'warning' %}
+	                    	<div class="alert alert-warning" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% else %}
+	                    	<div class="alert alert-info" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% endif %}
+				    {% endfor %}
+				</ul>
+				{% endif %}
 
 				<hr class="solid">
 
