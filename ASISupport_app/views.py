@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from datetime import datetime
 import pandas as pd
+import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
@@ -172,7 +173,7 @@ def new_case_view(request):
 			add_equip_sn_lst = request.POST.getlist('serial_number')
 			add_equip_sn_lst = list(set(list(filter(lambda x: x != "", add_equip_sn_lst))))
 			if not all(sn in equip_sn_lst  for sn in add_equip_sn_lst):
-				messages.error(request, 'Equipment field error: Equipment list contains items not found in database')
+				messages.error(request, 'Equipment field error: Equipment list contains equipment not found in database')
 
 
 			''' display validation errors '''
@@ -209,7 +210,7 @@ def new_case_view(request):
 										)
 				equip_data.save()
 
-			messages.success(request, 'Case Created Successfully')
+			messages.success(request, 'Case created successfully')
 			return redirect('ASISupport_app:view_case', id=req_case_num)
 
 
@@ -475,7 +476,7 @@ def case_view(request, id):
 				upd_equip_sn_lst = request.POST.getlist('serial_number')
 				upd_equip_sn_lst = list(set(list(filter(lambda x: x != "", upd_equip_sn_lst))))
 				if not all(sn in equip_sn_lst  for sn in upd_equip_sn_lst):
-					messages.error(request, 'Equipment field error: Equipment list contains items not found in database')
+					messages.error(request, 'Equipment field error: Equipment list contains equipment not found in database')
 
 
 				''' check for existsing validation errors '''
@@ -537,6 +538,8 @@ def case_view(request, id):
 				permit_equipment_delete = False
 				permit_equipment_add = False
 
+				messages.success(request, 'Case updated successfully')
+
 
 			except Exception as err:
 				''' display errors '''
@@ -555,67 +558,155 @@ def new_visit_view(request, id):
 
 	if request.method == 'POST' and 'save_btn' in request.POST:
 
-		''' save visit data '''
-		visits = Visit.objects.all()
-		visit_num_lst = [int(visit.visit_num[1:]) for visit in visits]
-		max_visit_num = max(visit_num_lst)
+		try:
 
-		req_visit_num 			= 'V'+str(max_visit_num+1).zfill(6)
-		req_case_num			= case
-		req_visit_date 			= datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
-		req_engineer 			= Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
-		req_customer 			= case.customer
-		req_customer_contact 	= request.POST.get('customer_contact')
-		req_remote		= request.POST.get('remote')
-		if req_remote == 'on':
-			req_remote = True
-		else:
-			req_remote = False
-		req_visit_start 		= request.POST.get('visit_start') + ':00'
-		req_visit_end 			= request.POST.get('visit_end') + ':00'
-		req_travel_hours 		= request.POST.get('travel_hours')
-		req_num_of_engineers 	= request.POST.get('num_of_engineers')
-		req_visit_summary 		= request.POST.get('visit_summary')
+			
+			''' get visit data '''
 
-		visit_data = Visit(visit_num=req_visit_num, 
-						case_num=req_case_num,
-						visit_date=req_visit_date,
-						engineer=req_engineer,
-						customer=req_customer,
-						customer_contact=req_customer_contact,
-						remote=req_remote,
-						visit_start=req_visit_start,
-						visit_end=req_visit_end,
-						travel_hours=req_travel_hours,
-						num_of_engineers=req_num_of_engineers,
-						visit_summary=req_visit_summary
-						)		
-		visit_data.sum_visit_hours()
-		visit_data.save()
+			''' init visit number '''
+			visits = Visit.objects.all()
+			visit_num_lst = [int(visit.visit_num[1:]) for visit in visits]
+			max_visit_num = max(visit_num_lst)
+			req_visit_num 			= 'V'+str(max_visit_num+1).zfill(6)
+
+			''' get visit case num '''
+			req_case_num			= case
+
+			''' get visit date '''
+			try:
+				req_visit_date 			= datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
+			except Exception as err:
+				messages.error(request, f'Visit date field error: {err}')
+
+			''' get engineer '''
+			try:
+				req_engineer 			= Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
+			except Exception as err:
+				messages.error(request, 'Engineer field error: Invalid engineer')
+
+			''' get visit customer '''
+			req_customer 			= case.customer
+
+			''' get customer contact '''
+			req_customer_contact 	= request.POST.get('customer_contact')
+			if not req_customer_contact:
+				messages.error(request, 'Customer contact field error: Customer contact is required')
+
+			''' get remote state '''
+			try:
+
+				req_remote		= request.POST.get('remote')
+				if req_remote == 'on':
+					req_remote = True
+				else:
+					req_remote = False
+			except Exception as err:
+				messages.error(request, f'Remote field error: {err}')
+
+			''' get visit start time '''
+			req_visit_start 		= request.POST.get('visit_start') + ':00'
+			if not req_visit_start:
+				messages.error(request, 'Visit start field error: Visit start time is required')
+			if not re.match("^([0-9]|[01][0-9]|2[0-3]):([0-9]|[0-5][0-9]):00$", req_visit_start):
+				messages.error(request, 'Visit start field error: Visit start must be in HH:mm format')	
+
+			''' get visit end time '''
+			req_visit_end 			= request.POST.get('visit_end') + ':00'
+			if not req_visit_end:
+				messages.error(request, 'Visit end field error: Visit end time is required')
+			if not re.match("^([0-9]|[01][0-9]|2[0-3]):([0-9]|[0-5][0-9]):00$", req_visit_end):
+				messages.error(request, 'Visit end field error: Visit end must be in HH:mm format')	
+
+			''' get travel hours '''
+			req_travel_hours 		= request.POST.get('travel_hours')
+			if not req_travel_hours:
+				messages.error(request, 'Travel hours field error: Visit travel hours are required')
+			if not re.match("^[0-9]*\\.?[0-9]*$", req_travel_hours):
+				messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')	
 
 
-
-		''' save part data '''
-		part_pn_lst = request.POST.getlist('part_num')
-		part_description_lst = request.POST.getlist('part_description')		
-		part_qty_lst = request.POST.getlist('qty')
-		part_charge_lst = request.POST.getlist('charge')
-		part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
-		d = {'1': True, '0': False}
-		part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
-		
-		for index, row in part_tbl.iterrows():
-			if Parts.objects.filter(part_pn=row['part_pn']).exists():
-				part_data = VisitParts(visit_num=Visit.objects.get(visit_num=req_visit_num),
-									part_pn=Parts.objects.get(part_pn=row['part_pn']),
-									qty=row['part_qty'],
-									charge=row['part_charge']
-									)
-				part_data.save()
+			''' get number of engineers '''
+			req_num_of_engineers 	= request.POST.get('num_of_engineers')
+			if not req_num_of_engineers:
+				messages.error(request, 'Number of engineers field error: Visit number of engineers is required')
+			if not re.match("^[1-9]*$", req_num_of_engineers):
+				messages.error(request, 'Number of engineers field error: Visit number of engineers must be a positive whole number')
 
 
+			''' get visit summary '''
+			req_visit_summary 		= request.POST.get('visit_summary')
+			if not req_visit_summary:
+				messages.error(request, 'Visit summary field error: Visit summary is required')
 
-		return redirect('ASISupport_app:view_visit', id=req_visit_num)
+			''' get parts data '''
+			part_pn_lst = request.POST.getlist('part_num')
+			part_qty_lst = request.POST.getlist('qty')
+			part_charge_lst = request.POST.getlist('charge')
+			print(part_pn_lst)
+			print(part_qty_lst)
+			print(part_charge_lst)
+			part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
+			part_tbl = part_tbl.drop(part_tbl[part_tbl.part_pn == ''].index)
+			print(part_tbl)
+			d = {'1': True, '0': False}
+			part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
+			''' check duplicates '''
+			dup_tbl = part_tbl[part_tbl['part_pn'].duplicated()]
+			if len(dup_tbl) > 0:
+				messages.error(request, f"Parts used field error: Detected more than one instance for part/s {','.join(list(set(dup_tbl['part_pn'].tolist())))}")
+			''' check pn validity '''
+			if not all(Parts.objects.filter(part_pn=pn).exists() for pn in part_tbl['part_pn'].tolist()):
+				messages.error(request, 'Parts used field error: Parts used list contains parts not found in database')
+			''' check qty validity '''
+			if not all(re.match("^[1-9]+$", qty) for qty in part_tbl['part_qty'].tolist()):
+				messages.error(request, 'Parts used field error: Parts used list contains invalid quantity inputs, please enter positive whole numbers only')
+
+			''' display validation errors '''
+			message_list = messages.get_messages(request)
+			if message_list:
+				return redirect('ASISupport_app:new_visit', id=id)
+
+
+			''' save visit data '''
+			visit_data = Visit(visit_num=req_visit_num, 
+							case_num=req_case_num,
+							visit_date=req_visit_date,
+							engineer=req_engineer,
+							customer=req_customer,
+							customer_contact=req_customer_contact,
+							remote=req_remote,
+							visit_start=req_visit_start,
+							visit_end=req_visit_end,
+							travel_hours=req_travel_hours,
+							num_of_engineers=req_num_of_engineers,
+							visit_summary=req_visit_summary
+							)		
+			visit_data.sum_visit_hours()
+			visit_data.save()
+
+			''' save part data '''
+			for index, row in part_tbl.iterrows():
+				if Parts.objects.filter(part_pn=row['part_pn']).exists():
+					part_data = VisitParts(visit_num=Visit.objects.get(visit_num=req_visit_num),
+										part_pn=Parts.objects.get(part_pn=row['part_pn']),
+										qty=row['part_qty'],
+										charge=row['part_charge']
+										)
+					part_data.save()
+
+
+			messages.success(request, 'Visit created successfully')
+			return redirect('ASISupport_app:view_visit', id=req_visit_num)
+
+		except Exception as err:
+			''' display errors '''
+			if Visit.objects.filter(visit_num=req_visit_num):
+				messages.warning(request, f'Parts used field error: {err}')
+				return redirect('ASISupport_app:view_visit', id=req_visit_num)
+
+			messages.error(request, err)
+			return redirect('ASISupport_app:new_visit', id=id)
+
 
 	if request.method == 'POST' and 'cancel_btn' in request.POST:
 		return redirect('ASISupport_app:view_case', id=id)
@@ -939,8 +1030,3 @@ def report_view(request):
 	customers = Customer.objects.all()
 		
 	return render(request, 'ASISupport_app/report.html', locals())
-
-@login_required(login_url='/accounts/login/')
-def error_page_view(request, error_message):
-
-	return render(request, 'ASISupport_app/error_page.html', locals())

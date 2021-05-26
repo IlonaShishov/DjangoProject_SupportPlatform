@@ -69,3 +69,9 @@ select:disabled {
 .alert_row_qty{
 	background-color: #FFA07A;
 }
+
+ul {
+	list-style-type:none;
+	margin: 0px;
+	padding: 0px;
+}

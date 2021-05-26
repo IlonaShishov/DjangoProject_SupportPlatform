@@ -27,6 +27,30 @@
 					</div>
 				</div>
 
+				{% if messages %}
+				<ul class="messages">
+				    {% for message in messages %}
+					    {% if message.tags == 'success' %}
+	                    	<div class="alert alert-success" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% elif message.tags == 'error' %}
+	                    	<div class="alert alert-danger" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% elif message.tags == 'warning' %}
+	                    	<div class="alert alert-warning" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% else %}
+	                    	<div class="alert alert-info" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% endif %}
+				    {% endfor %}
+				</ul>
+				{% endif %}
+
 				<hr class="solid">
 				
 				<!-- case number -->
@@ -129,14 +153,14 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}" {% if permit_travel_hours %} name="travel_hours" {% else %} readonly {% endif %} required>
+						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}"  oninput="IntValidation(this)" {% if permit_travel_hours %} name="travel_hours" {% else %} readonly {% endif %} required>
 					</div>
 					<!-- number of engineers -->
 					<div class="inline_it inline_spacing">
 						<div>
 							<label for="num_of_engineers">Number of Engineers</label>
 						</div>
-						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" {% if permit_num_of_engineers %} name="num_of_engineers" {% else %} readonly {% endif %} required>
+						<input class="form-control int_bar" id="num_of_engineers" type="text" value="{{ visit.num_of_engineers }}" oninput="PositiveIntValidation(this)" {% if permit_num_of_engineers %} name="num_of_engineers" {% else %} readonly {% endif %} required>
 					</div>
 				</div>
 
@@ -187,7 +211,7 @@
 												<input class="form-control" type="text" name="part_description" value="{{ description }}" readonly>
 											</td>
 											<td>
-												<input class="form-control" type="text" name="qty" value="{{ visit_part.qty }}" oninput="IntValueValidation(this)">
+												<input class="form-control" type="text" name="qty" value="{{ visit_part.qty }}" oninput="positiveQTYValidation(this)">
 											</td>
 											<td>
 												<div class="form-check charge_cb">	
@@ -238,6 +262,30 @@
 				<div>
 					<h1 class="inline_it">New Visit</h1>
 				</div>
+
+				{% if messages %}
+				<ul class="messages">
+				    {% for message in messages %}
+					    {% if message.tags == 'success' %}
+	                    	<div class="alert alert-success" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% elif message.tags == 'error' %}
+	                    	<div class="alert alert-danger" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% elif message.tags == 'warning' %}
+	                    	<div class="alert alert-warning" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+						{% else %}
+	                    	<div class="alert alert-info" role="alert">
+						    	<li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+							</div>
+	                	{% endif %}
+				    {% endfor %}
+				</ul>
+				{% endif %}
 
 				<hr class="solid">
 				
@@ -343,7 +391,7 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" name="travel_hours" id="travel_hours" type="text" required>
+						<input class="form-control int_bar" name="travel_hours" id="travel_hours" type="text" oninput="IntValidation(this)" required>
 						<script>
 							document.getElementById('travel_hours').value = 0;
 						</script> 
@@ -354,7 +402,7 @@
 						<div>
 							<label for="num_of_engineers">Number of Engineers</label>
 						</div>
-						<input class="form-control int_bar" name="num_of_engineers" id="num_of_engineers" type="text" required>
+						<input class="form-control int_bar" name="num_of_engineers" id="num_of_engineers" type="text" oninput="PositiveIntValidation(this)" required>
 						<script>
 							document.getElementById('num_of_engineers').value = 1;
 						</script>
@@ -389,7 +437,7 @@
 										<input class="form-control" type="text" name="part_description" readonly>
 									</td>
 									<td>
-										<input class="form-control" type="text" name="qty" oninput="IntValueValidation(this)">
+										<input class="form-control" type="text" name="qty" oninput="positiveQTYValidation(this)">
 									</td>
 									<td>
 										<div class="form-check charge_cb">

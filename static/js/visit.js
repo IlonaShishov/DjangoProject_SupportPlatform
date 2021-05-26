@@ -1,13 +1,28 @@
 function completeDesc(me, parts) {
 	var input = me.value;
+
+	// init exceptions
 	me.setCustomValidity("");
-
-
 	me.parentNode.parentNode.classList.remove("alert_row_desc");
-	if( parts[input] ) {
+
+	// count part num occurrences in table
+	occurrences = 0;
+	part_num_lst = document.getElementsByName("part_num");
+	for (var i = 0; i < part_num_lst.length; i++) {
+	  if (part_num_lst[i].value == input){ occurrences++; }
+	}
+
+
+	if ( occurrences > 1 ){
+		me.setCustomValidity("This part number has already been selected");
+		me.parentNode.parentNode.classList.add('class', 'alert_row_desc');
+	}
+
+	else if( parts[input] ) {
 		me.parentNode.nextElementSibling.firstElementChild.value = parts[input];
 		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = true;
 	}
+
 	else{
 		me.parentNode.nextElementSibling.firstElementChild.value = '';
 		me.parentNode.nextElementSibling.nextElementSibling.firstElementChild.required = false;
@@ -77,7 +92,7 @@ function addRow(tableID, parts) {
 	element4.type = "text";
 	element4.name="qty";
 	element4.setAttribute('class', 'form-control');
-	element4.oninput = function() {IntValueValidation(this);};
+	element4.oninput = function() {positiveQTYValidation(this);};
 	cell4.appendChild(element4);
 
 	// charge checkbox
@@ -154,7 +169,6 @@ function calculateTime() {
 		tot_time.value = ''
 
 	}
-
 }
 
 function listValueValidation(me) {
@@ -167,15 +181,35 @@ function listValueValidation(me) {
 	}
 }
 
-function IntValueValidation(me) {
+
+function positiveQTYValidation(me) {
 	me.parentNode.parentNode.classList.remove("alert_row_qty");
-	// if (!me.value || me.value >>> 0 === parseFloat(me.value)){
 	if (!me.value || me.value.match("^[1-9][0-9]*$")){
 		me.setCustomValidity("");
 	}
 	else{
-		me.setCustomValidity("Please enter a whole number");
+		me.setCustomValidity("Please enter a positive whole number");
 		me.parentNode.parentNode.classList.add('class', 'alert_row_qty');
 
+	}
+}
+
+
+function PositiveIntValidation(me) {
+	if (!me.value || me.value.match("^[1-9]*$")){
+		me.setCustomValidity("");
+	}
+	else{
+		me.setCustomValidity("Please enter a positive whole number");
+	}
+}
+
+
+function IntValidation(me) {
+	if (!me.value || me.value.match("^[0-9]*\\.?[0-9]*$")){
+		me.setCustomValidity("");
+	}
+	else{
+		me.setCustomValidity("Please enter a number greater or equal to zero");
 	}
 }
