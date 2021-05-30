@@ -642,12 +642,8 @@ def new_visit_view(request, id):
 			part_pn_lst = request.POST.getlist('part_num')
 			part_qty_lst = request.POST.getlist('qty')
 			part_charge_lst = request.POST.getlist('charge')
-			print(part_pn_lst)
-			print(part_qty_lst)
-			print(part_charge_lst)
 			part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
 			part_tbl = part_tbl.drop(part_tbl[part_tbl.part_pn == ''].index)
-			print(part_tbl)
 			d = {'1': True, '0': False}
 			part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
 			''' check duplicates '''
@@ -790,137 +786,197 @@ def visit_view(request, id):
 
 		if request.method == 'POST' and 'save_btn' in request.POST:
 
-			''' Update case data''' 
-			updated = False
+			try:
 
-			if permit_visit_date:
-				upd_visit_date = datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
-				if upd_visit_date != visit.visit_date:
-					visit.visit_date = upd_visit_date
-					updated = True
+				''' get updated visit data''' 
+				updated = False
 
+				''' get visit date '''
+				if permit_visit_date:
+					try:
+						upd_visit_date = datetime.strptime(request.POST.get('visit_date'),'%Y-%m-%d')
+						if upd_visit_date != visit.visit_date:
+							visit.visit_date = upd_visit_date
+							updated = True
+					except Exception as err:
+						messages.error(request, f'Visit date field error: {err}')
 
-			if permit_engineer:
-				upd_engineer = Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
-				if upd_engineer != visit.engineer:
-					visit.engineer = upd_engineer
-					updated = True
+				''' get engineer '''
+				if permit_engineer:
+					try:
+						upd_engineer = Employee.objects.get(employee_id=request.POST.get('engineer').split()[2])
+						if upd_engineer != visit.engineer:
+							visit.engineer = upd_engineer
+							updated = True
+					except Exception as err:
+						messages.error(request, 'Engineer field error: Invalid engineer')
 
-			if permit_customer_contact:
-				upd_customer_contact = request.POST.get('customer_contact')
-				if upd_customer_contact != visit.customer_contact:
-					visit.customer_contact = upd_customer_contact
-					updated = True
+				''' get customer contact '''
+				if permit_customer_contact:
+					upd_customer_contact = request.POST.get('customer_contact')
+					if upd_customer_contact != visit.customer_contact:
+						if not upd_customer_contact:
+							messages.error(request, 'Customer contact field error: Customer contact is required')
+						else:
+							visit.customer_contact = upd_customer_contact
+							updated = True
 
-			if permit_remote:
-				upd_remote = request.POST.get('remote')
-				if upd_remote == 'on':
-					upd_remote = True
-				else:
-					upd_remote = False
+				''' get remote state '''
+				if permit_remote:
+					try:
+						upd_remote = request.POST.get('remote')
+						if upd_remote == 'on':
+							upd_remote = True
+						else:
+							upd_remote = False
 
-				if upd_remote != visit.remote:
-					visit.remote = upd_remote
-					updated = True
+						if upd_remote != visit.remote:
+							visit.remote = upd_remote
+							updated = True
+					except Exception as err:
+						messages.error(request, f'Remote field error: {err}')
 
-			if permit_visit_start:
-				upd_visit_start = request.POST.get('visit_start') + ':00'
-				if upd_visit_start != visit.visit_start:
-					visit.visit_start = upd_visit_start
-					updated = True
+				''' get visit start time '''
+				if permit_visit_start:
+					upd_visit_start = request.POST.get('visit_start') + ':00'
+					if upd_visit_start != visit.visit_start:
+						if not upd_visit_start:
+							messages.error(request, 'Visit start field error: Visit start time is required')
+						elif not re.match("^([0-9]|[01][0-9]|2[0-3]):([0-9]|[0-5][0-9]):00$", upd_visit_start):
+							messages.error(request, 'Visit start field error: Visit start must be in HH:mm format')	
+						else:
+							visit.visit_start = upd_visit_start
+							updated = True
 
-			if permit_visit_end:
-				upd_visit_end = request.POST.get('visit_end') + ':00'
-				if upd_visit_end != visit.visit_end:
-					visit.visit_end = upd_visit_end
-					updated = True
+				''' get visit end time '''
+				if permit_visit_end:
+					upd_visit_end = request.POST.get('visit_end') + ':00'
+					if upd_visit_end != visit.visit_end:
+						if not upd_visit_end:
+							messages.error(request, 'Visit end field error: Visit end time is required')
+						elif not re.match("^([0-9]|[01][0-9]|2[0-3]):([0-9]|[0-5][0-9]):00$", upd_visit_end):
+							messages.error(request, 'Visit end field error: Visit end must be in HH:mm format')	
+						else:
+							visit.visit_end = upd_visit_end
+							updated = True
 
-			if permit_travel_hours:
-				upd_travel_hours = request.POST.get('travel_hours')
-				if upd_travel_hours != visit.travel_hours:
-					visit.travel_hours = upd_travel_hours
-					updated = True
+				''' get travel hours '''
+				if permit_travel_hours:
+					upd_travel_hours = request.POST.get('travel_hours')
+					if upd_travel_hours != visit.travel_hours:
+						if not upd_travel_hours:
+							messages.error(request, 'Travel hours field error: Visit travel hours are required')
+						elif not re.match("^[0-9]*\\.?[0-9]*$", upd_travel_hours):
+							messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')
+						else:
+							visit.travel_hours = upd_travel_hours
+							updated = True
 
-			if permit_num_of_engineers:
-				upd_num_of_engineers = request.POST.get('num_of_engineers')
-				if upd_num_of_engineers != visit.num_of_engineers:
-					visit.num_of_engineers = upd_num_of_engineers
-					updated = True
+				''' get number of engineers '''
+				if permit_num_of_engineers:
+					upd_num_of_engineers = request.POST.get('num_of_engineers')
+					if upd_num_of_engineers != visit.num_of_engineers:
+						if not upd_num_of_engineers:
+							messages.error(request, 'Number of engineers field error: Visit number of engineers is required')
+						elif not re.match("^[1-9]*$", upd_num_of_engineers):
+							messages.error(request, 'Number of engineers field error: Visit number of engineers must be a positive whole number')
+						else:
+							visit.num_of_engineers = upd_num_of_engineers
+							updated = True
 
-			if permit_visit_summary:
-				upd_visit_summary = request.POST.get('visit_summary')
-				if upd_visit_summary != visit.visit_summary:
-					visit.visit_summary = upd_visit_summary
-					updated = True
+				''' get visit summary '''
+				if permit_visit_summary:
+					upd_visit_summary = request.POST.get('visit_summary')
+					if upd_visit_summary != visit.visit_summary:
+						if not upd_visit_summary:
+							messages.error(request, 'Visit summary field error: Visit summary is required')
+						else:
+							visit.visit_summary = upd_visit_summary
+							updated = True
 
-			if updated:
-				visit.save()
-
-
-
-			''' Update parts data''' 
-			if permit_parts_delete or permit_parts_add:
+				''' get updated parts data'''
 				part_pn_lst = request.POST.getlist('part_num')
-				part_description_lst = request.POST.getlist('part_description')		
 				part_qty_lst = request.POST.getlist('qty')
 				part_charge_lst = request.POST.getlist('charge')
-				print(part_pn_lst)
-				print(part_description_lst)
-				print(part_qty_lst)
-				print(part_charge_lst)
-				part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_description':part_description_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
+				part_tbl = pd.DataFrame({'part_pn':part_pn_lst, 'part_qty':part_qty_lst, 'part_charge':part_charge_lst})
 				d = {'1': True, '0': False}
 				part_tbl['part_charge'] = part_tbl['part_charge'].map(d)
+				''' check duplicates '''
+				dup_tbl = part_tbl[part_tbl['part_pn'].duplicated()]
+				if len(dup_tbl) > 0:
+					messages.error(request, f"Parts used field error: Detected more than one instance for part/s {','.join(list(set(dup_tbl['part_pn'].tolist())))}")
+				''' check pn validity '''
+				if not all(Parts.objects.filter(part_pn=pn).exists() for pn in part_tbl['part_pn'].tolist()):
+					messages.error(request, 'Parts used field error: Parts used list contains parts not found in database')
+				''' check qty validity '''
+				if not all(re.match("^[1-9]+$", qty) for qty in part_tbl['part_qty'].tolist()):
+					messages.error(request, 'Parts used field error: Parts used list contains invalid quantity inputs, please enter positive whole numbers only')
+
+
+				''' check for existing validation errors '''
+				message_list = messages.get_messages(request)
+				if message_list:
+					return redirect('ASISupport_app:view_visit', id=id)
+
+
+				''' save updated visit data '''
+				if updated:
+					visit.save()
+
+				''' save updated parts data ''' 
+				if permit_parts_delete or permit_parts_add:
+
+					''' delete parts from visit '''
+					if permit_parts_delete:
+						for vp in visit_parts_lst:
+							if part_tbl.loc[(part_tbl['part_pn'] == vp.part_pn) & (part_tbl['part_qty'] == vp.qty) & (part_tbl['part_charge'] == vp.charge)].empty:
+								VisitParts.objects.get(visit_num=Visit.objects.get(visit_num=vp.visit_num), part_pn=Parts.objects.get(part_pn=vp.part_pn)).delete()
+
+
+					''' add parts to visit '''
+					if permit_parts_add:
+						for index, row in part_tbl.iterrows():
+							if Parts.objects.filter(part_pn=row['part_pn']).exists() and not visit_parts_lst.filter(part_pn=row['part_pn'], qty=row['part_qty'], charge=row['part_charge']).exists():
+								part_data = VisitParts(visit_num=Visit.objects.get(visit_num=visit.visit_num),
+													part_pn=Parts.objects.get(part_pn=row['part_pn']),
+													qty=row['part_qty'],
+													charge=row['part_charge']
+													)
+								part_data.save()
 
 
 
-				''' delete parts from visit '''
-				if permit_parts_delete:
-					for vp in visit_parts_lst:
-						if part_tbl.loc[(part_tbl['part_pn'] == vp.part_pn) & (part_tbl['part_qty'] == vp.qty) & (part_tbl['part_charge'] == vp.charge)].empty:
-							VisitParts.objects.get(visit_num=Visit.objects.get(visit_num=vp.visit_num), part_pn=Parts.objects.get(part_pn=vp.part_pn)).delete()
-							print(f'deleted {vp.part_pn}')
+					''' refresh part data collection '''
+					visit_parts_lst = VisitParts.objects.filter(visit_num=id)
+					visit_part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
+					parts_in_visit = Parts.objects.filter(part_pn__in=visit_part_pn_lst)
+					part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts_in_visit}
 
 
-				''' add parts to visit '''
-				if permit_parts_add:
-					for index, row in part_tbl.iterrows():
-						if Parts.objects.filter(part_pn=row['part_pn']).exists() and not visit_parts_lst.filter(part_pn=row['part_pn'], qty=row['part_qty'], charge=row['part_charge']).exists():
-							part_data = VisitParts(visit_num=Visit.objects.get(visit_num=visit.visit_num),
-												part_pn=Parts.objects.get(part_pn=row['part_pn']),
-												qty=row['part_qty'],
-												charge=row['part_charge']
-												)
-							part_data.save()
+				''' restrict permits '''
+				permit_edit = ('Manager' in groups) or ('Support' in groups)
+				edit = False
+				permit_visit_date = False
+				permit_engineer = False
+				permit_customer_contact = False
+				permit_remote = False
+				permit_visit_start = False
+				permit_visit_end = False
+				permit_travel_hours = False
+				permit_num_of_engineers = False
+				permit_visit_summary = False
+				permit_parts_add = False
+				permit_parts_delete = False
+
+				''' refresh visit data collection '''
+				visit = Visit.objects.get(visit_num=id)
+				visit.sum_visit_hours()
 
 
-
-				''' refresh part data collection '''
-				visit_parts_lst = VisitParts.objects.filter(visit_num=id)
-				visit_part_pn_lst = [vp.part_pn for vp in visit_parts_lst]
-				parts_in_visit = Parts.objects.filter(part_pn__in=visit_part_pn_lst)
-				part_description_dict = {VisitParts.objects.get(visit_num=id, part_pn=part.part_pn):part.part_description for part in parts_in_visit}
-
-
-			''' restrict permits '''
-			permit_edit = ('Manager' in groups) or ('Support' in groups)
-			edit = False
-			permit_visit_date = False
-			permit_engineer = False
-			permit_customer_contact = False
-			permit_remote = False
-			permit_visit_start = False
-			permit_visit_end = False
-			permit_travel_hours = False
-			permit_num_of_engineers = False
-			permit_visit_summary = False
-			permit_parts_add = False
-			permit_parts_delete = False
-
-			''' refresh visit data collection '''
-			visit = Visit.objects.get(visit_num=id)
-			visit.sum_visit_hours()
-
+			except Exception as err:
+				''' display errors '''
+				messages.error(request, err)
+				return redirect('ASISupport_app:view_visit', id=id)
 
 
 	return render(request, 'ASISupport_app/visit.html', locals())
