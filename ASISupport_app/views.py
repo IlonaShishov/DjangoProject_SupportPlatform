@@ -618,11 +618,14 @@ def new_visit_view(request, id):
 				messages.error(request, 'Visit end field error: Visit end must be in HH:mm format')	
 
 			''' get travel hours '''
-			req_travel_hours 		= request.POST.get('travel_hours')
-			if not req_travel_hours:
-				messages.error(request, 'Travel hours field error: Visit travel hours are required')
-			if not re.match("^[0-9]*\\.?[0-9]*$", req_travel_hours):
-				messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')	
+			if not req_remote:
+				req_travel_hours 		= request.POST.get('travel_hours')
+				if not req_travel_hours:
+					messages.error(request, 'Travel hours field error: Visit travel hours are required')
+				if not re.match("^[0-9]*\\.?[0-9]*$", req_travel_hours):
+					messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')	
+			else:
+				req_travel_hours = 0
 
 
 			''' get number of engineers '''
@@ -861,16 +864,19 @@ def visit_view(request, id):
 							updated = True
 
 				''' get travel hours '''
-				if permit_travel_hours:
-					upd_travel_hours = request.POST.get('travel_hours')
-					if upd_travel_hours != visit.travel_hours:
-						if not upd_travel_hours:
-							messages.error(request, 'Travel hours field error: Visit travel hours are required')
-						elif not re.match("^[0-9]*\\.?[0-9]*$", upd_travel_hours):
-							messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')
-						else:
-							visit.travel_hours = upd_travel_hours
-							updated = True
+				if not visit.remote:
+					if permit_travel_hours:
+						upd_travel_hours = request.POST.get('travel_hours')
+						if upd_travel_hours != visit.travel_hours:
+							if not upd_travel_hours:
+								messages.error(request, 'Travel hours field error: Visit travel hours are required')
+							elif not re.match("^[0-9]*\\.?[0-9]*$", upd_travel_hours):
+								messages.error(request, 'Travel hours field error: Visit travel hours must be a number greater or equal to zero')
+							else:
+								visit.travel_hours = upd_travel_hours
+								updated = True
+				else:
+					visit.travel_hours = 0
 
 				''' get number of engineers '''
 				if permit_num_of_engineers:

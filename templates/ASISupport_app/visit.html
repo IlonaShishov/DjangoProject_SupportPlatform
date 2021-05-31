@@ -116,7 +116,7 @@
 
 				<!-- remote check box -->
 				<div class="inline_it inline_spacing remote_cb">
-					<input type="checkbox" id="remote" {% if visit.remote %} checked {% endif %} {% if permit_remote %} name="remote" {% else %} disabled {% endif %}>
+					<input type="checkbox" id="remote" onclick="toggleTravelHours(this)" {% if visit.remote %} checked {% endif %} {% if permit_remote %} name="remote" {% else %} disabled {% endif %}>
 					<label for="remote">Remote</label>
 				</div>
 
@@ -153,8 +153,9 @@
 						<div>
 							<label for="travel_hours">Travel Hours</label>
 						</div>
-						<input class="form-control int_bar" id="travel_hours" type="text" value="{{ visit.travel_hours|floatformat:2 }}"  oninput="IntValidation(this)" {% if permit_travel_hours %} name="travel_hours" {% else %} readonly {% endif %} required>
+						<input class="form-control int_bar" id="travel_hours" type="text" {% if permit_travel_hours %} name="travel_hours" {% else %} readonly {% endif %} {% if visit.remote %} readonly value="0" {% else %} value="{{ visit.travel_hours|floatformat:2 }}" {% endif %} oninput="IntValidation(this)" required>
 					</div>
+
 					<!-- number of engineers -->
 					<div class="inline_it inline_spacing">
 						<div>
@@ -352,7 +353,7 @@
 
 				<!-- remote check box -->
 				<div class="inline_it inline_spacing remote_cb">
-					<input type="checkbox" name="remote">
+					<input type="checkbox" name="remote" onclick="toggleTravelHours(this)">
 					<label for="remote">Remote</label>
 				</div>
 

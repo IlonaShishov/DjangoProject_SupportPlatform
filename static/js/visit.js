@@ -213,3 +213,15 @@ function IntValidation(me) {
 		me.setCustomValidity("Please enter a number greater or equal to zero");
 	}
 }
+
+function toggleTravelHours(me) {
+	var travel_hours_element = document.getElementById('travel_hours');
+
+	if(me.checked){
+		travel_hours_element.setAttribute("readonly", true);
+		travel_hours_element.value = 0;
+	}
+	else{
+		travel_hours_element.removeAttribute('readonly');
+	}
+}
