@@ -57,3 +57,8 @@ small{
 .panel-body{
 	width: 1060px;
 }
+
+.no_data{
+	padding-top: 40px;
+	color: red;
+}

@@ -84,6 +84,7 @@ def new_case_view(request):
 			''' init case number '''
 			cases = Case.objects.all()
 			case_num_lst = [int(case.case_num[1:]) for case in cases]
+			case_num_lst.append(0)
 			max_case_num = max(case_num_lst)
 			req_case_num 			= 'C'+str(max_case_num+1).zfill(6)
 
@@ -566,6 +567,7 @@ def new_visit_view(request, id):
 			''' init visit number '''
 			visits = Visit.objects.all()
 			visit_num_lst = [int(visit.visit_num[1:]) for visit in visits]
+			visit_num_lst.append(0)
 			max_visit_num = max(visit_num_lst)
 			req_visit_num 			= 'V'+str(max_visit_num+1).zfill(6)
 

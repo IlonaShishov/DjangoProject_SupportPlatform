@@ -7,7 +7,6 @@
 	<script src="{% static 'js/report.js' %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/report.css' %}">
 
-	<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">    -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
 	<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
@@ -140,6 +139,14 @@
 
 							{% if case_report_case or case_report_from_date or case_report_to_date or case_report_type or case_report_status or case_report_case_manager or case_report_customer or case_report_machine_down %}
 								<button class="btn btn-default" type="submit" name="case_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+
+								{% if not cases %}
+									<h4 class="no_data">No data to retrieve</h4>
+									<script>
+										$( "#case_report" ).addClass( "in" );
+									</script>
+								{% endif %}
+
 							{% endif %}
 
 						</div>
@@ -270,6 +277,14 @@
 
 							{% if visit_report_visit or visit_report_from_date or visit_report_to_date or visit_report_engineer or visit_report_customer or visit_report_remote or visit_report_case %}
 								<button class="btn btn-default" type="submit" name="visit_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+
+								{% if not visits %}
+									<h4 class="no_data">No data to retrieve</h4>
+									<script>
+										$( "#visit_report" ).addClass( "in" );
+									</script>
+								{% endif %}
+
 							{% endif %}
 
 						</div>
@@ -372,6 +387,14 @@
 
 							{% if equip_report_sn or equip_report_pn or equip_report_description or equip_report_case or equip_report_customer %}
 								<button class="btn btn-default" type="submit" name="Equipment_report_clear_btn" id="clear_btn"><small>(clear)</small></button>
+
+								{% if not case_equip_lst %}
+									<h4 class="no_data">No data to retrieve</h4>
+									<script>
+										$( "#Equipment_report" ).addClass( "in" );
+									</script>
+								{% endif %}
+								
 							{% endif %}
 
 						</div>
